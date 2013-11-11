@@ -1299,7 +1299,6 @@ static void __init tegra_ardbeg_late_init(void)
 	else
 		platform_device_register(&ardbeg_audio_device_rt5639);
 
-	//tegra_ram_console_debug_init();
 	tegra_io_dpd_init();
 	ardbeg_sdhci_init();
 	if (board_info.board_id == BOARD_PM359 ||
@@ -1375,7 +1374,7 @@ static void __init tegra_ardbeg_late_init(void)
 
 static void __init ardbeg_ramconsole_reserve(unsigned long size)
 {
-	tegra_ram_console_debug_reserve(SZ_1M);
+	tegra_reserve_ramoops_memory(SZ_1M);
 }
 
 static void __init tegra_ardbeg_init_early(void)
