@@ -250,7 +250,6 @@ void tegra_dvfs_rail_pause(struct dvfs_rail *rail, ktime_t delta, bool on);
 int tegra_dvfs_rail_set_mode(struct dvfs_rail *rail, unsigned int mode);
 struct dvfs_rail *tegra_dvfs_get_rail_by_name(const char *reg_id);
 
-int tegra_dvfs_predict_millivolts(struct clk *c, unsigned long rate);
 int tegra_dvfs_predict_peak_millivolts(struct clk *c, unsigned long rate);
 const int *tegra_dvfs_get_millivolts_pll(struct dvfs *d);
 
