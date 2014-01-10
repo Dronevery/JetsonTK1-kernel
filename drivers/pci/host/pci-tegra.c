@@ -296,7 +296,6 @@ static struct resource pcie_mem_space;
 static struct resource pcie_prefetch_mem_space;
 
 /* this flag enables features required either after boot or resume */
-/* also required to enable msi from host both after boot and resume */
 static bool resume_path;
 /* used to avoid successive hotplug disconnect or connect */
 static bool hotplug_event;
@@ -1870,6 +1869,8 @@ static int tegra_pcie_suspend_noirq(struct device *dev)
 	return tegra_pcie_power_off();
 }
 
+static bool tegra_pcie_enable_msi(bool);
+
 static int tegra_pcie_resume_noirq(struct device *dev)
 {
 	int ret = 0;
@@ -1895,6 +1896,8 @@ static int tegra_pcie_resume_noirq(struct device *dev)
 	tegra_pcie_enable_pads(true);
 	tegra_pcie_enable_controller();
 	tegra_pcie_setup_translations();
+	/* Set up MSI registers, if MSI have been enabled */
+	tegra_pcie_enable_msi(true);
 
 	tegra_pcie_check_ports();
 	if (!tegra_pcie.num_ports) {
@@ -2061,37 +2064,38 @@ static irqreturn_t tegra_pcie_msi_isr(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-static bool tegra_pcie_enable_msi(void)
+static bool tegra_pcie_enable_msi(bool no_init)
 {
-	bool retval = false;
 	u32 reg;
-	u32 msi_base = 0;
-	u32 msi_aligned = 0;
+	static u32 msi_base;
 
 	PR_FUNC_LINE;
-	/* this only happens once. */
-	if (resume_path) {
-		retval = true;
-		goto exit;
-	}
-	msi_map_init();
+	if (!msi_base) {
+		/* if not already initialized and no_init, nothing to do */
+		if (no_init)
+			return true;
 
-	/* enables MSI interrupts.  */
-	if (request_irq(INT_PCIE_MSI, tegra_pcie_msi_isr,
-		IRQF_SHARED, "PCIe-MSI",
-		tegra_pcie_msi_isr)) {
+		msi_map_init();
+
+		/* enables MSI interrupts.  */
+		if (request_irq(INT_PCIE_MSI, tegra_pcie_msi_isr,
+			IRQF_SHARED, "PCIe-MSI", tegra_pcie_msi_isr)) {
 			pr_err("%s: Cannot register IRQ %u\n",
-				__func__, INT_PCIE_MSI);
-			goto exit;
+					__func__, INT_PCIE_MSI);
+			return false;
+		}
+		/* setup AFI/FPCI range */
+		/* FIXME do this better! should be based on PAGE_SIZE */
+		msi_base = __get_free_pages(GFP_KERNEL, 3);
+		if (!msi_base) {
+			pr_err("PCIE: Insufficient memory\n");
+			return false;
+		}
+		msi_base = virt_to_phys((void *)msi_base);
 	}
-	/* setup AFI/FPCI range */
-	/* FIXME do this better! should be based on PAGE_SIZE */
-	msi_base = __get_free_pages(GFP_KERNEL, 3);
-	msi_aligned = ((msi_base + ((1<<12) - 1)) & ~((1<<12) - 1));
-	msi_aligned = virt_to_phys((void *)msi_aligned);
 
-	afi_writel(msi_aligned>>8, AFI_MSI_FPCI_BAR_ST);
-	afi_writel(msi_aligned, AFI_MSI_AXI_BAR_ST);
+	afi_writel(msi_base>>8, AFI_MSI_FPCI_BAR_ST);
+	afi_writel(msi_base, AFI_MSI_AXI_BAR_ST);
 	/* this register is in 4K increments */
 	afi_writel(1, AFI_MSI_BAR_SZ);
 
@@ -2112,14 +2116,7 @@ static bool tegra_pcie_enable_msi(void)
 
 	set_irq_flags(INT_PCIE_MSI, IRQF_VALID);
 
-	resume_path = true;
-	retval = true;
-exit:
-	if (!retval) {
-		if (msi_base)
-			free_pages(msi_base, 3);
-	}
-	return retval;
+	return true;
 }
 
 
@@ -2131,7 +2128,7 @@ int arch_setup_msi_irq(struct pci_dev *pdev, struct msi_desc *desc)
 	struct msi_map_entry *map_entry = NULL;
 
 	PR_FUNC_LINE;
-	if (!tegra_pcie_enable_msi())
+	if (!tegra_pcie_enable_msi(false))
 		goto exit;
 
 	map_entry = msi_map_get();
