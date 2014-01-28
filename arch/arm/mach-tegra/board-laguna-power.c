@@ -1,7 +1,7 @@
 /*
  * arch/arm/mach-tegra/board-laguna-power.c
  *
- * Copyright (c) 2013 NVIDIA Corporation. All rights reserved.
+ * Copyright (c) 2013-2014 NVIDIA Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -476,12 +476,12 @@ static struct regulator_consumer_supply fixed_reg_usb0_usb1_vbus_pm359_supply[] 
 	REGULATOR_SUPPLY("usb_vbus", "tegra-ehci.0"),
 	REGULATOR_SUPPLY("usb_vbus", "tegra-otg"),
 	REGULATOR_SUPPLY("usb_vbus0", "tegra-xhci"),
-	REGULATOR_SUPPLY("usb_vbus", "tegra-ehci.1"),
-	REGULATOR_SUPPLY("usb_vbus1", "tegra-xhci"),
 };
 
 /* EN_USB1_USB2_VBUS From TEGRA GPIO PN5 */
 static struct regulator_consumer_supply fixed_reg_usb2_vbus_pm359_supply[] = {
+	REGULATOR_SUPPLY("usb_vbus", "tegra-ehci.1"),
+	REGULATOR_SUPPLY("usb_vbus1", "tegra-xhci"),
 	REGULATOR_SUPPLY("usb_vbus", "tegra-ehci.2"),
 	REGULATOR_SUPPLY("usb_vbus2", "tegra-xhci"),
 };
