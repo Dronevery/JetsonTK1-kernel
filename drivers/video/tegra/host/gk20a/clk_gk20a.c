@@ -3,7 +3,7 @@
  *
  * GK20A Clocks
  *
- * Copyright (c) 2011-2013, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -807,6 +807,7 @@ static int monitor_get(void *data, u64 *val)
 	u32 clkin = clk->gpc_pll.clk_in;
 	u32 count1, count2;
 
+	gk20a_busy(g->dev);
 	gk20a_writel(g, trim_gpc_clk_cntr_ncgpcclk_cfg_r(0),
 		     trim_gpc_clk_cntr_ncgpcclk_cfg_reset_asserted_f());
 	gk20a_writel(g, trim_gpc_clk_cntr_ncgpcclk_cfg_r(0),
@@ -824,6 +825,7 @@ static int monitor_get(void *data, u64 *val)
 	udelay(100);
 	count2 = gk20a_readl(g, trim_gpc_clk_cntr_ncgpcclk_cnt_r(0));
 	*val = (u64)(trim_gpc_clk_cntr_ncgpcclk_cnt_value_v(count2) * clkin / ncycle);
+	gk20a_idle(g->dev);
 
 	if (count1 != count2)
 		return -EBUSY;
