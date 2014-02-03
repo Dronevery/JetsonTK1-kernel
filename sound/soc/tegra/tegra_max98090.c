@@ -98,6 +98,7 @@ struct tegra_max98090 {
 	struct ahub_bbc1_config ahub_bbc1_info;
 	struct regulator *avdd_aud_reg;
 	struct regulator *vdd_sw_1v8_reg;
+	struct regulator *spkvdd_5v0;
 	enum snd_soc_bias_level bias_level;
 	struct snd_soc_card *pcard;
 #ifdef CONFIG_SWITCH
@@ -1023,7 +1024,8 @@ static int tegra_max98090_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	if (gpio_is_valid(pdata->gpio_hp_det) &&
-		of_machine_is_compatible("nvidia,norrin")) {
+		(of_machine_is_compatible("nvidia,norrin") ||
+		(of_machine_is_compatible("nvidia,laguna")))) {
 		tegra_max98090_hp_jack_gpio.gpio = pdata->gpio_hp_det;
 		tegra_max98090_hp_jack_gpio.invert =
 			!pdata->gpio_hp_det_active_high;
@@ -1125,6 +1127,8 @@ static int tegra_max98090_suspend_post(struct snd_soc_card *card)
 			regulator_disable(machine->avdd_aud_reg);
 		if (machine->vdd_sw_1v8_reg)
 			regulator_disable(machine->vdd_sw_1v8_reg);
+		if (machine->spkvdd_5v0)
+			regulator_disable(machine->spkvdd_5v0);
 	}
 
 	return 0;
@@ -1204,6 +1208,10 @@ static int tegra_late_probe(struct snd_soc_card *card)
 				card->rtd[DAI_LINK_HIFI_MAX97236].codec;
 	int ret;
 
+	if (of_machine_is_compatible("nvidia,laguna")) {
+		return 0;
+	}
+
 	ret = snd_soc_jack_new(codec236,
 			"Headphone Jack",
 			SND_JACK_HEADSET | SND_JACK_LINEOUT | 0x7E00,
@@ -1255,6 +1263,11 @@ static __devinit int tegra_max98090_driver_probe(struct platform_device *pdev)
 	struct tegra_asoc_platform_data *pdata;
 	int ret, i;
 
+	if (of_machine_is_compatible("nvidia,laguna")) {
+		card->num_links = 1;
+		card->dai_link[DAI_LINK_HIFI].codec_name = "max98090.7-0010";
+	}
+
 	pdata = pdev->dev.platform_data;
 	if (!pdata) {
 		dev_err(&pdev->dev, "No platform data supplied\n");
@@ -1294,6 +1307,14 @@ static __devinit int tegra_max98090_driver_probe(struct platform_device *pdev)
 		machine->vdd_sw_1v8_reg = 0;
 	}
 
+	machine->spkvdd_5v0 = regulator_get(&pdev->dev, "spkvdd");
+	if (IS_ERR(machine->spkvdd_5v0)) {
+		dev_info(&pdev->dev, "spkvdd_5v0 regulator not found\n");
+		machine->spkvdd_5v0 = 0;
+	}
+
+	if (machine->spkvdd_5v0)
+		ret = regulator_enable(machine->spkvdd_5v0);
 	if (machine->vdd_sw_1v8_reg)
 		ret = regulator_enable(machine->vdd_sw_1v8_reg);
 	if (machine->avdd_aud_reg)
@@ -1419,6 +1440,9 @@ static int __devexit tegra_max98090_driver_remove(struct platform_device *pdev)
 
 	if (machine->vdd_sw_1v8_reg)
 		regulator_put(machine->vdd_sw_1v8_reg);
+
+	if (machine->spkvdd_5v0)
+		regulator_put(machine->spkvdd_5v0);
 
 	snd_soc_unregister_card(card);
 
