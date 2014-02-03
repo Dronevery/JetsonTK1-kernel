@@ -64,6 +64,7 @@
 #include <linux/platform_data/tegra_usb_modem_power.h>
 #include <linux/platform_data/tegra_ahci.h>
 #include <linux/irqchip/tegra.h>
+#include <linux/i2c/pca954x.h>
 
 #include <mach/irqs.h>
 #include <mach/pinmux.h>
@@ -185,8 +186,47 @@ static __initdata struct tegra_clk_init_table ardbeg_clk_init_table[] = {
 	{ NULL,		NULL,		0,		0},
 };
 
+static struct pca954x_platform_mode ardbeg_pca954x_modes[] = {
+	{ .adap_id = PCA954x_I2C_BUS0, .deselect_on_exit = true, },
+	{ .adap_id = PCA954x_I2C_BUS1, .deselect_on_exit = true, },
+	{ .adap_id = PCA954x_I2C_BUS2, .deselect_on_exit = true, },
+	{ .adap_id = PCA954x_I2C_BUS3, .deselect_on_exit = true, },
+};
+
+static struct pca954x_platform_data ardbeg_pca954x_data = {
+	.modes    = ardbeg_pca954x_modes,
+	.num_modes      = ARRAY_SIZE(ardbeg_pca954x_modes),
+};
+
+static const struct i2c_board_info laguna_erss_i2c1_board_info[] = {
+	{
+		I2C_BOARD_INFO("pca9546", 0x70),
+		.platform_data = &ardbeg_pca954x_data,
+	},
+};
+
 static struct i2c_hid_platform_data i2c_keyboard_pdata = {
 	.hid_descriptor_address = 0x0,
+};
+
+/* addresses on i2c1_0 max98090 */
+enum {
+	LAGUNA_ERSS_MAX_I2C_1_0_ADDR_10,
+};
+
+/* addresses on i2c1_1 max98090 */
+enum {
+	LAGUNA_ERSS_MAX_I2C_1_1_ADDR_10,
+};
+
+/* addresses on i2c1_2 max98090 */
+enum {
+	LAGUNA_ERSS_MAX_I2C_1_2_ADDR_10,
+};
+
+/* addresses on i2c1_3 max98090 */
+enum {
+	LAGUNA_ERSS_MAX_I2C_1_3_ADDR_10,
 };
 
 static struct i2c_board_info __initdata i2c_keyboard_board_info = {
@@ -219,6 +259,10 @@ static void ardbeg_i2c_init(void)
 		i2c_touchpad_board_info.irq = gpio_to_irq(I2C_TP_IRQ);
 		i2c_register_board_info(1, &i2c_touchpad_board_info , 1);
 	}
+
+	if (board_info.board_id == BOARD_PM359)
+		i2c_register_board_info(0, laguna_erss_i2c1_board_info,
+				ARRAY_SIZE(laguna_erss_i2c1_board_info));
 }
 
 #ifndef CONFIG_USE_OF
@@ -286,6 +330,7 @@ static void ardbeg_audio_init(void)
 {
 	struct board_info board_info;
 	tegra_get_board_info(&board_info);
+
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
 			board_info.board_id == BOARD_PM370 ||
