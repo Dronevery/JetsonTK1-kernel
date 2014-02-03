@@ -1219,6 +1219,9 @@ static void __init tegra_ardbeg_late_init(void)
 	case BOARD_PM358:
 		laguna_pm358_pmon_init();
 		break;
+	case BOARD_PM359:
+		; /* powermon not present in Laguna ERS-S */
+		break;
 	case BOARD_P1761:
 		tn8_p1761_pmon_init();
 		break;
