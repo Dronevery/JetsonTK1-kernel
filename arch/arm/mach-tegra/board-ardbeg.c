@@ -60,6 +60,7 @@
 #include <linux/irqchip/tegra.h>
 #include <linux/pci-tegra.h>
 #include <linux/tegra-soc.h>
+#include <sound/max98090.h>
 #include <linux/tegra_fiq_debugger.h>
 #include <linux/platform_data/tegra_usb_modem_power.h>
 #include <linux/platform_data/tegra_ahci.h>
@@ -229,6 +230,55 @@ enum {
 	LAGUNA_ERSS_MAX_I2C_1_3_ADDR_10,
 };
 
+static struct max98090_pdata laguna_max98090_pdata = {
+	/* Microphone Configuration */
+	.digmic_left_mode = 1,
+	.digmic_right_mode = 1,
+};
+
+static struct i2c_board_info laguna_i2c1_0_max98090_board_info[] = {
+	[LAGUNA_ERSS_MAX_I2C_1_0_ADDR_10] = {
+		I2C_BOARD_INFO("max98090", 0x10),
+		.platform_data  = &laguna_max98090_pdata,
+	},
+};
+static struct i2c_board_info laguna_i2c1_1_max98090_board_info[] = {
+	[LAGUNA_ERSS_MAX_I2C_1_1_ADDR_10] = {
+		I2C_BOARD_INFO("max98090", 0x10),
+		.platform_data  = &laguna_max98090_pdata,
+	},
+};
+static struct i2c_board_info laguna_i2c1_2_max98090_board_info[] = {
+	[LAGUNA_ERSS_MAX_I2C_1_2_ADDR_10] = {
+		I2C_BOARD_INFO("max98090", 0x10),
+		.platform_data  = &laguna_max98090_pdata,
+	},
+};
+static struct i2c_board_info laguna_i2c1_3_max98090_board_info[] = {
+	[LAGUNA_ERSS_MAX_I2C_1_3_ADDR_10] = {
+		I2C_BOARD_INFO("max98090", 0x10),
+		.platform_data  = &laguna_max98090_pdata,
+	},
+};
+
+static void laguna_register_max98090(void)
+{
+	laguna_max98090_pdata.irq = gpio_to_irq(TEGRA_GPIO_PH4);
+
+	i2c_register_board_info(PCA954x_I2C_BUS0,
+			laguna_i2c1_0_max98090_board_info,
+			ARRAY_SIZE(laguna_i2c1_0_max98090_board_info));
+	i2c_register_board_info(PCA954x_I2C_BUS1,
+			laguna_i2c1_1_max98090_board_info,
+			ARRAY_SIZE(laguna_i2c1_1_max98090_board_info));
+	i2c_register_board_info(PCA954x_I2C_BUS2,
+			laguna_i2c1_2_max98090_board_info,
+			ARRAY_SIZE(laguna_i2c1_2_max98090_board_info));
+	i2c_register_board_info(PCA954x_I2C_BUS3,
+			laguna_i2c1_3_max98090_board_info,
+			ARRAY_SIZE(laguna_i2c1_3_max98090_board_info));
+}
+
 static struct i2c_board_info __initdata i2c_keyboard_board_info = {
 	I2C_BOARD_INFO("hid", 0x3B),
 	.platform_data  = &i2c_keyboard_pdata,
@@ -327,10 +377,28 @@ static struct tegra_asoc_platform_data ardbeg_audio_pdata_rt5639 = {
 	},
 };
 
+static struct tegra_asoc_platform_data laguna_audio_pdata_max98090 = {
+	.gpio_hp_det = TEGRA_GPIO_HP_DET,
+	.gpio_hp_mute = -1,
+	.edp_support            = true,
+	.edp_states             = {1080, 842, 0},
+	.i2s_param[HIFI_CODEC]  = {
+		.audio_port_id  = 1,
+		.is_i2s_master  = 1,
+		.i2s_mode       = TEGRA_DAIFMT_DSP_A,
+		.sample_size    = 16,
+		.channels       = 2,
+		.bit_clk        = 1536000,
+	},
+};
+
 static void ardbeg_audio_init(void)
 {
 	struct board_info board_info;
 	tegra_get_board_info(&board_info);
+
+	if (board_info.board_id == BOARD_PM359)
+		laguna_register_max98090();
 
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
@@ -361,6 +429,9 @@ static void ardbeg_audio_init(void)
 
 	ardbeg_audio_pdata_rt5639.codec_name = "rt5639.0-001c";
 	ardbeg_audio_pdata_rt5639.codec_dai_name = "rt5639-aif1";
+
+	laguna_audio_pdata_max98090.codec_name = "max98090.7-0010";
+	laguna_audio_pdata_max98090.codec_dai_name = "HiFi";
 }
 
 static struct platform_device ardbeg_audio_device_rt5639 = {
@@ -368,6 +439,14 @@ static struct platform_device ardbeg_audio_device_rt5639 = {
 	.id = 0,
 	.dev = {
 		.platform_data = &ardbeg_audio_pdata_rt5639,
+	},
+};
+
+static struct platform_device laguna_audio_device_max98090 = {
+	.name = "tegra-snd-max98090",
+	.id = 0,
+	.dev = {
+		.platform_data = &laguna_audio_pdata_max98090,
 	},
 };
 
@@ -1186,7 +1265,9 @@ static void __init tegra_ardbeg_late_init(void)
 	ardbeg_audio_init();
 	platform_add_devices(ardbeg_devices, ARRAY_SIZE(ardbeg_devices));
 
-	if (board_info.board_id != BOARD_PM359)
+	if (board_info.board_id == BOARD_PM359) /* Laguna ERS-S */
+		platform_device_register(&laguna_audio_device_max98090);
+	else
 		platform_device_register(&ardbeg_audio_device_rt5639);
 
 	//tegra_ram_console_debug_init();

@@ -530,6 +530,7 @@ static struct regulator_consumer_supply fixed_reg_3v3_supply[] = {
 	REGULATOR_SUPPLY("vdd_sys_cam_3v3", NULL),
 	REGULATOR_SUPPLY("micvdd", "tegra-snd-rt5645.0"),
 	REGULATOR_SUPPLY("micvdd", "tegra-snd-rt5639.0"),
+	REGULATOR_SUPPLY("spkvdd", "tegra-snd-max98090.0"),
 	REGULATOR_SUPPLY("vdd_gps_3v3", NULL),
 	REGULATOR_SUPPLY("vdd_nfc_3v3", NULL),
 	REGULATOR_SUPPLY("vdd_3v3_sensor", NULL),
@@ -562,6 +563,7 @@ static struct regulator_consumer_supply fixed_reg_dcdc_1v8_supply[] = {
 	REGULATOR_SUPPLY("dbvdd", "tegra-snd-rt5639.0"),
 	REGULATOR_SUPPLY("dmicvdd", "tegra-snd-rt5639.0"),
 	REGULATOR_SUPPLY("dmicvdd", "tegra-snd-rt5645.0"),
+	REGULATOR_SUPPLY("vdd_aud_dgtl", "tegra-snd-max98090.0"),
 	REGULATOR_SUPPLY("vdd_1v8b_nfc", NULL),
 	REGULATOR_SUPPLY("vdd_1v8_sensor", NULL),
 	REGULATOR_SUPPLY("vdd_1v8_sdmmc", NULL),
@@ -584,6 +586,7 @@ static struct regulator_consumer_supply fixed_reg_dcdc_1v8_supply[] = {
 /* gated by TCA6416 GPIO EXP GPIO0 */
 static struct regulator_consumer_supply fixed_reg_dcdc_1v2_supply[] = {
 	REGULATOR_SUPPLY("vdd_1v2_en", NULL),
+	REGULATOR_SUPPLY("avdd_aud", "tegra-snd-max98090.0"),
 };
 
 /* AMS GPIO2 */
