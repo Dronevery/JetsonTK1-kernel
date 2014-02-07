@@ -1761,7 +1761,9 @@ static void tegra_pcie_enable_features(void)
 		pr_info("PCIE: No Link speed change happened\n");
 
 	tegra_pcie_pll_pdn();
+#if !defined(CONFIG_ARCH_TEGRA_12x_SOC)
 	tegra_pcie_enable_aspm();
+#endif
 	tegra_pcie_apply_sw_war(0, true);
 }
 
