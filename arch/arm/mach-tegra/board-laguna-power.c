@@ -155,6 +155,9 @@ static struct regulator_consumer_supply as3722_sd4_supply[] = {
 	REGULATOR_SUPPLY("avdd_sata_pll", NULL),
 	REGULATOR_SUPPLY("avddio_usb", "tegra-xhci"),
 	REGULATOR_SUPPLY("avdd_hdmi", "tegradc.1"),
+#ifdef CONFIG_TEGRA_HDMI_PRIMARY
+	REGULATOR_SUPPLY("avdd_hdmi", "tegradc.0"),
+#endif
 };
 
 static struct regulator_consumer_supply as3722_sd5_supply[] = {
@@ -398,8 +401,10 @@ static inline void fill_reg_map(void)
 	struct board_info board_info;
 
 	tegra_get_board_info(&board_info);
-	if ((board_info.board_id == BOARD_PM359) &&
-				(board_info.major_revision == 'C'))
+	if ((board_info.board_id == BOARD_PM375) ||
+		(board_info.board_id == BOARD_PM377) ||
+		((board_info.board_id == BOARD_PM359) &&
+				(board_info.major_revision == 'C')))
 		reg_init_value = 0x1e;
 
 	for (i = 0; i < PMU_CPU_VDD_MAP_SIZE; i++) {
@@ -505,11 +510,13 @@ static struct regulator_consumer_supply fixed_reg_usb0_usb1_vbus_pm363_supply[] 
 
 /* Gated by GPIO_PK6  in FAB B and further*/
 static struct regulator_consumer_supply fixed_reg_vdd_hdmi_5v0_supply[] = {
+	REGULATOR_SUPPLY("vdd_hdmi_5v0", "tegradc.0"),
 	REGULATOR_SUPPLY("vdd_hdmi_5v0", "tegradc.1"),
 };
 
 /* Gated by GPIO_PH7  in FAB B and further*/
 static struct regulator_consumer_supply fixed_reg_vdd_hdmi_supply[] = {
+	REGULATOR_SUPPLY("avdd_hdmi_pll", "tegradc.0"),
 	REGULATOR_SUPPLY("avdd_hdmi_pll", "tegradc.1"),
 };
 
@@ -617,6 +624,10 @@ static struct regulator_consumer_supply fixed_reg_vdd_cdc_1v2_aud_supply[] = {
 	REGULATOR_SUPPLY("ldoen", "tegra-snd-rt5639.0"),
 };
 
+static struct regulator_consumer_supply
+fixed_reg_vdd_cdc_1v2_aud_pm375_supply[] = {
+	REGULATOR_SUPPLY("ldoen", "tegra-snd-rt5639.0"),
+};
 static struct regulator_consumer_supply fixed_reg_vdd_amp_shut_aud_supply[] = {
 	REGULATOR_SUPPLY("epamp", "tegra-snd-rt5645.0"),
 };
@@ -742,6 +753,10 @@ FIXED_REG(21,	vdd_cdc_1v2_aud,	vdd_cdc_1v2_aud,	NULL,	0,
 		0,	PMU_TCA6416_GPIO(2),	false,	true,	0,
 		1200,	250000);
 
+FIXED_REG(21,	vdd_cdc_1v2_aud_pm375,	vdd_cdc_1v2_aud_pm375,	NULL,	0,
+		0,	TEGRA_GPIO_PR2,	false,	true,	0,
+		1200,	250000);
+
 FIXED_REG(22,	vdd_amp_shut_aud,	vdd_amp_shut_aud,	NULL,	0,
 		0,	PMU_TCA6416_GPIO(3),	false,	true,	0,
 		1200,	0);
@@ -788,6 +803,12 @@ FIXED_REG(23,	vdd_dsi_mux,		vdd_dsi_mux,	NULL,	0,	0,
 	ADD_FIXED_REG(usb2_vbus_pm363),		\
 	ADD_FIXED_REG(usb0_usb1_vbus_pm363),
 
+#define BEAVER_PM375_FIXED_REG			\
+	ADD_FIXED_REG(vdd_cdc_1v2_aud_pm375),	\
+	ADD_FIXED_REG(usb2_vbus_pm363),		\
+	ADD_FIXED_REG(usb0_usb1_vbus_pm363),
+
+
 /* Gpio switch regulator platform data for laguna pm358 ERS*/
 static struct platform_device *fixed_reg_devs_pm358[] = {
 	LAGUNA_COMMON_FIXED_REG,
@@ -817,6 +838,12 @@ static struct platform_device *fixed_reg_devs_pm374[] = {
 	LAGUNA_PM358_FIXED_REG
 };
 
+/* Gpio switch regulator platform data for BEAVER PM375 && PM377*/
+static struct platform_device *fixed_reg_devs_pm375[] = {
+	LAGUNA_COMMON_FIXED_REG,
+	BEAVER_PM375_FIXED_REG
+};
+
 static int __init laguna_fixed_regulator_init(void)
 {
 	struct board_info board_info;
@@ -828,6 +855,10 @@ static int __init laguna_fixed_regulator_init(void)
 	if (board_info.board_id == BOARD_PM374)
 		return platform_add_devices(fixed_reg_devs_pm374,
 				ARRAY_SIZE(fixed_reg_devs_pm374));
+	else if ((board_info.board_id == BOARD_PM375) ||
+		(board_info.board_id == BOARD_PM377))
+		return platform_add_devices(fixed_reg_devs_pm375,
+				ARRAY_SIZE(fixed_reg_devs_pm375));
 	else if (board_info.board_id == BOARD_PM359)
 		return platform_add_devices(fixed_reg_devs_pm359,
 				ARRAY_SIZE(fixed_reg_devs_pm359));

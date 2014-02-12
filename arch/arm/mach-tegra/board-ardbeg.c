@@ -404,6 +404,8 @@ static void ardbeg_audio_init(void)
 			board_info.board_id == BOARD_PM358 ||
 			board_info.board_id == BOARD_PM370 ||
 			board_info.board_id == BOARD_PM374 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_PM363) {
 		/*Laguna*/
 		ardbeg_audio_pdata_rt5639.gpio_hp_det = TEGRA_GPIO_HP_DET;
@@ -520,6 +522,10 @@ static void laguna_pcie_init(void)
 		if (lane_owner == PCIE_LANES_X4_X1)
 			laguna_pcie_platform_data.gpio_x1_slot =
 					PMU_TCA6416_GPIO(8);
+	} else if (board_info.board_id == BOARD_PM375) {
+		laguna_pcie_platform_data.port_status[1] = 1;
+		laguna_pcie_platform_data.gpio_hot_plug = TEGRA_GPIO_INVALID;
+		laguna_pcie_platform_data.gpio_wake = TEGRA_GPIO_INVALID;
 	}
 	tegra_pci_device.dev.platform_data = &laguna_pcie_platform_data;
 	platform_device_register(&tegra_pci_device);
@@ -717,6 +723,8 @@ static void ardbeg_usb_init(void)
 			board_info.board_id == BOARD_PM358 ||
 			board_info.board_id == BOARD_PM370 ||
 			board_info.board_id == BOARD_PM374 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_PM363) {
 		/* Laguna */
 		/* Host cable is detected through AMS PMU Interrupt */
@@ -801,8 +809,10 @@ static void ardbeg_xusb_init(void)
 
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
-			board_info.board_id == BOARD_PM374 ||
 			board_info.board_id == BOARD_PM370 ||
+			board_info.board_id == BOARD_PM374 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_PM363) {
 		/* Laguna */
 		pr_info("Laguna ERS. 0x%x\n", board_info.board_id);
@@ -1171,6 +1181,8 @@ static void __init ardbeg_sysedp_batmon_init(void)
 		break;
 	case BOARD_PM358:
 	case BOARD_PM359:
+	case BOARD_PM375:
+	case BOARD_PM377:
 	default:
 		break;
 	}
@@ -1196,6 +1208,8 @@ static void __init edp_init(void)
 			break;
 	case BOARD_PM358:
 	case BOARD_PM359:
+	case BOARD_PM375:
+	case BOARD_PM377:
 			laguna_edp_init();
 			break;
 	default:
@@ -1276,6 +1290,8 @@ static void __init tegra_ardbeg_late_init(void)
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
 			board_info.board_id == BOARD_PM363 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_E1782)
 		ardbeg_sata_init();
 	else
@@ -1283,6 +1299,8 @@ static void __init tegra_ardbeg_late_init(void)
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
 			board_info.board_id == BOARD_PM370 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_PM363)
 		laguna_regulator_init();
 	else if (board_info.board_id == BOARD_PM374)
@@ -1294,7 +1312,9 @@ static void __init tegra_ardbeg_late_init(void)
 	ardbeg_emc_init();
 	edp_init();
 	isomgr_init();
-	ardbeg_touch_init();
+	if ((board_info.board_id != BOARD_PM375) &&
+		(board_info.board_id != BOARD_PM377))
+		ardbeg_touch_init();
 	ardbeg_panel_init();
 	switch (board_info.board_id) {
 	case BOARD_PM358:
@@ -1312,6 +1332,8 @@ static void __init tegra_ardbeg_late_init(void)
 	}
 	if (board_info.board_id == BOARD_PM359 ||
 			board_info.board_id == BOARD_PM358 ||
+			board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377 ||
 			board_info.board_id == BOARD_PM363)
 		laguna_pcie_init();
 	else {
@@ -1325,7 +1347,9 @@ static void __init tegra_ardbeg_late_init(void)
 	tegra_wdt_recovery_init();
 #endif
 
-	ardbeg_sensors_init();
+	if ((board_info.board_id != BOARD_PM375) &&
+		(board_info.board_id != BOARD_PM377))
+		ardbeg_sensors_init();
 
 	ardbeg_soctherm_init();
 
