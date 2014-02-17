@@ -1166,6 +1166,8 @@ static int tegra_max98090_resume_pre(struct snd_soc_card *card)
 			ret = regulator_enable(machine->avdd_aud_reg);
 		if (machine->vdd_sw_1v8_reg)
 			ret = regulator_enable(machine->vdd_sw_1v8_reg);
+		if (machine->spkvdd_5v0)
+			ret = regulator_enable(machine->spkvdd_5v0);
 	}
 
 	return 0;
