@@ -109,6 +109,11 @@ static int vi_probe(struct platform_device *dev)
 		match = of_match_device(tegra_vi_of_match, &dev->dev);
 		if (match)
 			pdata = (struct nvhost_device_data *)match->data;
+
+		/* DT initializes it to -1, use below WAR to set correct value.
+		 * TODO: Once proper fix for dev-id goes in, remove it.
+		 */
+		dev->id = dev->dev.id;
 	} else
 		pdata = (struct nvhost_device_data *)dev->dev.platform_data;
 
