@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2012-2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -121,6 +121,14 @@ static inline u32 gr_intr_exception_pending_f(void)
 static inline u32 gr_intr_exception_reset_f(void)
 {
 	return 0x200000;
+}
+static inline u32 gr_intr_firmware_method_pending_f(void)
+{
+	return 0x100;
+}
+static inline u32 gr_intr_firmware_method_reset_f(void)
+{
+	return 0x100;
 }
 static inline u32 gr_intr_nonstall_r(void)
 {
