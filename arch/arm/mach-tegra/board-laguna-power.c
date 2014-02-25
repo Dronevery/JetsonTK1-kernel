@@ -327,8 +327,10 @@ int __init laguna_as3722_regulator_init(void)
 	as3722_ldo3_reg_pdata.enable_tracking = true;
 	as3722_ldo3_reg_pdata.disable_tracking_suspend = true;
 
-	if ((board_info.board_id == BOARD_PM359) &&
-				(board_info.major_revision == 'C'))
+	if (board_info.board_id == BOARD_PM375 ||
+	    board_info.board_id == BOARD_PM377 ||
+	    ((board_info.board_id == BOARD_PM359) &&
+	     (board_info.major_revision == 'C')))
 		as3722_pdata.minor_rev = 2;
 
 	printk(KERN_INFO "%s: i2c_register_board_info\n",
