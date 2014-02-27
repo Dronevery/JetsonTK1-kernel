@@ -372,5 +372,7 @@ int gr_gk20a_get_ctx_buffer_offsets(struct gk20a *g,
 				    u32 *offsets, u32 *offset_addrs,
 				    u32 *num_offsets,
 				    bool is_quad, u32 quad);
-
+int gr_gk20a_update_smpc_ctxsw_mode(struct gk20a *g,
+				 struct channel_gk20a *c,
+				    bool enable_smpc_ctxsw);
 #endif /*__GR_GK20A_H__*/
