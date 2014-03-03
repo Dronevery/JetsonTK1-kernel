@@ -1388,13 +1388,24 @@ static void __init tegra_ardbeg_dt_init(void)
 
 static void __init tegra_ardbeg_reserve(void)
 {
+	unsigned long fb1_size, fb2_size, carveout_size;
+
+#ifndef CONFIG_TEGRA_HDMI_PRIMARY
+	fb1_size = SZ_16M + SZ_2M; /* 1920*1200*4*2 = 18432000 bytes */
+	fb2_size = SZ_64M + SZ_4M; /* 3840*2160*4*2 = 66355200 bytes */
+#else
+	fb1_size = SZ_64M + SZ_4M; /* 3840*2160*4*2 = 66355200 bytes */
+	fb2_size = SZ_16M + SZ_2M; /* 1920*1200*4*2 = 18432000 bytes */
+#endif
+
 #if defined(CONFIG_NVMAP_CONVERT_CARVEOUT_TO_IOVMM) || \
 		defined(CONFIG_TEGRA_NO_CARVEOUT)
-	/* 1920*1200*4*2 = 18432000 bytes */
-	tegra_reserve(0, SZ_16M + SZ_2M, SZ_16M);
+	carveout_size = 0;
 #else
-	tegra_reserve(SZ_1G, SZ_16M + SZ_2M, SZ_4M);
+	carveout_size = SZ_1G;
 #endif
+
+	tegra_reserve(carveout_size, fb1_size, fb2_size);
 	ardbeg_ramconsole_reserve(SZ_1M);
 }
 
