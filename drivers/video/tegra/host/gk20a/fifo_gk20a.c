@@ -1067,6 +1067,7 @@ static bool gk20a_fifo_handle_mmu_fault(struct gk20a *g)
 	/* resetting the engines and clearing the runlists is done in
 	   a separate function to allow deferred reset. */
 	fifo_gk20a_finish_mmu_fault_handling(g, fault_id);
+
 	return verbose;
 }
 
