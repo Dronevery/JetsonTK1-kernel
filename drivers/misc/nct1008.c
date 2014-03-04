@@ -202,6 +202,9 @@ static int nct1008_ext_get_temp_common(struct nct1008_data *data,
 	}
 	temp_ext_milli += off;
 
+	if (temp_ext_milli > NCT1008_MAX_TEMP_MILLI)
+		return -1;
+
 	*temp = temp_ext_milli;
 	data->etemp = temp_ext_milli;
 
