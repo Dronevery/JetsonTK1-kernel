@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010 Google, Inc.
  *
- * Copyright (c) 2010-2013, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -39,7 +39,13 @@ static bool tegra_dc_windows_are_clean(struct tegra_dc_win *windows[],
 
 	mutex_lock(&dc->lock);
 	for (i = 0; i < n; i++) {
-		if (windows[i]->dirty) {
+		struct tegra_dc_win *dc_win;
+		if (windows[i] == NULL)
+			continue;
+		dc_win = tegra_dc_get_window(dc, windows[i]->idx);
+		if (WARN_ON(dc_win == NULL))
+			continue;
+		if (dc_win->dirty) {
 			mutex_unlock(&dc->lock);
 			return false;
 		}
@@ -478,21 +484,35 @@ int tegra_dc_update_windows(struct tegra_dc_win *windows[], int n)
 		tegra_dc_writel(dc, WRITE_MUX_ASSEMBLY | READ_MUX_ASSEMBLY,
 			DC_CMD_STATE_ACCESS);
 
-	for_each_set_bit(i, &dc->valid_windows, n) {
-		struct tegra_dc_win *win = windows[i];
-		struct tegra_dc_win *dc_win = tegra_dc_get_window(dc, win->idx);
+	for (i = 0; i < n; i++) {
+		struct tegra_dc_win *win;
+		struct tegra_dc_win *dc_win;
 		bool scan_column = 0;
 		fixed20_12 h_offset, v_offset;
-		bool invert_h = (win->flags & TEGRA_WIN_FLAG_INVERT_H) != 0;
-		bool invert_v = (win->flags & TEGRA_WIN_FLAG_INVERT_V) != 0;
-		bool yuv = tegra_dc_is_yuv(win->fmt);
-		bool yuvp = tegra_dc_is_yuv_planar(win->fmt);
-		bool yuvsp = tegra_dc_is_yuv_semi_planar(win->fmt);
-		unsigned Bpp = tegra_dc_fmt_bpp(win->fmt) / 8;
+		bool invert_h;
+		bool invert_v;
+		bool yuv;
+		bool yuvp;
+		bool yuvsp;
+		unsigned Bpp;
 		/* Bytes per pixel of bandwidth, used for dda_inc calculation */
-		unsigned Bpp_bw = Bpp * ((yuvp || yuvsp) ? 2 : 1);
+		unsigned Bpp_bw;
 		bool filter_h;
 		bool filter_v;
+		win = windows[i];
+		if (win == NULL)
+			continue;
+		if (WARN_ON(!test_bit(win->idx, &dc->valid_windows)))
+			continue;
+		dc_win = tegra_dc_get_window(dc, win->idx);
+		invert_h = (win->flags & TEGRA_WIN_FLAG_INVERT_H) != 0;
+		invert_v = (win->flags & TEGRA_WIN_FLAG_INVERT_V) != 0;
+		yuv = tegra_dc_is_yuv(win->fmt);
+		yuvp = tegra_dc_is_yuv_planar(win->fmt);
+		yuvsp = tegra_dc_is_yuv_semi_planar(win->fmt);
+		Bpp = tegra_dc_fmt_bpp(win->fmt) / 8;
+		/* Bytes per pixel of bandwidth, used for dda_inc calculation */
+		Bpp_bw = Bpp * ((yuvp || yuvsp) ? 2 : 1);
 #if defined(CONFIG_TEGRA_DC_SCAN_COLUMN)
 		scan_column = (win->flags & TEGRA_WIN_FLAG_SCAN_COLUMN);
 #endif

@@ -2508,7 +2508,7 @@ void tegra_dc_blank(struct tegra_dc *dc)
 	struct tegra_dc_win *dcwins[DC_N_WINDOWS];
 	unsigned i;
 
-	for_each_set_bit(i, &dc->valid_windows, DC_N_WINDOWS) {
+	for (i = 0; i < DC_N_WINDOWS; i++) {
 		dcwins[i] = tegra_dc_get_window(dc, i);
 		if (!dcwins[i])
 			continue;
