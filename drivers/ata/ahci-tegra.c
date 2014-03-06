@@ -1,7 +1,7 @@
 /*
  * ahci-tegra.c - AHCI SATA support for TEGRA AHCI device
  *
- * Copyright (c) 2011-2013, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA Corporation.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -932,16 +932,14 @@ static int tegra_ahci_controller_init(struct tegra_ahci_host_priv *tegra_hpriv,
 
 	tegra_ahci_clr_clk_rst_cnt_rst_dev();
 
-	if (ahci_pdata->pexp_gpio) {
-		if (gpio_is_valid(ahci_pdata->pexp_gpio)) {
-			val = gpio_request(ahci_pdata->pexp_gpio, "ahci-tegra");
-			if (val) {
-				pr_err("failed to allocate Port expander gpio\n");
-				err = -ENODEV;
-				goto exit;
-			}
-			gpio_direction_output(ahci_pdata->pexp_gpio, 1);
+	if (gpio_is_valid(ahci_pdata->pexp_gpio)) {
+		val = gpio_request(ahci_pdata->pexp_gpio, "ahci-tegra");
+		if (val) {
+			pr_err("failed to allocate Port expander gpio\n");
+			err = -ENODEV;
+			goto exit;
 		}
+		gpio_direction_output(ahci_pdata->pexp_gpio, 1);
 	}
 
 	val = 0x100;
@@ -1238,7 +1236,7 @@ static int tegra_ahci_controller_suspend(struct platform_device *pdev)
 		}
 	}
 
-	if (ahci_pdata->pexp_gpio)
+	if (gpio_is_valid(ahci_pdata->pexp_gpio))
 		gpio_free(ahci_pdata->pexp_gpio);
 	spin_unlock_irqrestore(&host->lock, flags);
 
