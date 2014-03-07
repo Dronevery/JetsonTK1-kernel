@@ -14,9 +14,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <linux/list.h>
@@ -624,6 +623,7 @@ void gk20a_free_channel(struct nvhost_hwctx *ctx, bool finish)
 		nvhost_dbg(dbg_intr | dbg_gpu_dbg, "engine reset was"
 			   " deferred, running now");
 		fifo_gk20a_finish_mmu_fault_handling(g, g->fifo.mmu_fault_engines);
+		g->fifo.mmu_fault_engines = 0;
 		g->fifo.deferred_reset_pending = false;
 	}
 	mutex_unlock(&f->deferred_reset_mutex);
