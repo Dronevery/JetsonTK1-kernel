@@ -1353,9 +1353,7 @@ static void __init tegra_ardbeg_late_init(void)
 	tegra_wdt_recovery_init();
 #endif
 
-	if ((board_info.board_id != BOARD_PM375) &&
-		(board_info.board_id != BOARD_PM377))
-		ardbeg_sensors_init();
+	ardbeg_sensors_init();
 
 	ardbeg_soctherm_init();
 

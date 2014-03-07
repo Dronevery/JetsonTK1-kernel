@@ -1472,6 +1472,10 @@ static int ardbeg_nct72_init(void)
 			board_info.board_id == BOARD_PM363)
 		i2c_register_board_info(1, laguna_i2c_nct72_board_info,
 		ARRAY_SIZE(laguna_i2c_nct72_board_info));
+	else if (board_info.board_id == BOARD_PM375 ||
+			board_info.board_id == BOARD_PM377)
+		i2c_register_board_info(0, laguna_i2c_nct72_board_info,
+				ARRAY_SIZE(laguna_i2c_nct72_board_info));
 	else
 		i2c_register_board_info(1, ardbeg_i2c_nct72_board_info,
 		ARRAY_SIZE(ardbeg_i2c_nct72_board_info));
