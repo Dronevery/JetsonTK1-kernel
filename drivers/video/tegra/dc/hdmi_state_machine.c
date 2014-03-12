@@ -4,7 +4,7 @@
  * HDMI library support functions for Nvidia Tegra processors.
  *
  * Copyright (C) 2012-2013 Google - http://www.google.com/
- * Copyright (C) 2013, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (C) 2013-2014, NVIDIA CORPORATION. All rights reserved.
  * Authors:	John Grossman <johngro@google.com>
  * Authors:	Mike J. Chen <mjchen@google.com>
  *
@@ -252,6 +252,11 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 	hdmi->dc->out->v_size = specs.max_y * 1000;
 
 	hdmi->dvi = !(specs.misc & FB_MISC_HDMI);
+
+	/* Need to unpowergate DC if it was powergated. Updating monitorspecs
+	 * triggers pan_display which tries updating windows */
+	if (!tegra_dc_is_powered(hdmi->dc))
+		tegra_dc_unpowergate_locked(hdmi->dc);
 
 	tegra_fb_update_monspecs(hdmi->dc->fb, &specs,
 		tegra_dc_hdmi_mode_filter);
