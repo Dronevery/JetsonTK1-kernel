@@ -553,6 +553,7 @@ static struct regulator_consumer_supply fixed_reg_3v3_supply[] = {
 	REGULATOR_SUPPLY("vdd", "0-000c"),
 	REGULATOR_SUPPLY("vdd", "0-0077"),
 	REGULATOR_SUPPLY("vin", "2-0030"),
+	REGULATOR_SUPPLY("pcie_usb_vbus", "tegra-xhci"),
 };
 
 /* AS3722 GPIO1*/
