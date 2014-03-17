@@ -573,6 +573,11 @@ static struct tegra_panel *ardbeg_panel_configure(struct board_info *board_out,
 		tegra_io_dpd_enable(&dsic_io);
 		tegra_io_dpd_enable(&dsid_io);
 		break;
+	case BOARD_PM375:
+		ardbeg_tmds_config[2].pe_current = 0x0;
+		ardbeg_tmds_config[2].drive_current = 0x2d2d2d2d;
+		ardbeg_tmds_config[2].peak_current = 0x05050505;
+		break;
 	default:
 		panel = &dsi_p_wuxga_10_1;
 		tegra_io_dpd_enable(&dsic_io);
