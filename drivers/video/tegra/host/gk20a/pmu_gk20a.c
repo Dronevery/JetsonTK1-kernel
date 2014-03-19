@@ -2301,7 +2301,6 @@ void gk20a_pmu_isr(struct gk20a *g)
 	if (intr & pwr_falcon_irqstat_exterr_true_f()) {
 		nvhost_err(dev_from_gk20a(g),
 			"pmu exterr intr not implemented. Clearing interrupt.");
-		pmu_dump_falcon_stats(pmu);
 
 		gk20a_writel(g, pwr_falcon_exterrstat_r(),
 			gk20a_readl(g, pwr_falcon_exterrstat_r()) &
