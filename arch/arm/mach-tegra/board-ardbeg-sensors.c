@@ -1641,10 +1641,12 @@ int __init ardbeg_sensors_init(void)
 {
 	struct board_info board_info;
 	tegra_get_board_info(&board_info);
-	/* PM363 and PM359 don't have mpu 9250 mounted */
+	/* PM363 and PM359 , PM375, PM377 don't have mpu 9250 mounted */
 	/* TN8 sensors use Device Tree */
 	if (board_info.board_id != BOARD_PM363 &&
 		board_info.board_id != BOARD_PM359 &&
+		board_info.board_id != BOARD_PM375 &&
+		board_info.board_id != BOARD_PM377 &&
 		!of_machine_is_compatible("nvidia,tn8"))
 		mpuirq_init();
 	ardbeg_camera_init();
@@ -1659,9 +1661,11 @@ int __init ardbeg_sensors_init(void)
 	} else
 		ardbeg_nct72_init();
 
-	/* TN8 and PM359 don't have ALS CM32181 */
+	/* TN8 and PM359, PM375, PM377 don't have ALS CM32181 */
 	if (!of_machine_is_compatible("nvidia,tn8") &&
-	    board_info.board_id != BOARD_PM359)
+	    board_info.board_id != BOARD_PM359 &&
+	    board_info.board_id != BOARD_PM375 &&
+	    board_info.board_id != BOARD_PM377)
 		i2c_register_board_info(0, ardbeg_i2c_board_info_cm32181,
 			ARRAY_SIZE(ardbeg_i2c_board_info_cm32181));
 
