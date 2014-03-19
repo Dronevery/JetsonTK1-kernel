@@ -574,6 +574,9 @@ static struct tegra_panel *ardbeg_panel_configure(struct board_info *board_out,
 		tegra_io_dpd_enable(&dsid_io);
 		break;
 	case BOARD_PM375:
+		ardbeg_tmds_config[1].pe_current = 0x08080808;
+		ardbeg_tmds_config[1].drive_current = 0x2d2d2d2d;
+		ardbeg_tmds_config[1].peak_current = 0x0;
 		ardbeg_tmds_config[2].pe_current = 0x0;
 		ardbeg_tmds_config[2].drive_current = 0x2d2d2d2d;
 		ardbeg_tmds_config[2].peak_current = 0x05050505;
