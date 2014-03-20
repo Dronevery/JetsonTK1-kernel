@@ -5422,7 +5422,7 @@ int gk20a_gr_isr(struct gk20a *g)
 			}
 
 			if (need_reset)
-				gk20a_set_error_notifier(ch,
+				gk20a_set_error_notifier(ch->hwctx,
 					NVHOST_CHANNEL_GR_ERROR_SW_NOTIFY);
 		}
 
