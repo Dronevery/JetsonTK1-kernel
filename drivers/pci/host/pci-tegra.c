@@ -1106,7 +1106,7 @@ static int tegra_pcie_power_ungate(void)
 		pr_err("PCIE: mselect clk enable failed: %d\n", err);
 		return err;
 	}
-	clk_set_rate(tegra_pcie.pcie_mselect, 408000000);
+	clk_set_rate(tegra_pcie.pcie_mselect, 102000000);
 	/* pciex is reset only but need to be enabled for dvfs support */
 	err = clk_enable(tegra_pcie.pcie_xclk);
 	if (err) {
