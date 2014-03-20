@@ -552,8 +552,6 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 	mutex_lock(&fb_info->info->lock);
 	fb_destroy_modedb(fb_info->info->monspecs.modedb);
 
-	fb_destroy_modelist(&fb_info->info->modelist);
-
 	if (specs == NULL) {
 		struct tegra_dc_mode mode;
 		memset(&fb_info->info->monspecs, 0x0,

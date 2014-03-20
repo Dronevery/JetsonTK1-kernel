@@ -146,6 +146,12 @@ static void hdmi_state_machine_handle_hpd_l(int cur_hpd)
 	hdmi_state_machine_set_state_l(tgt_state, timeout);
 }
 
+/* Enable DC when hotplug succeeds */
+static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
+{
+	tegra_dc_enable(hdmi->dc);
+}
+
 /************************************************************
  *
  * internal state handlers and dispatch table
@@ -255,7 +261,7 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 
 	/* Need to unpowergate DC if it was powergated. Updating monitorspecs
 	 * triggers pan_display which tries updating windows */
-	if (!tegra_dc_is_powered(hdmi->dc))
+	if (hdmi->dc->enabled && !tegra_dc_is_powered(hdmi->dc))
 		tegra_dc_unpowergate_locked(hdmi->dc);
 
 	tegra_fb_update_monspecs(hdmi->dc->fb, &specs,
@@ -270,7 +276,7 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 #endif
 	hdmi->dc->connected = true;
 	tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
-	hdmi_state_machine_set_state_l(HDMI_STATE_DONE_ENABLED, -1);
+	hdmi_state_machine_set_state_l(HDMI_STATE_DONE_ENABLED, 0);
 
 	return;
 
@@ -390,7 +396,7 @@ static const dispatch_func_t state_machine_dispatch[] = {
 	handle_check_plug_state_l,	/* STATE_CHECK_PLUG_STATE */
 	handle_check_edid_l,		/* STATE_CHECK_EDID */
 	NULL,				/* STATE_DONE_DISABLED */
-	NULL,				/* STATE_DONE_ENABLED */
+	handle_enable_l,		/* STATE_DONE_ENABLED */
 	handle_wait_for_hpd_reassert_l,	/* STATE_DONE_WAIT_FOR_HPD_REASSERT */
 	handle_recheck_edid_l,		/* STATE_DONE_RECHECK_EDID */
 };
