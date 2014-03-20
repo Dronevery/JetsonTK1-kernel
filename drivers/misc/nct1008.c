@@ -163,7 +163,7 @@ static int nct1008_read_reg(struct i2c_client *client, u8 reg)
 }
 
 static int nct1008_ext_get_temp_common(struct nct1008_data *data,
-					unsigned long *temp)
+					long *temp)
 {
 	struct i2c_client *client = data->client;
 	struct nct1008_platform_data *pdata = client->dev.platform_data;
@@ -572,7 +572,7 @@ static int nct1008_shutdown_warning_get_cur_state(
 {
 	struct nct1008_data *data = cdev->devdata;
 	long ext_limit = data->plat_data.shutdown_ext_limit * 1000;
-	unsigned long temp;
+	long temp;
 
 	if (nct1008_ext_get_temp_common(data, &temp))
 		return -1;
@@ -592,7 +592,7 @@ static int nct1008_shutdown_warning_set_cur_state(
 	static long temp_sav;
 	struct nct1008_data *data = cdev->devdata;
 	long ext_limit = data->plat_data.shutdown_ext_limit * 1000;
-	unsigned long temp;
+	long temp;
 
 	if (nct1008_ext_get_temp_common(data, &temp))
 		return -1;
