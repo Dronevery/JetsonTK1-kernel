@@ -1766,7 +1766,7 @@ static void tegra_pcie_enable_features(void)
 	PR_FUNC_LINE;
 
 	/* configure all links to gen2 speed by default */
-	if (!tegra_pcie_link_speed(true))
+	if (!tegra_pcie_link_speed(false))
 		pr_info("PCIE: No Link speed change happened\n");
 
 	tegra_pcie_pll_pdn();
