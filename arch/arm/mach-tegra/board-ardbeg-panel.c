@@ -573,14 +573,6 @@ static struct tegra_panel *ardbeg_panel_configure(struct board_info *board_out,
 		tegra_io_dpd_enable(&dsic_io);
 		tegra_io_dpd_enable(&dsid_io);
 		break;
-	case BOARD_PM375:
-		ardbeg_tmds_config[1].pe_current = 0x08080808;
-		ardbeg_tmds_config[1].drive_current = 0x2d2d2d2d;
-		ardbeg_tmds_config[1].peak_current = 0x0;
-		ardbeg_tmds_config[2].pe_current = 0x0;
-		ardbeg_tmds_config[2].drive_current = 0x2d2d2d2d;
-		ardbeg_tmds_config[2].peak_current = 0x05050505;
-		break;
 	default:
 		panel = &dsi_p_wuxga_10_1;
 		tegra_io_dpd_enable(&dsic_io);
@@ -647,15 +639,24 @@ int __init ardbeg_panel_init(void)
 	int err = 0;
 	struct resource __maybe_unused *res;
 	struct platform_device *phost1x = NULL;
-
+	static struct board_info board_info;
 	struct device_node *dc1_node = NULL;
 	struct device_node *dc2_node = NULL;
 
+	tegra_get_board_info(&board_info);
 	find_dc_node(&dc1_node, &dc2_node);
 
 #ifndef CONFIG_TEGRA_HDMI_PRIMARY
 	ardbeg_panel_select();
 #endif
+	if (board_info.board_id == BOARD_PM375) {
+		ardbeg_tmds_config[1].pe_current = 0x08080808;
+		ardbeg_tmds_config[1].drive_current = 0x2d2d2d2d;
+		ardbeg_tmds_config[1].peak_current = 0x0;
+		ardbeg_tmds_config[2].pe_current = 0x0;
+		ardbeg_tmds_config[2].drive_current = 0x2d2d2d2d;
+		ardbeg_tmds_config[2].peak_current = 0x05050505;
+	}
 
 #ifdef CONFIG_TEGRA_NVMAP
 	ardbeg_carveouts[1].base = tegra_carveout_start;
