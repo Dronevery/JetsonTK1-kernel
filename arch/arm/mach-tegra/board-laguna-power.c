@@ -205,8 +205,8 @@ AMS_PDATA_INIT(ldo11, NULL, 1800000, 1800000, 0, 0, 1, 0);
 
 static struct as3722_pinctrl_platform_data as3722_pctrl_pdata[] = {
 	AS3722_PIN_CONTROL("gpio0", "gpio", NULL, NULL, NULL, "output-low"),
-	AS3722_PIN_CONTROL("gpio1", "gpio", NULL, NULL, NULL, "output-high"),
-	AS3722_PIN_CONTROL("gpio2", "gpio", NULL, NULL, NULL, "output-high"),
+	AS3722_PIN_CONTROL("gpio1", "gpio", "pull-down", NULL, NULL, "output-high"),
+	AS3722_PIN_CONTROL("gpio2", "gpio", "pull-down", NULL, NULL, "output-high"),
 	AS3722_PIN_CONTROL("gpio3", "gpio", NULL, NULL, "enabled", NULL),
 	AS3722_PIN_CONTROL("gpio4", "gpio", NULL, NULL, NULL, "output-high"),
 	AS3722_PIN_CONTROL("gpio5", "gpio", "pull-down", NULL, "enabled", NULL),
