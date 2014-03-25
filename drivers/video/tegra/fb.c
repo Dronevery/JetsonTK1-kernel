@@ -355,6 +355,11 @@ static int tegra_fb_pan_display(struct fb_var_screeninfo *var,
 		return 0;
 #endif
 
+	/* To prevent any call to update and sync window
+	    when HDMI is not connected. */
+	if (!tegra_fb->win->dc->connected)
+		return 0;
+
 	if (!tegra_fb->win->cur_handle) {
 		flush_start = info->screen_base +
 		(var->yoffset * info->fix.line_length);

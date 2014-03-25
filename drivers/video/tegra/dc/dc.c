@@ -2508,6 +2508,12 @@ void tegra_dc_blank(struct tegra_dc *dc)
 	struct tegra_dc_win *dcwins[DC_N_WINDOWS];
 	unsigned i;
 
+/* virtual terminal triggers blank after blank timeout.
+    If HDMI is not connected, dc is powergated.
+    This check prevents operations on powergated DC. */
+	if (!dc->connected)
+		return;
+
 	for (i = 0; i < DC_N_WINDOWS; i++) {
 		dcwins[i] = tegra_dc_get_window(dc, i);
 		if (!dcwins[i])
