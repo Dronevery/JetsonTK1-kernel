@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -286,6 +286,7 @@ static struct powergate_partition_info tegra12x_powergate_partition_info[] = {
 #define MC_CLIENT_HOTRESET_STAT		0x204
 #define MC_CLIENT_HOTRESET_CTRL_1	0x970
 #define MC_CLIENT_HOTRESET_STAT_1	0x974
+#define MC_VIDEO_PROTECT_REG_CTRL	0x650
 
 #define PMC_GPU_RG_CNTRL_0		0x2d4
 
@@ -444,11 +445,26 @@ err_power_off:
 	return ret;
 }
 
+static int mc_check_vpr(void)
+{
+	int ret = 0;
+	u32 val = mc_read(MC_VIDEO_PROTECT_REG_CTRL);
+	if ((val & 1) == 0) {
+		pr_err("VPR configuration not locked down\n");
+		ret = -EINVAL;
+	}
+	return ret;
+}
+
 static int tegra12x_gpu_unpowergate(int id,
 	struct powergate_partition_info *pg_info)
 {
 	int ret = 0;
 	bool first = false;
+
+	ret = mc_check_vpr();
+	if (ret)
+		return ret;
 
 	if (!gpu_rail) {
 		gpu_rail = tegra_dvfs_get_rail_by_name("vdd_gpu");
