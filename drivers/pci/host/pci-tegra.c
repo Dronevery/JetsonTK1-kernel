@@ -1758,6 +1758,10 @@ static void tegra_pcie_enable_aspm(void)
 		pcie_capability_read_word(pdev, PCI_EXP_LNKCTL, &val);
 		val |= aspm >> 10;
 		pcie_capability_write_word(pdev, PCI_EXP_LNKCTL, val);
+#if defined CONFIG_ARCH_TEGRA_12x_SOC
+		pcie_capability_clear_word(pdev, PCI_EXP_LNKCTL,
+				PCI_EXP_LNKCTL_ASPM_L0S);
+#endif
 	}
 }
 
@@ -1770,9 +1774,7 @@ static void tegra_pcie_enable_features(void)
 		pr_info("PCIE: No Link speed change happened\n");
 
 	tegra_pcie_pll_pdn();
-#if !defined(CONFIG_ARCH_TEGRA_12x_SOC)
 	tegra_pcie_enable_aspm();
-#endif
 	tegra_pcie_apply_sw_war(0, true);
 }
 
