@@ -1404,14 +1404,6 @@ static struct i2c_board_info ardbeg_i2c_nct72_board_info[] = {
 #endif
 };
 
-static struct i2c_board_info laguna_i2c_nct72_board_info[] = {
-	{
-		I2C_BOARD_INFO("nct72", 0x4c),
-		.platform_data = &ardbeg_nct72_pdata,
-		.irq = -1,
-	},
-};
-
 static int ardbeg_nct72_init(void)
 {
 	s32 base_cp, shft_cp;
@@ -1470,13 +1462,16 @@ static int ardbeg_nct72_init(void)
 			board_info.board_id == BOARD_PM370 ||
 			board_info.board_id == BOARD_PM374 ||
 			board_info.board_id == BOARD_PM363)
-		i2c_register_board_info(1, laguna_i2c_nct72_board_info,
-		ARRAY_SIZE(laguna_i2c_nct72_board_info));
+		i2c_register_board_info(1, ardbeg_i2c_nct72_board_info,
+		ARRAY_SIZE(ardbeg_i2c_nct72_board_info));
 	else if (board_info.board_id == BOARD_PM375 ||
-			board_info.board_id == BOARD_PM377)
-		i2c_register_board_info(0, laguna_i2c_nct72_board_info,
-				ARRAY_SIZE(laguna_i2c_nct72_board_info));
-	else
+			board_info.board_id == BOARD_PM377) {
+		/* its a developer board and may not have soctherm driver */
+		ardbeg_nct72_pdata.shutdown_ext_limit = 100;
+		ardbeg_nct72_pdata.shutdown_local_limit = 95;
+		i2c_register_board_info(0, ardbeg_i2c_nct72_board_info,
+				ARRAY_SIZE(ardbeg_i2c_nct72_board_info));
+	} else
 		i2c_register_board_info(1, ardbeg_i2c_nct72_board_info,
 		ARRAY_SIZE(ardbeg_i2c_nct72_board_info));
 
