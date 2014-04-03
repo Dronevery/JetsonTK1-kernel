@@ -639,6 +639,10 @@ static int nct1008_thermal_set_limits(struct nct1008_data *data,
 				EXT_TEMP_LO_LIMIT_HI_BYTE_WR, value);
 		if (err)
 			return err;
+		err = nct1008_write_reg(data->client,
+				LOCAL_TEMP_LO_LIMIT_WR, value);
+		if (err)
+			return err;
 
 		data->current_lo_limit = lo_limit;
 	}
@@ -648,6 +652,10 @@ static int nct1008_thermal_set_limits(struct nct1008_data *data,
 		pr_debug("%s: set hi_limit %ld\n", __func__, hi_limit);
 		err = nct1008_write_reg(data->client,
 				EXT_TEMP_HI_LIMIT_HI_BYTE_WR, value);
+		if (err)
+			return err;
+		err = nct1008_write_reg(data->client,
+				LOCAL_TEMP_HI_LIMIT_WR, value);
 		if (err)
 			return err;
 
