@@ -4,7 +4,7 @@
  * HDMI library support functions for Nvidia Tegra processors.
  *
  * Copyright (C) 2013 Google - http://www.google.com/
- * Copyright (C) 2013, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (C) 2013-2014, NVIDIA CORPORATION. All rights reserved.
  * Authors:	John Grossman <johngro@google.com>
  * Authors:	Mike J. Chen <mjchen@google.com>
  *
@@ -97,5 +97,6 @@ void hdmi_state_machine_init(struct tegra_dc_hdmi_data *hdmi);
 void hdmi_state_machine_shutdown(void);
 void hdmi_state_machine_set_pending_hpd(void);
 int hdmi_state_machine_get_state(void);
+bool hdmi_reread_edid(struct tegra_dc *dc);
 
 #endif  /* __TEGRA_HDMI_STATE_MACHINE_H */

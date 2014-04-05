@@ -147,9 +147,14 @@ static void hdmi_state_machine_handle_hpd_l(int cur_hpd)
 }
 
 /* Enable DC when hotplug succeeds */
+static int emulate_hotplug = 1;
 static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 {
 	tegra_dc_enable(hdmi->dc);
+	if (emulate_hotplug) {
+		emulate_hotplug = 0;
+		hdmi_reread_edid(hdmi->dc);
+	}
 }
 
 /************************************************************
@@ -482,4 +487,13 @@ int hdmi_state_machine_get_state(void)
 	rt_mutex_unlock(&work_lock);
 
 	return ret;
+}
+
+bool hdmi_reread_edid(struct tegra_dc *dc)
+{
+	struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
+
+	handle_check_edid_l(hdmi);
+	hdmi_state_machine_handle_hpd_l(0);
+	return dc->connected;
 }
