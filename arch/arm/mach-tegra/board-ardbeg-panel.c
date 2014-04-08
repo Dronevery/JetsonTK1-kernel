@@ -335,17 +335,17 @@ struct tegra_hdmi_out ardbeg_hdmi_out = {
 #if defined(CONFIG_FRAMEBUFFER_CONSOLE)
 static struct tegra_dc_mode hdmi_panel_modes[] = {
 	{
-		.pclk =			148500000,
+		.pclk =			25200000,
 		.h_ref_to_sync =	1,
 		.v_ref_to_sync =	1,
-		.h_sync_width =		44,	/* hsync_len */
-		.v_sync_width =		5,	/* vsync_len */
-		.h_back_porch =		148,	/* left_margin */
-		.v_back_porch =		36,	/* upper_margin */
-		.h_active =		1920,	/* xres */
-		.v_active =		1080,	/* yres */
-		.h_front_porch =	88,	/* right_margin */
-		.v_front_porch =	4,	/* lower_margin */
+		.h_sync_width =		96,	/* hsync_len */
+		.v_sync_width =		2,	/* vsync_len */
+		.h_back_porch =		48,	/* left_margin */
+		.v_back_porch =		33,	/* upper_margin */
+		.h_active =		640,	/* xres */
+		.v_active =		480,	/* yres */
+		.h_front_porch =	16,	/* right_margin */
+		.v_front_porch =	10,	/* lower_margin */
 	},
 };
 #elif defined(CONFIG_TEGRA_HDMI_PRIMARY)
