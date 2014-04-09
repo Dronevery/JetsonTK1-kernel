@@ -2,6 +2,7 @@
  * max98090.c -- MAX98090 ALSA SoC Audio driver
  *
  * Copyright 2011-2012 Maxim Integrated Products
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -2779,8 +2780,8 @@ static void max98090_jack_work(struct work_struct *work)
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "SPKR");
 			snd_soc_dapm_disable_pin(&codec->dapm, "MIC1");
 			snd_soc_dapm_disable_pin(&codec->dapm, "MIC2");
-			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMIC1");
-			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMIC2");
+			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMICL");
+			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMICR");
 			max98090_dmic_switch(codec, 1);
 
 			break;
@@ -2814,8 +2815,8 @@ static void max98090_jack_work(struct work_struct *work)
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "HPR");
 			snd_soc_dapm_disable_pin(&codec->dapm, "MIC1");
 			snd_soc_dapm_disable_pin(&codec->dapm, "MIC2");
-			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMIC1");
-			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMIC2");
+			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMICL");
+			snd_soc_dapm_force_enable_pin(&codec->dapm, "DMICR");
 			max98090_dmic_switch(codec, 1);
 
 			break;
@@ -2833,8 +2834,8 @@ static void max98090_jack_work(struct work_struct *work)
 			snd_soc_dapm_disable_pin(&codec->dapm, "SPKR");
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "HPL");
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "HPR");
-			snd_soc_dapm_disable_pin(&codec->dapm, "DMIC1");
-			snd_soc_dapm_disable_pin(&codec->dapm, "DMIC2");
+			snd_soc_dapm_disable_pin(&codec->dapm, "DMICL");
+			snd_soc_dapm_disable_pin(&codec->dapm, "DMICR");
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "MIC1");
 			snd_soc_dapm_force_enable_pin(&codec->dapm, "MIC2");
 			max98090_dmic_switch(codec, 0);
