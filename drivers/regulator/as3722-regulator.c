@@ -942,7 +942,22 @@ static int as3722_regulator_suspend(struct device *dev)
 	struct as3722_regulators *as3722_regs = dev_get_drvdata(dev);
 	struct as3722_regulator_config_data *reg_config;
 	int ret;
+	u32 val;
 
+	/* Enable SD1 external control before entering suspend */
+	reg_config = &as3722_regs->reg_config_data[AS3722_REGULATOR_ID_SD1];
+	val =  AS3722_EXT_CONTROL_ENABLE1 << (ffs(
+		as3722_reg_lookup[AS3722_REGULATOR_ID_SD1].
+		sleep_ctrl_mask) - 1);
+
+	ret = as3722_update_bits(as3722_regs->as3722, AS3722_ENABLE_CTRL1_REG,
+			AS3722_SD1_EXT_ENABLE_MASK,
+			val);
+	if (ret < 0) {
+		dev_err(dev, "Reg 0x%02x write failed: %d\n",
+				AS3722_ENABLE_CTRL1_REG, ret);
+		return ret;
+	}
 	reg_config = &as3722_regs->reg_config_data[AS3722_REGULATOR_ID_LDO3];
 	if (reg_config->enable_tracking &&
 		reg_config->disable_tracking_suspend) {
@@ -961,7 +976,18 @@ static int as3722_regulator_resume(struct device *dev)
 	struct as3722_regulators *as3722_regs = dev_get_drvdata(dev);
 	struct as3722_regulator_config_data *reg_config;
 	int ret;
+	u32 val;
 
+	/* Disable SD1 external control after resuming to have a
+	 * proper shutdown sequence
+	 */
+	ret = as3722_update_bits(as3722_regs->as3722, AS3722_ENABLE_CTRL1_REG,
+			AS3722_SD1_EXT_ENABLE_MASK, 0);
+	if (ret < 0) {
+		dev_err(dev, "Reg 0x%02x write failed: %d\n",
+				AS3722_ENABLE_CTRL1_REG, ret);
+		return ret;
+	}
 	reg_config = &as3722_regs->reg_config_data[AS3722_REGULATOR_ID_LDO3];
 	if (reg_config->enable_tracking &&
 		reg_config->disable_tracking_suspend) {
