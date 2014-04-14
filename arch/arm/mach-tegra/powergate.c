@@ -2,7 +2,7 @@
  * arch/arm/mach-tegra/powergate.c
  *
  * Copyright (c) 2010 Google, Inc
- * Copyright (c) 2011 - 2013, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011 - 2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * Author:
  *	Colin Cross <ccross@google.com>
@@ -382,7 +382,7 @@ bool tegra_powergate_is_powered(int id)
 	u32 status;
 
 	if (!pg_ops) {
-		pr_info("This SOC doesn't support powergating\n");
+		pr_debug("This SOC doesn't support powergating\n");
 		return -EINVAL;
 	}
 
