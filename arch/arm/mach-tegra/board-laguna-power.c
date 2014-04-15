@@ -809,8 +809,8 @@ FIXED_REG(23,	vdd_dsi_mux,		vdd_dsi_mux,	NULL,	0,	0,
 
 #define BEAVER_PM375_FIXED_REG			\
 	ADD_FIXED_REG(vdd_cdc_1v2_aud_pm375),	\
-	ADD_FIXED_REG(usb2_vbus_pm363),		\
-	ADD_FIXED_REG(usb0_usb1_vbus_pm363),
+	ADD_FIXED_REG(usb2_vbus_pm359),		\
+	ADD_FIXED_REG(usb0_usb1_vbus_pm359),
 
 
 /* Gpio switch regulator platform data for laguna pm358 ERS*/
