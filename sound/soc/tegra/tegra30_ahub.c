@@ -1,7 +1,7 @@
 /*
  * tegra30_ahub.c - Tegra30 AHUB driver
  *
- * Copyright (c) 2011-2013, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -617,6 +617,20 @@ static const char * const configlink_clocks[] = {
 /*No SPDIF in 14x*/
 #ifndef CONFIG_ARCH_TEGRA_14x_SOC
 	"spdif_in",
+#endif
+#if defined(CONFIG_ARCH_TEGRA_11x_SOC) || defined(CONFIG_ARCH_TEGRA_12x_SOC)
+	"amx",
+	"adx",
+#endif
+#ifdef CONFIG_ARCH_TEGRA_12x_SOC
+	"amx1",
+	"adx1",
+	"afc0",
+	"afc1",
+	"afc2",
+	"afc3",
+	"afc4",
+	"afc5",
 #endif
 };
 
