@@ -1,7 +1,7 @@
 /*
  * drivers/usb/phy/tegra11x_usb_phy.c
  *
- * Copyright (c) 2012-2013 NVIDIA Corporation. All rights reserved.
+ * Copyright (c) 2012-2014 NVIDIA Corporation. All rights reserved.
  *
  *
  * This software is licensed under the terms of the GNU General Public
@@ -1023,7 +1023,7 @@ static int utmi_phy_power_on(struct tegra_usb_phy *phy)
 	utmi_phy_iddq_override(false);
 
 	if (usb_phy_reg_status_wait(base + USB_SUSP_CTRL,
-		USB_PHY_CLK_VALID, USB_PHY_CLK_VALID, 2500))
+		USB_PHY_CLK_VALID, USB_PHY_CLK_VALID, 2600))
 		pr_warn("%s: timeout waiting for phy to stabilize\n", __func__);
 
 	val = readl(base + HOSTPC1_DEVLC);
