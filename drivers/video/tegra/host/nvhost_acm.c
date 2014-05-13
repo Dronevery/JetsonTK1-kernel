@@ -167,17 +167,12 @@ int nvhost_module_busy(struct platform_device *dev)
 		return ret;
 
 #ifdef CONFIG_PM_RUNTIME
-	if (pm_runtime_enabled(&dev->dev)) {
-		ret = pm_runtime_get_sync(&dev->dev);
-		if (ret < 0) {
-			if (dev->dev.parent &&
-				(dev->dev.parent != &platform_bus))
-				nvhost_module_idle(nvhost_get_parent(dev));
-
-			nvhost_err(&dev->dev,
-				"failed to power on, err %d", ret);
-			return ret;
-		}
+	ret = pm_runtime_get_sync(&dev->dev);
+	if (ret < 0) {
+		if (dev->dev.parent && (dev->dev.parent != &platform_bus))
+			nvhost_module_idle(nvhost_get_parent(dev));
+		nvhost_err(&dev->dev, "failed to power on, err %d", ret);
+		return ret;
 	}
 #endif
 
@@ -210,21 +205,19 @@ void nvhost_module_idle_mult(struct platform_device *dev, int refs)
 	struct nvhost_device_data *pdata = platform_get_drvdata(dev);
 
 #ifdef CONFIG_PM_RUNTIME
-	if (pm_runtime_enabled(&dev->dev)) {
-		/* call idle callback only if the device is turned on. */
-		if (atomic_read(&dev->dev.power.usage_count) == refs &&
-		    pm_runtime_active(&dev->dev)) {
-			if (pdata->idle)
-				pdata->idle(dev);
-		}
+	/* call idle callback only if the device is turned on. */
+	if (atomic_read(&dev->dev.power.usage_count) == refs &&
+	    pm_runtime_active(&dev->dev)) {
+		if (pdata->idle)
+			pdata->idle(dev);
+	}
 
-		while (refs--) {
-			pm_runtime_mark_last_busy(&dev->dev);
-			if (pdata->clockgate_delay)
-				pm_runtime_put_sync_autosuspend(&dev->dev);
-			else
-				pm_runtime_put(&dev->dev);
-		}
+	while (refs--) {
+		pm_runtime_mark_last_busy(&dev->dev);
+		if (pdata->clockgate_delay)
+			pm_runtime_put_sync_autosuspend(&dev->dev);
+		else
+			pm_runtime_put(&dev->dev);
 	}
 #else
 	if (pdata->idle)
