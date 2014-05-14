@@ -11523,8 +11523,8 @@ static struct tegra12_emc_table ardbeg_lpddr3_emc_table_E1781[] = {
 
 static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 	{
-		0x19,       /* V5.0.14 */
-		"04_12750_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_12750_01_V5.0.17_V1.1", /* DVFS table version */
 		12750,      /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -11540,7 +11540,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_RP */
 			0x00000004, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000000, /* EMC_RD_RCD */
 			0x00000000, /* EMC_WR_RCD */
@@ -11589,22 +11589,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -11687,14 +11687,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* MC_EMEM_ARB_TIMING_RAS */
 			0x00000002, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06030203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0402, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0502, /* MC_EMEM_ARB_DA_COVERS */
 			0x77e30303, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -11750,8 +11750,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		57820,      /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_20400_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_20400_01_V5.0.17_V1.1", /* DVFS table version */
 		20400,      /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -11767,7 +11767,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_RP */
 			0x00000004, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000000, /* EMC_RD_RCD */
 			0x00000000, /* EMC_WR_RCD */
@@ -11816,22 +11816,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -11914,14 +11914,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* MC_EMEM_ARB_TIMING_RAS */
 			0x00000002, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06030203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0402, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0502, /* MC_EMEM_ARB_DA_COVERS */
 			0x76230303, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -11977,8 +11977,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		35610,      /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_40800_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_40800_01_V5.0.17_V1.1", /* DVFS table version */
 		40800,      /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -11994,7 +11994,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_RP */
 			0x00000004, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000000, /* EMC_RD_RCD */
 			0x00000000, /* EMC_WR_RCD */
@@ -12043,22 +12043,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -12141,14 +12141,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* MC_EMEM_ARB_TIMING_RAS */
 			0x00000002, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06030203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0402, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0502, /* MC_EMEM_ARB_DA_COVERS */
 			0x74a30303, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -12204,8 +12204,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		20850,      /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_68000_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_68000_01_V5.0.17_V1.1", /* DVFS table version */
 		68000,      /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -12221,7 +12221,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_RP */
 			0x00000004, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000000, /* EMC_RD_RCD */
 			0x00000000, /* EMC_WR_RCD */
@@ -12270,22 +12270,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -12368,14 +12368,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* MC_EMEM_ARB_TIMING_RAS */
 			0x00000002, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06030203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0402, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0502, /* MC_EMEM_ARB_DA_COVERS */
 			0x74230403, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -12431,8 +12431,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		10720,      /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_102000_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_102000_01_V5.0.17_V1.1", /* DVFS table version */
 		102000,     /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -12448,7 +12448,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000001, /* EMC_RP */
 			0x00000004, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000001, /* EMC_RD_RCD */
 			0x00000001, /* EMC_WR_RCD */
@@ -12486,7 +12486,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x00000003, /* EMC_TFAW */
+			0x00000002, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000005, /* EMC_TCLKSTABLE */
 			0x00000005, /* EMC_TCLKSTOP */
@@ -12497,22 +12497,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -12595,14 +12595,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* MC_EMEM_ARB_TIMING_RAS */
 			0x00000002, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06030203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0403, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0503, /* MC_EMEM_ARB_DA_COVERS */
 			0x73c30504, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -12658,8 +12658,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		6890,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_204000_04_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_204000_01_V5.0.17_V1.1", /* DVFS table version */
 		204000,     /* SDRAM frequency */
 		800,        /* min voltage */
 		800,        /* gpu min voltage */
@@ -12675,7 +12675,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000002, /* EMC_RP */
 			0x00000005, /* EMC_R2W */
 			0x0000000a, /* EMC_W2R */
-			0x00000003, /* EMC_R2P */
+			0x00000005, /* EMC_R2P */
 			0x0000000b, /* EMC_W2P */
 			0x00000002, /* EMC_RD_RCD */
 			0x00000002, /* EMC_WR_RCD */
@@ -12713,7 +12713,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x00000007, /* EMC_TFAW */
+			0x00000006, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000005, /* EMC_TCLKSTABLE */
 			0x00000005, /* EMC_TCLKSTOP */
@@ -12724,22 +12724,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x106aa298, /* EMC_FBIO_CFG5 */
 			0x002c00a0, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00064000, /* EMC_DLL_XFORM_DQS0 */
-			0x00064000, /* EMC_DLL_XFORM_DQS1 */
-			0x00064000, /* EMC_DLL_XFORM_DQS2 */
-			0x00064000, /* EMC_DLL_XFORM_DQS3 */
-			0x00064000, /* EMC_DLL_XFORM_DQS4 */
-			0x00064000, /* EMC_DLL_XFORM_DQS5 */
-			0x00064000, /* EMC_DLL_XFORM_DQS6 */
-			0x00064000, /* EMC_DLL_XFORM_DQS7 */
-			0x00064000, /* EMC_DLL_XFORM_DQS8 */
-			0x00064000, /* EMC_DLL_XFORM_DQS9 */
-			0x00064000, /* EMC_DLL_XFORM_DQS10 */
-			0x00064000, /* EMC_DLL_XFORM_DQS11 */
-			0x00064000, /* EMC_DLL_XFORM_DQS12 */
-			0x00064000, /* EMC_DLL_XFORM_DQS13 */
-			0x00064000, /* EMC_DLL_XFORM_DQS14 */
-			0x00064000, /* EMC_DLL_XFORM_DQS15 */
+			0x00080000, /* EMC_DLL_XFORM_DQS0 */
+			0x00080000, /* EMC_DLL_XFORM_DQS1 */
+			0x00080000, /* EMC_DLL_XFORM_DQS2 */
+			0x00080000, /* EMC_DLL_XFORM_DQS3 */
+			0x00080000, /* EMC_DLL_XFORM_DQS4 */
+			0x00080000, /* EMC_DLL_XFORM_DQS5 */
+			0x00080000, /* EMC_DLL_XFORM_DQS6 */
+			0x00080000, /* EMC_DLL_XFORM_DQS7 */
+			0x00080000, /* EMC_DLL_XFORM_DQS8 */
+			0x00080000, /* EMC_DLL_XFORM_DQS9 */
+			0x00080000, /* EMC_DLL_XFORM_DQS10 */
+			0x00080000, /* EMC_DLL_XFORM_DQS11 */
+			0x00080000, /* EMC_DLL_XFORM_DQS12 */
+			0x00080000, /* EMC_DLL_XFORM_DQS13 */
+			0x00080000, /* EMC_DLL_XFORM_DQS14 */
+			0x00080000, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -12820,16 +12820,16 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000001, /* MC_EMEM_ARB_TIMING_RP */
 			0x00000004, /* MC_EMEM_ARB_TIMING_RC */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RAS */
-			0x00000004, /* MC_EMEM_ARB_TIMING_FAW */
+			0x00000003, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
-			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
+			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
 			0x00000003, /* MC_EMEM_ARB_TIMING_R2R */
 			0x00000002, /* MC_EMEM_ARB_TIMING_W2W */
 			0x00000004, /* MC_EMEM_ARB_TIMING_R2W */
 			0x00000006, /* MC_EMEM_ARB_TIMING_W2R */
 			0x06040203, /* MC_EMEM_ARB_DA_TURNS */
-			0x000a0404, /* MC_EMEM_ARB_DA_COVERS */
+			0x000a0504, /* MC_EMEM_ARB_DA_COVERS */
 			0x73840a05, /* MC_EMEM_ARB_MISC0 */
 			0x70000f03, /* MC_EMEM_ARB_MISC1 */
 			0x001f0000, /* MC_EMEM_ARB_RING1_THROTTLE */
@@ -12871,8 +12871,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		0x001fffff, /* EMC_AUTO_CAL_INTERVAL */
 		0x00000802, /* EMC_CTT_TERM_CTRL */
 		0x73240000, /* EMC_CFG */
-		0x0000088d, /* EMC_CFG_2 */
-		0x00040008, /* EMC_SEL_DPD_CTRL */
+		0x000008cd, /* EMC_CFG_2 */
+		0x00040128, /* EMC_SEL_DPD_CTRL */
 		0x002c0068, /* EMC_CFG_DIG_DLL */
 		0x00000008, /* EMC_BGBIAS_CTL0 */
 		0x00000000, /* EMC_AUTO_CAL_CONFIG2 */
@@ -12885,8 +12885,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		3420,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_300000_04_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_300000_01_V5.0.17_V1.1", /* DVFS table version */
 		300000,     /* SDRAM frequency */
 		820,        /* min voltage */
 		820,        /* gpu min voltage */
@@ -12940,7 +12940,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x00000009, /* EMC_TFAW */
+			0x00000008, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000005, /* EMC_TCLKSTABLE */
 			0x00000005, /* EMC_TCLKSTOP */
@@ -13005,14 +13005,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_DLI_TRIM_TXDQS13 */
 			0x00000000, /* EMC_DLI_TRIM_TXDQS14 */
 			0x00000000, /* EMC_DLI_TRIM_TXDQS15 */
-			0x00060000, /* EMC_DLL_XFORM_DQ0 */
-			0x00060000, /* EMC_DLL_XFORM_DQ1 */
-			0x00060000, /* EMC_DLL_XFORM_DQ2 */
-			0x00060000, /* EMC_DLL_XFORM_DQ3 */
-			0x00006000, /* EMC_DLL_XFORM_DQ4 */
-			0x00006000, /* EMC_DLL_XFORM_DQ5 */
-			0x00006000, /* EMC_DLL_XFORM_DQ6 */
-			0x00006000, /* EMC_DLL_XFORM_DQ7 */
+			0x00050000, /* EMC_DLL_XFORM_DQ0 */
+			0x00050000, /* EMC_DLL_XFORM_DQ1 */
+			0x00050000, /* EMC_DLL_XFORM_DQ2 */
+			0x00050000, /* EMC_DLL_XFORM_DQ3 */
+			0x00005000, /* EMC_DLL_XFORM_DQ4 */
+			0x00005000, /* EMC_DLL_XFORM_DQ5 */
+			0x00005000, /* EMC_DLL_XFORM_DQ6 */
+			0x00005000, /* EMC_DLL_XFORM_DQ7 */
 			0x10000280, /* EMC_XM2CMDPADCTRL */
 			0x00000000, /* EMC_XM2CMDPADCTRL4 */
 			0x00111111, /* EMC_XM2CMDPADCTRL5 */
@@ -13047,7 +13047,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000002, /* MC_EMEM_ARB_TIMING_RP */
 			0x00000007, /* MC_EMEM_ARB_TIMING_RC */
 			0x00000004, /* MC_EMEM_ARB_TIMING_RAS */
-			0x00000005, /* MC_EMEM_ARB_TIMING_FAW */
+			0x00000004, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000007, /* MC_EMEM_ARB_TIMING_WAP2PRE */
@@ -13112,8 +13112,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		2680,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_396000_05_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_396000_01_V5.0.17_V1.1", /* DVFS table version */
 		396000,     /* SDRAM frequency */
 		850,        /* min voltage */
 		850,        /* gpu min voltage */
@@ -13167,7 +13167,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x0000000d, /* EMC_TFAW */
+			0x0000000b, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000005, /* EMC_TCLKSTABLE */
 			0x00000005, /* EMC_TCLKSTOP */
@@ -13274,7 +13274,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000002, /* MC_EMEM_ARB_TIMING_RP */
 			0x00000009, /* MC_EMEM_ARB_TIMING_RC */
 			0x00000005, /* MC_EMEM_ARB_TIMING_RAS */
-			0x00000007, /* MC_EMEM_ARB_TIMING_FAW */
+			0x00000006, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000008, /* MC_EMEM_ARB_TIMING_WAP2PRE */
@@ -13339,8 +13339,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		2180,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_528000_05_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_528000_01_V5.0.17_V1.1", /* DVFS table version */
 		528000,     /* SDRAM frequency */
 		880,        /* min voltage */
 		870,        /* gpu min voltage */
@@ -13394,7 +13394,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x00000013, /* EMC_TFAW */
+			0x00000010, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000006, /* EMC_TCLKSTABLE */
 			0x00000006, /* EMC_TCLKSTOP */
@@ -13459,14 +13459,14 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_DLI_TRIM_TXDQS13 */
 			0x00000000, /* EMC_DLI_TRIM_TXDQS14 */
 			0x00000000, /* EMC_DLI_TRIM_TXDQS15 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ0 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ1 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ2 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ3 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ4 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ5 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ6 */
-			0x0000000e, /* EMC_DLL_XFORM_DQ7 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ0 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ1 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ2 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ3 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ4 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ5 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ6 */
+			0x0000000c, /* EMC_DLL_XFORM_DQ7 */
 			0x100002a0, /* EMC_XM2CMDPADCTRL */
 			0x00000000, /* EMC_XM2CMDPADCTRL4 */
 			0x00111111, /* EMC_XM2CMDPADCTRL5 */
@@ -13501,7 +13501,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000003, /* MC_EMEM_ARB_TIMING_RP */
 			0x0000000c, /* MC_EMEM_ARB_TIMING_RC */
 			0x00000007, /* MC_EMEM_ARB_TIMING_RAS */
-			0x0000000a, /* MC_EMEM_ARB_TIMING_FAW */
+			0x00000008, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x00000009, /* MC_EMEM_ARB_TIMING_WAP2PRE */
@@ -13566,8 +13566,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		1440,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_600000_03_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_600000_01_V5.0.17_V1.1", /* DVFS table version */
 		600000,     /* SDRAM frequency */
 		910,        /* min voltage */
 		910,        /* gpu min voltage */
@@ -13621,7 +13621,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* EMC_TCKE */
 			0x00000005, /* EMC_TCKESR */
 			0x00000004, /* EMC_TPD */
-			0x00000015, /* EMC_TFAW */
+			0x00000013, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000006, /* EMC_TCLKSTABLE */
 			0x00000006, /* EMC_TCLKSTOP */
@@ -13720,7 +13720,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_CTT */
 			0x00000003, /* EMC_CTT_DURATION */
 			0x000040a0, /* EMC_CFG_PIPE */
-			0x800024a9, /* EMC_DYN_SELF_REF_CONTROL */
+			0x800024aa, /* EMC_DYN_SELF_REF_CONTROL */
 			0x0000000e, /* EMC_QPOP */
 			0x00000009, /* MC_EMEM_ARB_CFG */
 			0x80000040, /* MC_EMEM_ARB_OUTSTANDING_REQ */
@@ -13728,7 +13728,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000004, /* MC_EMEM_ARB_TIMING_RP */
 			0x0000000e, /* MC_EMEM_ARB_TIMING_RC */
 			0x00000009, /* MC_EMEM_ARB_TIMING_RAS */
-			0x0000000b, /* MC_EMEM_ARB_TIMING_FAW */
+			0x0000000a, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000001, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x0000000b, /* MC_EMEM_ARB_TIMING_WAP2PRE */
@@ -13793,8 +13793,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		1440,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_792000_06_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_792000_01_V5.0.17_V1.1", /* DVFS table version */
 		792000,     /* SDRAM frequency */
 		980,        /* min voltage */
 		980,        /* gpu min voltage */
@@ -13814,7 +13814,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000013, /* EMC_W2P */
 			0x0000000a, /* EMC_RD_RCD */
 			0x0000000a, /* EMC_WR_RCD */
-			0x00000003, /* EMC_RRD */
+			0x00000004, /* EMC_RRD */
 			0x00000002, /* EMC_REXT */
 			0x00000000, /* EMC_WEXT */
 			0x00000006, /* EMC_WDV */
@@ -13848,7 +13848,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000005, /* EMC_TCKE */
 			0x00000006, /* EMC_TCKESR */
 			0x00000005, /* EMC_TPD */
-			0x0000001d, /* EMC_TFAW */
+			0x00000019, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x00000008, /* EMC_TCLKSTABLE */
 			0x00000008, /* EMC_TCLKSTOP */
@@ -13859,22 +13859,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x104ab098, /* EMC_FBIO_CFG5 */
 			0xe00700b1, /* EMC_CFG_DIG_DLL */
 			0x00008000, /* EMC_CFG_DIG_DLL_PERIOD */
-			0x00000008, /* EMC_DLL_XFORM_DQS0 */
-			0x00000008, /* EMC_DLL_XFORM_DQS1 */
-			0x00000008, /* EMC_DLL_XFORM_DQS2 */
-			0x00000008, /* EMC_DLL_XFORM_DQS3 */
-			0x00000008, /* EMC_DLL_XFORM_DQS4 */
-			0x00000008, /* EMC_DLL_XFORM_DQS5 */
-			0x00000008, /* EMC_DLL_XFORM_DQS6 */
-			0x00000008, /* EMC_DLL_XFORM_DQS7 */
-			0x00000008, /* EMC_DLL_XFORM_DQS8 */
-			0x00000008, /* EMC_DLL_XFORM_DQS9 */
-			0x00000008, /* EMC_DLL_XFORM_DQS10 */
-			0x00000008, /* EMC_DLL_XFORM_DQS11 */
-			0x00000008, /* EMC_DLL_XFORM_DQS12 */
-			0x00000008, /* EMC_DLL_XFORM_DQS13 */
-			0x00000008, /* EMC_DLL_XFORM_DQS14 */
-			0x00000008, /* EMC_DLL_XFORM_DQS15 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS0 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS1 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS2 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS3 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS4 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS5 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS6 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS7 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS8 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS9 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS10 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS11 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS12 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS13 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS14 */
+			0x007fc008, /* EMC_DLL_XFORM_DQS15 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE0 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE1 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE2 */
@@ -13955,7 +13955,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000005, /* MC_EMEM_ARB_TIMING_RP */
 			0x00000013, /* MC_EMEM_ARB_TIMING_RC */
 			0x0000000c, /* MC_EMEM_ARB_TIMING_RAS */
-			0x0000000f, /* MC_EMEM_ARB_TIMING_FAW */
+			0x0000000d, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000003, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x0000000c, /* MC_EMEM_ARB_TIMING_WAP2PRE */
@@ -14020,8 +14020,8 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 		1200,       /* expected dvfs latency (ns) */
 	},
 	{
-		0x19,       /* V5.0.14 */
-		"04_924000_06_V5.0.14_V1.1", /* DVFS table version */
+		0x19,       /* V5.0.17 */
+		"01_924000_01_V5.0.17_V1.1", /* DVFS table version */
 		924000,     /* SDRAM frequency */
 		1010,       /* min voltage */
 		1010,       /* gpu min voltage */
@@ -14075,7 +14075,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000006, /* EMC_TCKE */
 			0x00000007, /* EMC_TCKESR */
 			0x00000006, /* EMC_TPD */
-			0x00000022, /* EMC_TFAW */
+			0x0000001e, /* EMC_TFAW */
 			0x00000000, /* EMC_TRPAB */
 			0x0000000a, /* EMC_TCLKSTABLE */
 			0x0000000a, /* EMC_TCLKSTOP */
@@ -14124,22 +14124,22 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000000, /* EMC_DLL_XFORM_QUSE13 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE14 */
 			0x00000000, /* EMC_DLL_XFORM_QUSE15 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS0 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS1 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS2 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS3 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS4 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS5 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS6 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS7 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS8 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS9 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS10 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS11 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS12 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS13 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS14 */
-			0x00000005, /* EMC_DLI_TRIM_TXDQS15 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS0 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS1 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS2 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS3 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS4 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS5 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS6 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS7 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS8 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS9 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS10 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS11 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS12 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS13 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS14 */
+			0x00000004, /* EMC_DLI_TRIM_TXDQS15 */
 			0x00000008, /* EMC_DLL_XFORM_DQ0 */
 			0x00000008, /* EMC_DLL_XFORM_DQ1 */
 			0x00000008, /* EMC_DLL_XFORM_DQ2 */
@@ -14182,7 +14182,7 @@ static struct tegra12_emc_table jetson_tk1_ddr3_emc_table[] = {
 			0x00000006, /* MC_EMEM_ARB_TIMING_RP */
 			0x00000016, /* MC_EMEM_ARB_TIMING_RC */
 			0x0000000e, /* MC_EMEM_ARB_TIMING_RAS */
-			0x00000011, /* MC_EMEM_ARB_TIMING_FAW */
+			0x0000000f, /* MC_EMEM_ARB_TIMING_FAW */
 			0x00000002, /* MC_EMEM_ARB_TIMING_RRD */
 			0x00000004, /* MC_EMEM_ARB_TIMING_RAP2PRE */
 			0x0000000e, /* MC_EMEM_ARB_TIMING_WAP2PRE */
