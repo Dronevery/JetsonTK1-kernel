@@ -151,7 +151,7 @@ static int emulate_hotplug = 1;
 static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 {
 	tegra_dc_enable(hdmi->dc);
-	if (emulate_hotplug) {
+	if (emulate_hotplug && hdmi->dvi) {
 		emulate_hotplug = 0;
 		hdmi_reread_edid(hdmi->dc);
 	}
