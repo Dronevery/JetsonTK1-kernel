@@ -39,6 +39,7 @@
 			threshold = <80>;
 			vdd-supply = <&palmas_smps9>;
 			vled-supply = <&palmas_smps8>;
+			status = "disabled";
 		};
 	};
 
