@@ -73,7 +73,7 @@ static char *vic_get_fw_name(struct platform_device *dev)
 
 	decode_vic_ver(pdata->version, &maj, &min);
 	sprintf(fw_name, "vic%02d_ucode.bin", maj);
-	dev_info(&dev->dev, "fw name:%s\n", fw_name);
+	dev_dbg(&dev->dev, "fw name:%s\n", fw_name);
 
 	return fw_name;
 }
