@@ -178,12 +178,12 @@ static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 	pr_info("%s: hpd_switch 0\n", __func__);
 #endif
 	tegra_nvhdcp_set_plug(hdmi->nvhdcp, 0);
+	hdmi->dc->connected = false;
+	tegra_fb_update_monspecs(hdmi->dc->fb, NULL, NULL);
+	tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 	if (hdmi->dc->enabled) {
 		pr_info("HDMI from connected to disconnected\n");
-		hdmi->dc->connected = false;
 		tegra_dc_disable(hdmi->dc);
-		tegra_fb_update_monspecs(hdmi->dc->fb, NULL, NULL);
-		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 	}
 }
 
