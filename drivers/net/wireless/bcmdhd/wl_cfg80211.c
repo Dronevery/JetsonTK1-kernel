@@ -5192,17 +5192,10 @@ wl_cfg80211_change_bss(struct wiphy *wiphy,
 	return 0;
 }
 
-#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0)) && !0)
-static s32
-wl_cfg80211_set_channel(struct wiphy *wiphy, struct net_device *dev,
-	struct ieee80211_channel *chan,
-	struct cfg80211_chan_def chandef)
-#else
 static s32
 wl_cfg80211_set_channel(struct wiphy *wiphy, struct net_device *dev,
 	struct ieee80211_channel *chan,
 	enum nl80211_channel_type channel_type)
-#endif
 {
 	s32 _chan;
 	chanspec_t chspec = 0;
@@ -5219,37 +5212,11 @@ wl_cfg80211_set_channel(struct wiphy *wiphy, struct net_device *dev,
 
 	if (!wl)
 		return ERR_PTR(-EINVAL);
-
-#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0)) && !0)
-	enum nl80211_channel_type channel_type = NL80211_CHAN_HT20;
-#endif
-
 	dev = ndev_to_wlc_ndev(dev, wl);
 	_chan = ieee80211_frequency_to_channel(chan->center_freq);
-	WL_ERR(("netdev_ifidx(%d), chan_type(%d) target channel(%d)\n",
+	WL_ERR(("netdev_ifidx(%d), chan_type(%d) target channel(%d) \n",
 		dev->ifindex, channel_type, _chan));
 
-#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)) && !0)
-	WL_ERR(("chan_width = %d\n", chandef.width));
-	switch (chandef.width) {
-	case NL80211_CHAN_WIDTH_40:
-		bw = WL_CHANSPEC_BW_40;
-		break;
-	case NL80211_CHAN_WIDTH_80:
-		bw = WL_CHANSPEC_BW_80;
-		break;
-	case NL80211_CHAN_WIDTH_80P80:
-		bw = WL_CHANSPEC_BW_8080;
-		break;
-	case NL80211_CHAN_WIDTH_160:
-		bw = WL_CHANSPEC_BW_160;
-		break;
-	default:
-		bw = WL_CHANSPEC_BW_20;
-		break;
-	}
-	goto set_channel;
-#endif
 
 	if (chan->band == IEEE80211_BAND_5GHZ) {
 		param.band = WLC_BAND_5G;
@@ -6148,8 +6115,8 @@ wl_cfg80211_start_ap(
 #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0)) && !0)
 	if ((err = wl_cfg80211_set_channel(wiphy, dev,
 		dev->ieee80211_ptr->preset_chandef.chan,
-		dev->ieee80211_ptr->preset_chandef) < 0)) {
-		WL_ERR(("Set channel failed\n"));
+		NL80211_CHAN_HT20) < 0)) {
+		WL_ERR(("Set channel failed \n"));
 		goto fail;
 	}
 #endif 
