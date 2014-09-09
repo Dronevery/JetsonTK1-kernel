@@ -122,10 +122,9 @@
 #define TOUCH_THR1   0x14
 #define TOUCH_THR2   0x02
 #define TOUCH_THR3   0x03
-#define MOV_THR      0x04   /* 0x15 -->0x4 (Enable motion detection) */
+#define MOV_THR      0x15
 #define MOV_DEB      0x00
-#define HALT_TIME    0x30  /* 0xFF -> 0x64(2min) -> 0x30(55sec) --> 0x16 (30 sec) */
-#define HALT_RESEED  0x00   /* RESEED CMD */
+#define HALT_TIME    0xFF
 #define I2C_TIMEOUT  0x04
 
 #define SYST_SET     0x80
@@ -217,12 +216,12 @@ static u8 beforeinit_prox_settings[10] = { PROX_SET0 | 0x80, PROX_SET1 | 0x0,
 					   EVENT_MASK };
 static u8 active_ch[] = { ACT_CH0 | 0x05 };
 static u8 set_thresholds[] = { PROX_THR, TOUCH_THR1, TOUCH_THR2, TOUCH_THR3,
-			       MOV_THR, HALT_RESEED, HALT_TIME, I2C_TIMEOUT };
+			       MOV_THR, MOV_DEB, HALT_TIME, I2C_TIMEOUT };
 static u8 set_multipliers[] = { CH0_MULT, CH1_MULT, CH2_MULT, CH3_MULT,
 				 CH_BASE | 0x00};
 static u8 set_tim_targets[] = { LP_TIME, TARGET_T, TARGET_P };
 static u8 afterinit_prox_settings[] = { PROX_SET0 | 0x10, PROX_SET1 | 0x02,
-					PROX_SET2 | 0x04, PROX_SET3 | 0x05,
+					PROX_SET2 | 0x00, PROX_SET3 | 0x01,
 					EVENT_MASK };
 static u8 set_ati[] = {0 };
 
