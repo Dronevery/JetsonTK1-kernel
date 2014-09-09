@@ -478,10 +478,10 @@ static void iqs253_sar_proximity_detect_work(struct work_struct *ws)
 			goto finish;
 		/* provide input to SAR */
 		if (chip->value/2) {
-			/* pr_info("%s :<-- undetect -->\n", __func__); */
+			pr_info("%s :<-- undetect -->\n", __func__);
 			gpio_direction_output(chip->sar_gpio, 1);
 		} else {
-			/* pr_info("%s :--> detect <--\n", __func__); */
+			pr_info("%s :--> detect <--\n", __func__);
 			gpio_direction_output(chip->sar_gpio, 0);
 		}
        } else {
@@ -505,42 +505,6 @@ static void iqs253_sar_proximity_detect_work(struct work_struct *ws)
 finish:
 	queue_delayed_work(chip->sar_wq, &chip->sar_dw, msecs_to_jiffies(1000));
 }
-
-static ssize_t show_proximity_status(struct device * dev,
-	struct device_attribute *attr, char *buf)
-{
-	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
-	struct iqs253_chip *chip = iio_priv(indio_dev);
-	if (chip->version == 253) {
-		if (chip->value / 2)
-			return sprintf(buf, "1"); /* undetect */
-		return sprintf(buf, "0"); /* detect */
-	} else {
-		if ((chip->value & 0x04) != 0)
-			return sprintf(buf, "0"); /* detect */
-		return sprintf(buf, "1"); /* undetect */
-	}
-	return sprintf(buf, "invalid iqs sensor version..\n");
-}
-
-static IIO_CONST_ATTR(name, "iqs_sar_sensor");
-static IIO_DEVICE_ATTR(proximity_status, S_IRUGO, show_proximity_status,
-		       NULL, 0);
-
-static struct attribute *iqs253_iio_attr[] = {
-	&iio_dev_attr_proximity_status.dev_attr.attr,
-	&iio_const_attr_name.dev_attr.attr,
-	NULL
-};
-
-static const struct attribute_group iqs253_iio_attr_grp = {
-	.attrs = iqs253_iio_attr,
-};
-
-static const struct iio_info iqs253_iio_info = {
-	.attrs = &iqs253_iio_attr_grp,
-	.driver_module = THIS_MODULE,
-};
 
 static int iqs253_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
@@ -639,21 +603,11 @@ static int iqs253_probe(struct i2c_client *client,
 
 	queue_delayed_work(iqs253_chip->sar_wq, &iqs253_chip->sar_dw, 0);
 
-	indio_dev->info = &iqs253_iio_info;
-	indio_dev->dev.parent = &client->dev;
-	indio_dev->modes = INDIO_DIRECT_MODE;
-	ret = iio_device_register(indio_dev);
-	if (ret) {
-		dev_err(&client->dev, "%s iio_device_register err\n", __func__);
-		goto err_iio_register;
-	}
-
 	dev_info(&client->dev, "devname:%s func:%s line:%d probe success\n",
 			id->name, __func__, __LINE__);
 
 	return 0;
 
-err_iio_register:
 err_gpio_request:
 	if (iqs253_chip->sar_wq)
 		destroy_workqueue(iqs253_chip->sar_wq);
