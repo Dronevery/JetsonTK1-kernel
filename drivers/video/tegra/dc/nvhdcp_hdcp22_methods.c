@@ -38,6 +38,7 @@
 
 #define HDCP22_SRM_PATH "etc/hdcpsrm/hdcp2x.srm"
 
+u8 g_seq_num_init;
 u8 g_srm_2x_prod[] = {
 0x91, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x8B,
 0xBE, 0x2D, 0x46, 0x05, 0x9F, 0x00, 0x78, 0x7B, 0xF2, 0x84, 0x79, 0x7F, 0xC4,
@@ -98,6 +99,7 @@ int tsec_hdcp_create_session(struct hdcp_context_t *hdcp_context)
 {
 	int err = 0;
 	struct hdcp_create_session_param create_session_param;
+	g_seq_num_init = 0;
 
 	memset(&create_session_param, 0,
 			sizeof(struct hdcp_create_session_param));
@@ -436,6 +438,7 @@ int tsec_hdcp_verify_vprime(struct hdcp_context_t *hdcp_context)
 {
 	int err = 0;
 	u16 rxinfo;
+	u8 seq_num_start[HDCP_SIZE_SEQ_NUM_V_8] = {0x00, 0x00, 0x00};
 	struct hdcp_verify_vprime_param verify_vprime_param;
 	memset(&verify_vprime_param, 0,
 			sizeof(struct hdcp_verify_vprime_param));
@@ -446,7 +449,9 @@ int tsec_hdcp_verify_vprime(struct hdcp_context_t *hdcp_context)
 	memcpy(hdcp_context->cpuvaddr_rcvr_id_list,
 		hdcp_context->msg.rcvr_id_list,
 		HDCP_RCVR_ID_LIST_SIZE);
-	memcpy(&verify_vprime_param.vprime,
+	memset(&verify_vprime_param, 0x0,
+		sizeof(struct hdcp_verify_vprime_param));
+	memcpy(verify_vprime_param.vprime,
 		hdcp_context->msg.vprime,
 		HDCP_SIZE_VPRIME_2X_8/2);
 	verify_vprime_param.rxinfo = hdcp_context->msg.rxinfo;
@@ -460,8 +465,19 @@ int tsec_hdcp_verify_vprime(struct hdcp_context_t *hdcp_context)
 	verify_vprime_param.has_hdcp1_device = (rxinfo & 0x0001);
 	verify_vprime_param.bstatus = 0;
 	verify_vprime_param.is_ver_hdcp2x = 1;
-	memcpy(&verify_vprime_param.seqnum,
-		&hdcp_context->msg.seq_num,
+
+	if (!g_seq_num_init) {
+		if (memcmp(hdcp_context->msg.seq_num,
+			seq_num_start,
+			HDCP_SIZE_SEQ_NUM_V_8)) {
+			hdcp_err("tsec_hdcp_verify_vprime: Invalid seq_num_V\n");
+			return -EINVAL;
+		}
+		g_seq_num_init = 1;
+	}
+
+	memcpy(verify_vprime_param.seqnum,
+		hdcp_context->msg.seq_num,
 		HDCP_SIZE_SEQ_NUM_V_8);
 	memcpy(hdcp_context->cpuvaddr_mthd_buf_aligned,
 		&verify_vprime_param,
@@ -558,6 +574,33 @@ int tsec_hdcp_update_rrx(struct hdcp_context_t *hdcp_context)
 	return err;
 }
 
+int tsec_hdcp_rptr_stream_manage(struct hdcp_context_t *hdcp_context)
+{
+	int err = 0;
+	struct hdcp_stream_manage_param    stream_manage_param;
+	memset(hdcp_context->cpuvaddr_mthd_buf_aligned, 0,
+		HDCP_MTHD_RPLY_BUF_SIZE);
+	stream_manage_param.session_id = hdcp_context->session_id;
+	stream_manage_param.manage_flag = HDCP_STREAM_MANAGE_FLAG_MANAGE;
+	memcpy(hdcp_context->cpuvaddr_mthd_buf_aligned,
+		&stream_manage_param,
+		sizeof(struct hdcp_stream_manage_param));
+	tsec_send_method(hdcp_context, HDCP_STREAM_MANAGE,
+		HDCP_MTHD_FLAGS_SB);
+	memcpy(&stream_manage_param,
+		hdcp_context->cpuvaddr_mthd_buf_aligned,
+		sizeof(struct hdcp_stream_manage_param));
+	/* Need to fix the ucode for this */
+	if (stream_manage_param.ret_code) {
+		hdcp_err("tsec_hdcp_rptr_stream_manage:failed with error %d\n",
+		stream_manage_param.ret_code);
+	}
+	memcpy(hdcp_context->msg.seq_num_m, stream_manage_param.seqnum_m,
+		HDCP_SIZE_SEQ_NUM_M_8);
+	err = stream_manage_param.ret_code;
+	return err;
+}
+
 int tsec_hdcp_rptr_stream_ready(struct hdcp_context_t *hdcp_context)
 {
 	int err = 0;
@@ -568,9 +611,9 @@ int tsec_hdcp_rptr_stream_ready(struct hdcp_context_t *hdcp_context)
 		HDCP_MTHD_RPLY_BUF_SIZE);
 	stream_manage_param.session_id = hdcp_context->session_id;
 	stream_manage_param.manage_flag = HDCP_STREAM_MANAGE_FLAG_READY;
-	stream_manage_param.str_type[0][0] = 0;
-	stream_manage_param.content_id[0][0] = 0x10;
-	stream_manage_param.content_id[0][1] = 0x11;
+	stream_manage_param.streamid_type = 0x0000;
+	stream_manage_param.content_id[0][0] = 0x0000;
+	stream_manage_param.str_type[0][0] = 0x0;
 	memcpy(stream_manage_param.mprime,
 		hdcp_context->msg.mprime,
 		HDCP_SIZE_MPRIME_8);
@@ -581,9 +624,8 @@ int tsec_hdcp_rptr_stream_ready(struct hdcp_context_t *hdcp_context)
 	memcpy(&stream_manage_param,
 		hdcp_context->cpuvaddr_mthd_buf_aligned,
 		sizeof(struct hdcp_stream_manage_param));
-	/* Need to fix the ucode for this */
 	if (stream_manage_param.ret_code) {
-		hdcp_err("tsec_hdcp_rptr_auth_stream_manage: failed with error %d\n",
+		hdcp_err("tsec_hdcp_rptr_auth_stream_ready: failed with error %d\n",
 		stream_manage_param.ret_code);
 	}
 	err = stream_manage_param.ret_code;

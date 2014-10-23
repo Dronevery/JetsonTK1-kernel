@@ -68,6 +68,7 @@ struct tegra_nvhdcp {
 	int				fail_count;
 	char				hdcp22;
 	u8				max_retries;
+	u8				repeater;
 };
 
 #ifdef CONFIG_TEGRA_HDMIHDCP
