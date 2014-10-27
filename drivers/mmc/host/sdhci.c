@@ -2,7 +2,7 @@
  *  linux/drivers/mmc/host/sdhci.c - Secure Digital Host Controller Interface driver
  *
  *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
- *  Copyright (C) 2012-2014, NVIDIA CORPORATION.  All rights reserved.
+ *  Copyright (C) 2012-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2434,6 +2434,11 @@ static int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 			err = -EIO;
 		} else {
 			sdhci_config_tap(mmc, SAVE_TUNED_TAP);
+			pr_info("%s: tap value and tuning window after hw tuning completion ...\n",
+				mmc_hostname(mmc));
+			/* log tap, trim and tuning windows */
+			if (host->ops->dump_host_cust_regs)
+				host->ops->dump_host_cust_regs(host);
 		}
 	}
 
