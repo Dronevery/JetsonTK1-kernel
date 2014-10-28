@@ -571,4 +571,5 @@ struct tegra_fb_info *tegra_nvdisp_fb_register(struct platform_device *ndev,
 	struct resource *fb_mem);
 #endif
 
+int tegra_fb_release_fbmem(struct tegra_fb_info *);
 #endif
