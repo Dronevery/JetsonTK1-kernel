@@ -155,6 +155,8 @@ struct nvhost_device_data t21_vi_info = {
 	.slcg_notifier_enable	= true,
 	.gather_filter_enabled	= true,
 	.bond_out_id		= BOND_OUT_VI,
+	.prepare_poweroff = nvhost_vi_prepare_poweroff,
+	.finalize_poweron = nvhost_vi_finalize_poweron,
 };
 #else
 struct nvhost_device_data t21_vib_info = {
@@ -215,6 +217,8 @@ struct nvhost_device_data t21_vi_info = {
 	.num_channels		= 1,
 	.gather_filter_enabled	= true,
 	.bond_out_id		= BOND_OUT_VI,
+	.prepare_poweroff = nvhost_vi_prepare_poweroff,
+	.finalize_poweron = nvhost_vi_finalize_poweron,
 };
 #endif
 
