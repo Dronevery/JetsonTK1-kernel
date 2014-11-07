@@ -170,5 +170,10 @@
 			linux,default-trigger = "default-on";
 		};
 	};
+	soctherm@0x700E2000 {
+		throttle@oc1 {
+			status = "disabled";
+		};
+	};
 };
 
