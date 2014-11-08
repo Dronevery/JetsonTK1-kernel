@@ -67,6 +67,7 @@ struct tegra_nvhdcp {
 	u64				bksv_list[TEGRA_NVHDCP_MAX_DEVS];
 	int				fail_count;
 	char				hdcp22;
+	u8				max_retries;
 };
 
 #ifdef CONFIG_TEGRA_HDMIHDCP
@@ -77,6 +78,7 @@ void tegra_nvhdcp_resume(struct tegra_nvhdcp *nvhdcp);
 struct tegra_nvhdcp *tegra_nvhdcp_create(struct tegra_hdmi *hdmi,
 					int id, int bus);
 void tegra_nvhdcp_destroy(struct tegra_nvhdcp *nvhdcp);
+void tegra_nvhdcp_debugfs_init(struct tegra_nvhdcp *nvhdcp);
 #else
 static inline void tegra_nvhdcp_set_plug(struct tegra_nvhdcp *nvhdcp, bool hpd)
 {
