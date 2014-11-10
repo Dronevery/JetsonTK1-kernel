@@ -507,7 +507,8 @@ static struct dvfs qspi_sdr_dvfs =
 static struct dvfs qspi_ddr_dvfs =
 	CORE_DVFS("qspi",		-1, -1, 1, KHZ,	  80000,   80000,   80000,   80000,   80000,   80000,   80000,   80000);
 
-int tegra_dvfs_disable_core_set(const char *arg, const struct kernel_param *kp)
+static int tegra_dvfs_disable_core_set(const char *arg,
+	const struct kernel_param *kp)
 {
 	int ret;
 
@@ -523,7 +524,8 @@ int tegra_dvfs_disable_core_set(const char *arg, const struct kernel_param *kp)
 	return 0;
 }
 
-int tegra_dvfs_disable_cpu_set(const char *arg, const struct kernel_param *kp)
+static int tegra_dvfs_disable_cpu_set(const char *arg,
+	const struct kernel_param *kp)
 {
 	int ret;
 
@@ -539,7 +541,8 @@ int tegra_dvfs_disable_cpu_set(const char *arg, const struct kernel_param *kp)
 	return 0;
 }
 
-int tegra_dvfs_disable_gpu_set(const char *arg, const struct kernel_param *kp)
+static int tegra_dvfs_disable_gpu_set(const char *arg,
+	const struct kernel_param *kp)
 {
 	int ret;
 
@@ -555,7 +558,7 @@ int tegra_dvfs_disable_gpu_set(const char *arg, const struct kernel_param *kp)
 	return 0;
 }
 
-int tegra_dvfs_disable_get(char *buffer, const struct kernel_param *kp)
+static int tegra_dvfs_disable_get(char *buffer, const struct kernel_param *kp)
 {
 	return param_get_bool(buffer, kp);
 }
