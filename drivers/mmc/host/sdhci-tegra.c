@@ -4903,27 +4903,23 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 		if (IS_ERR_OR_NULL(tegra_host->default_drv_code_strength))
 			dev_dbg(dev, "Missing sdmmc default drive code state\n");
 
-		/* Since default mode pad strengths apply for many SD/eMMC card
-			modes lookup once and assign the same pointer */
+		/* Apply the default_mode settings to all modes of SD/MMC
+		   initially and then later update the pad strengths depending
+		   upon the states specified if any */
 		pctl_state = pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
-						"sdcard_default_mode");
+						"default_mode");
 		if (IS_ERR_OR_NULL(pctl_state)) {
 			dev_dbg(dev, "Missing default mode pad control state\n");
 		}
 		else {
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_LEGACY] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_MMC_HS] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_SD_HS] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_UHS_SDR12] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_UHS_SDR25] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_MMC_HS200] = pctl_state;
-			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_MMC_HS400] = pctl_state;
+			for (i = 0; i < MMC_TIMINGS_MAX_MODES; i++)
+				tegra_host->sdmmc_pad_ctrl[i] = pctl_state;
 		}
 
 		pctl_state = pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
-						"sdcard_uhs_sdr50_mode");
+						"uhs_sdr50_mode");
 		if (IS_ERR_OR_NULL(pctl_state)) {
-			dev_warn(dev, "Missing sdr50 pad control state\n");
+			dev_dbg(dev, "Missing sdr50 pad control state\n");
 		}
 		else {
 			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_UHS_SDR50] = pctl_state;
@@ -4931,7 +4927,7 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 		}
 
 		pctl_state = pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
-						"sdcard_uhs_sdr104_mode");
+						"uhs_sdr104_mode");
 		if (IS_ERR_OR_NULL(pctl_state)) {
 			dev_dbg(dev, "Missing sdr104 pad control state\n");
 		}
