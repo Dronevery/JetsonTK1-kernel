@@ -494,7 +494,7 @@ static void tegra_hdmi_ddc_power_toggle(int value)
 
 static int tegra_hdmi_get_mon_spec(struct tegra_hdmi *hdmi)
 {
-#define MAX_RETRY 20
+#define MAX_RETRY 100
 #define MIN_RETRY_DELAY_US 200
 #define MAX_RETRY_DELAY_US (MIN_RETRY_DELAY_US + 200)
 
