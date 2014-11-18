@@ -51,6 +51,7 @@
 #include <linux/tegra-pmc.h>
 
 #include <linux/platform_data/mmc-sdhci-tegra.h>
+#include <linux/platform/tegra/common.h>
 
 #include "sdhci-pltfm.h"
 
@@ -4661,6 +4662,7 @@ static struct tegra_sdhci_platform_data *sdhci_tegra_dt_parse_pdata(
 	plat->en_io_trim_volt = of_property_read_bool(np,
 			"nvidia,en-io-trim-volt");
 	plat->is_emmc = of_property_read_bool(np, "nvidia,is-emmc");
+	plat->is_sd_device = of_property_read_bool(np, "nvidia,sd-device");
 
 	if (!of_property_read_u32(np, "mmc-ocr-mask", &val)) {
 		if (val == 0)
@@ -4857,6 +4859,7 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	const char *parent_clk_list[TEGRA_SDHCI_MAX_PLL_SOURCE];
 	int rc;
 	u8 i;
+	u32 opt_subrevision;
 
 	for (i = 0; i < ARRAY_SIZE(parent_clk_list); i++)
 		parent_clk_list[i] = NULL;
@@ -5039,6 +5042,14 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 		 */
 		tegra_host->vddio_min_uv = SDHOST_HIGH_VOLT_MIN;
 		tegra_host->vddio_max_uv = SDHOST_HIGH_VOLT_MAX;
+	}
+
+	if (plat->is_sd_device &&
+		(tegra_get_chipid() == TEGRA_CHIPID_TEGRA21) &&
+		(tegra_chip_get_revision() == TEGRA_REVISION_A01)) {
+		opt_subrevision = tegra_get_fuse_opt_subrevision();
+		if ((opt_subrevision == 0) || (opt_subrevision == 1))
+			plat->limit_vddio_max_volt = true;
 	}
 
 	if (plat->limit_vddio_max_volt) {
