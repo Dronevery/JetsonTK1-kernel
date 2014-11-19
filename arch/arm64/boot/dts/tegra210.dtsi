@@ -24,6 +24,7 @@
 #include "tegra210-platforms/tegra210-thermal-aotag.dtsi"
 #include "tegra210-platforms/tegra210-thermal.dtsi"
 #include <dt-bindings/gpio/tegra-gpio.h>
+#include <dt-bindings/padctrl/tegra210-pads.h>
 
 / {
 	compatible = "nvidia,tegra210";
@@ -635,9 +636,11 @@
 		reg = <0x0 0x700e3000 0x0 0x00000100>;
 	};
 
-	pmc@7000e400 {
+	tegra_pmc: pmc@7000e400 {
 		compatible = "nvidia,tegra210-pmc";
 		reg = <0x0 0x7000e400 0x0 0x400>;
+		#padcontroller-cells = <1>;
+		status = "disabled";
 	};
 
 	adma: adma@702e2000 {
