@@ -479,7 +479,7 @@ static void __init tegra_t210ref_reserve(void)
 	ulong fb2_size = SZ_4M;
 #endif
 	ulong fb1_size = SZ_16M + SZ_2M;
-	ulong vpr_size = 186 * SZ_1M;
+	ulong vpr_size = 672 * SZ_1M;
 
 #if defined(CONFIG_TEGRA_NVADSP) && \
 		!defined(CONFIG_TEGRA_NVADSP_ON_SMMU)
