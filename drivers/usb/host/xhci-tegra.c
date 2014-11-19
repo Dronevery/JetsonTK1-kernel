@@ -4405,7 +4405,7 @@ static int hsic_power_create_file(struct tegra_xhci_hcd *tegra)
 		err = device_create_file(dev, &tegra->hsic_power_attr[p]);
 		if (err) {
 			kzfree(attr_name(tegra->hsic_power_attr[p]));
-			attr_name(tegra->hsic_power_attr[p]) = 0;
+			attr_name(tegra->hsic_power_attr[p]) = NULL;
 			return err;
 		}
 	}
