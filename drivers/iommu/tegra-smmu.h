@@ -235,6 +235,8 @@ struct smmu_debugfs_info {
 	struct smmu_device *smmu;
 	int mc;
 	int cache;
+	u64 val[2]; /* FIXME: per MC */
+	struct timer_list stats_timer;
 };
 
 /*
