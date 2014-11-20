@@ -43,6 +43,7 @@
 #include "os.h"
 #include "dev.h"
 #include "dram_app_mem_manager.h"
+#include "adsp_console_dbfs.h"
 
 #define NVADSP_ELF "adsp.elf"
 #define NVADSP_FIRMWARE NVADSP_ELF
@@ -74,8 +75,8 @@
 /* total number of crashes allowed on adsp */
 #define ALLOWED_CRASHES	2
 
-#define DISABLE_MBOX2_EMPTY_INT	0xFFFFFFFF
-#define ENABLE_MBOX2_EMPTY_INT	0x0
+#define DISABLE_MBOX2_FULL_INT	0x0
+#define ENABLE_MBOX2_FULL_INT	0xFFFFFFFF
 
 #define LOGGER_TIMEOUT	20 /* in ms */
 
@@ -98,8 +99,13 @@ struct nvadsp_os_data {
 	void __iomem		*misc_base;
 	struct resource		**dram_region;
 	struct nvadsp_debug_log	logger;
+	struct nvadsp_cnsl   console;
 	struct work_struct	restart_os_work;
 	int			adsp_num_crashes;
+	bool			adsp_os_fw_loaded;
+	struct mutex		fw_load_lock;
+	bool			os_running;
+	struct mutex		os_run_lock;
 };
 
 static struct nvadsp_os_data priv;
@@ -114,7 +120,9 @@ static struct nvadsp_mappings adsp_map[NM_LOAD_MAPPINGS];
 static int map_idx;
 static struct nvadsp_mbox adsp_com_mbox;
 
-DECLARE_COMPLETION(entered_wfe);
+static DECLARE_COMPLETION(entered_wfe);
+
+static void __nvadsp_os_stop(bool);
 #ifdef CONFIG_DEBUG_FS
 
 static int adsp_logger_open(struct inode *inode, struct file *file)
@@ -125,8 +133,8 @@ static int adsp_logger_open(struct inode *inode, struct file *file)
 	/* loop till writer is initilized with SOH */
 	do {
 		msleep(20);
-		if (!IS_ERR_OR_NULL(logger->debug_ram_rdr))
-			start = strchr(logger->debug_ram_rdr, SOH);
+		start = !IS_ERR_OR_NULL(logger->debug_ram_rdr) ?
+				strchr(logger->debug_ram_rdr, SOH) : NULL;
 	} while (!start);
 
 	/* maxdiff can be 0, therefore valid */
@@ -466,7 +474,7 @@ void *get_mailbox_shared_region(void)
 static void copy_io_in_l(void *to, const void *from, int sz)
 {
 	int i;
-	for (i = 0; i <= sz; i += 4) {
+	for (i = 0; i < sz; i += 4) {
 		int val = *(int *)(from + i);
 		writel(val, to + i);
 	}
@@ -595,14 +603,18 @@ int nvadsp_os_load(void)
 	struct nvadsp_drv_data *drv_data;
 	const struct firmware *fw;
 	struct device *dev;
-	int ret;
+	int ret = 0;
 	void *ptr;
 
+	mutex_lock(&priv.fw_load_lock);
 	if (!priv.pdev) {
 		pr_err("ADSP Driver is not initialized\n");
 		ret = -EINVAL;
 		goto end;
 	}
+
+	if (priv.adsp_os_fw_loaded)
+		goto end;
 
 	dev = &priv.pdev->dev;
 
@@ -658,7 +670,9 @@ int nvadsp_os_load(void)
 	update_nvadsp_app_shared_ptr(ptr);
 	drv_data->shared_adsp_os_data = ptr;
 	priv.os_firmware = fw;
+	priv.adsp_os_fw_loaded = true;
 
+	mutex_unlock(&priv.fw_load_lock);
 	return 0;
 
 deallocate_os_memory:
@@ -666,6 +680,7 @@ deallocate_os_memory:
 release_firmware:
 	release_firmware(fw);
 end:
+	mutex_unlock(&priv.fw_load_lock);
 	return ret;
 }
 EXPORT_SYMBOL(nvadsp_os_load);
@@ -677,26 +692,31 @@ static int __nvadsp_os_start(void)
 #if !CONFIG_SYSTEM_FPGA
 	u32 val;
 #endif
-	int ret;
+	int ret = 0;
 
 	dev = &priv.pdev->dev;
 	drv_data = platform_get_drvdata(priv.pdev);
 
-	dev_info(dev, "Copying EVP...\n");
+	dev_dbg(dev, "Copying EVP...\n");
 	copy_io_in_l(drv_data->state.evp_ptr,
 		     drv_data->state.evp,
 		     AMC_EVP_SIZE);
 
 	if (drv_data->adsp_cpu_clk) {
-		dev_info(dev, "setting adsp cpu to %lu...\n", LOAD_ADSP_FREQ);
+		dev_dbg(dev, "setting adsp cpu to %lu...\n", LOAD_ADSP_FREQ);
 		clk_set_rate(drv_data->adsp_cpu_clk, LOAD_ADSP_FREQ);
+	} else {
+		ret = -EINVAL;
+		goto end;
 	}
 
-	dev_info(dev, "Starting ADSP OS...\n");
 	if (drv_data->adsp_clk) {
-		dev_info(dev, "deasserting adsp...\n");
+		dev_dbg(dev, "deasserting adsp...\n");
 		tegra_periph_reset_deassert(drv_data->adsp_clk);
 		udelay(200);
+	} else {
+		ret = -EINVAL;
+		goto end;
 	}
 
 #if !CONFIG_SYSTEM_FPGA
@@ -705,43 +725,76 @@ static int __nvadsp_os_start(void)
 
 	dev_info(dev, "waiting for ADSP OS to boot up...\n");
 	ret = wait_for_adsp_os_load_complete();
-	dev_info(dev, "waiting for ADSP OS to boot up...Done.\n");
+	if (ret) {
+		dev_err(dev, "Unable to start ADSP OS\n");
+		goto end;
+	}
+	dev_info(dev, "ADSP OS boot up... Done!\n");
 
 #ifdef CONFIG_TEGRA_ADSP_DFS
-	if (adsp_dfs_core_init(priv.pdev)) {
+	ret = adsp_dfs_core_init(priv.pdev);
+	if (ret) {
 		dev_err(dev, "adsp dfs initialization failed\n");
-		return -EINVAL;
+		goto err;
 	}
 #endif
 
 #ifdef CONFIG_TEGRA_ADSP_ACTMON
-	if (ape_actmon_init(priv.pdev)) {
+	ret = ape_actmon_init(priv.pdev);
+	if (ret) {
 		dev_err(dev, "ape actmon initialization failed\n");
-		return -EINVAL;
+		goto err;
 	}
 #endif
-
-	drv_data->adsp_os_loaded = true;
-	return 0;
+end:
+	return ret;
+err:
+	__nvadsp_os_stop(true);
+	return ret;
 }
 
 int nvadsp_os_start(void)
 {
-	int ret;
+	struct nvadsp_drv_data *drv_data;
+	struct device *dev;
+	int ret = 0;
 
 	if (!priv.pdev) {
 		pr_err("ADSP Driver is not initialized\n");
-		return -EINVAL;
+		ret = -EINVAL;
+		goto end;
 	}
 
-	ret = pm_runtime_get_sync(&priv.pdev->dev);
+	drv_data = platform_get_drvdata(priv.pdev);
+	dev = &priv.pdev->dev;
 
-	return __nvadsp_os_start();
+	/* check if fw is loaded then start the adsp os */
+	if (!priv.adsp_os_fw_loaded) {
+		dev_err(dev, "Call to nvadsp_os_load not made\n");
+		ret = -EINVAL;
+		goto end;
+	}
+
+	mutex_lock(&priv.os_run_lock);
+	/* if adsp is started/running exit gracefully */
+	if (priv.os_running)
+		goto unlock;
+
+	ret = pm_runtime_get_sync(&priv.pdev->dev);
+	if (ret)
+		goto unlock;
+	ret = __nvadsp_os_start();
+	priv.os_running = drv_data->adsp_os_running = ret ? false : true;
+unlock:
+	mutex_unlock(&priv.os_run_lock);
+end:
+	return ret;
 }
 EXPORT_SYMBOL(nvadsp_os_start);
 
 static int __nvadsp_os_suspend(void)
 {
+	struct device *dev = &priv.pdev->dev;
 	uint16_t com_mid = ADSP_COM_MBOX_ID;
 	int ret;
 
@@ -757,14 +810,14 @@ static int __nvadsp_os_suspend(void)
 			       "adsp_com_mbox",
 			       NULL, NULL);
 	if (ret) {
-		pr_err("failed to open adsp com mbox\n");
+		dev_err(dev, "failed to open adsp com mbox\n");
 		goto out;
 	}
 
 	ret = nvadsp_mbox_send(&adsp_com_mbox, ADSP_OS_SUSPEND,
 			       NVADSP_MBOX_SMSG, true, UINT_MAX);
 	if (ret) {
-		pr_err("failed to send with adsp com mbox\n");
+		dev_err(dev, "failed to send with adsp com mbox\n");
 		goto out;
 	}
 
@@ -773,13 +826,13 @@ static int __nvadsp_os_suspend(void)
 
 	ret = nvadsp_mbox_close(&adsp_com_mbox);
 	if (ret) {
-		pr_err("failed to close adsp com mbox\n");
+		dev_err(dev, "failed to close adsp com mbox\n");
 		goto out;
 	}
 
 	ret = pm_runtime_put_sync(&priv.pdev->dev);
 	if (ret) {
-		pr_err("failed in pm_runtime_put_sync\n");
+		dev_err(dev, "failed in pm_runtime_put_sync\n");
 		goto out;
 	}
  out:
@@ -809,9 +862,9 @@ static void __nvadsp_os_stop(bool reload)
 	ape_actmon_exit(priv.pdev);
 #endif
 
-	writel(ENABLE_MBOX2_EMPTY_INT, priv.misc_base + HWMBOX2_REG);
+	writel(ENABLE_MBOX2_FULL_INT, priv.misc_base + HWMBOX2_REG);
 	wait_for_completion(&entered_wfe);
-	writel(DISABLE_MBOX2_EMPTY_INT, priv.misc_base + HWMBOX2_REG);
+	writel(DISABLE_MBOX2_FULL_INT, priv.misc_base + HWMBOX2_REG);
 
 	tegra_periph_reset_assert(drv_data->adsp_clk);
 
@@ -837,20 +890,58 @@ static void __nvadsp_os_stop(bool reload)
 
 void nvadsp_os_stop(void)
 {
+	struct nvadsp_drv_data *drv_data;
+
+	if (!priv.pdev) {
+		pr_err("ADSP Driver is not initialized\n");
+		return;
+	}
+
+	drv_data = platform_get_drvdata(priv.pdev);
+
+	mutex_lock(&priv.os_run_lock);
+	/* check if os is running else exit */
+	if (!priv.os_running)
+		goto end;
 	__nvadsp_os_stop(true);
+	priv.os_running = drv_data->adsp_os_running = false;
+end:
+	mutex_unlock(&priv.os_run_lock);
 }
 EXPORT_SYMBOL(nvadsp_os_stop);
 
-void nvadsp_os_suspend(void)
+int nvadsp_os_suspend(void)
 {
+	struct nvadsp_drv_data *drv_data;
+	int ret = -EINVAL;
+
+	if (!priv.pdev) {
+		pr_err("ADSP Driver is not initialized\n");
+		goto end;
+	}
+
 	/*
 	 * No os suspend/stop on linsim as
 	 * APE can be reset only once.
 	 */
 	if (tegra_platform_is_linsim())
-		return;
+		goto end;
 
-	__nvadsp_os_suspend();
+	drv_data = platform_get_drvdata(priv.pdev);
+
+	mutex_lock(&priv.os_run_lock);
+	/* check if os is running else exit */
+	if (!priv.os_running) {
+		ret = 0;
+		goto unlock;
+	}
+	ret = __nvadsp_os_suspend();
+	if (!ret)
+		priv.os_running = drv_data->adsp_os_running = false;
+unlock:
+	mutex_unlock(&priv.os_run_lock);
+end:
+	return ret;
 }
 EXPORT_SYMBOL(nvadsp_os_suspend);
 
@@ -935,10 +1026,18 @@ int nvadsp_os_probe(struct platform_device *pdev)
 	priv.dram_region = drv_data->dram_region;
 
 #ifdef CONFIG_DEBUG_FS
+	priv.logger.dev = &priv.pdev->dev;
+
 	if (adsp_create_debug_logger(drv_data->adsp_debugfs_root))
 		dev_err(dev,
 			"unable to create adsp debug logger file\n");
-#endif
+#ifdef CONFIG_TEGRA_ADSP_CONSOLE
+	priv.console.dev = &priv.pdev->dev;
+	if (adsp_create_cnsl(drv_data->adsp_debugfs_root, &priv.console))
+		dev_err(dev,
+		"unable to create adsp console file\n");
+#endif /* CONFIG_TEGRA_ADSP_CONSOLE */
+#endif /* CONFIG_DEBUG_FS */
 
 	ret = devm_request_irq(dev, wdt_virq, adsp_wdt_handler,
 			IRQF_TRIGGER_RISING, "adsp watchdog", &priv);
@@ -954,17 +1053,18 @@ int nvadsp_os_probe(struct platform_device *pdev)
 		goto end;
 	}
 
-	ret = tegra_agic_route_interrupt(INT_AMISC_MBOX_EMPTY2,
+	ret = tegra_agic_route_interrupt(INT_AMISC_MBOX_FULL2,
 			TEGRA_AGIC_ADSP);
 	if (ret) {
 		dev_err(dev, "failed to route fiq interrupt\n");
 		goto end;
 	}
 
-	writel(DISABLE_MBOX2_EMPTY_INT, priv.misc_base + HWMBOX2_REG);
+	writel(DISABLE_MBOX2_FULL_INT, priv.misc_base + HWMBOX2_REG);
 
 	INIT_WORK(&priv.restart_os_work, nvadsp_os_restart);
-
+	mutex_init(&priv.fw_load_lock);
+	mutex_init(&priv.os_run_lock);
 end:
 	return ret;
 }
