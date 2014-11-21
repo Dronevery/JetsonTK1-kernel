@@ -62,4 +62,9 @@
 			};
 		};
 	};
+
+	modem {
+		/* pre boost regulator gpio */
+		nvidia,pre-boost-gpio = <&gpio TEGRA_GPIO(E, 5) GPIO_ACTIVE_HIGH>;
+	};
 };
