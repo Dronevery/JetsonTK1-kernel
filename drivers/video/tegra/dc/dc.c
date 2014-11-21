@@ -1955,6 +1955,16 @@ static int tegra_dc_set_out(struct tegra_dc *dc, struct tegra_dc_out *out)
 	int err = 0;
 
 	dc->out = out;
+
+	if (dc->out->type == TEGRA_DC_OUT_HDMI &&
+			tegra_is_hdmi_initialised()) {
+		/*
+		 * Bootloader enables clk and host1x in seamless
+		 * usecase. Below extra reference accounts for it
+		 */
+		tegra_dc_get(dc);
+	}
+
 	mode = tegra_dc_get_override_mode(dc);
 
 	if (mode) {
@@ -2886,7 +2896,9 @@ static void tegra_dc_init_vpulse2_int(struct tegra_dc *dc)
 	tegra_dc_writel(dc, val , DC_CMD_INT_ENABLE);
 
 	tegra_dc_mask_interrupt(dc, V_PULSE2_INT);
-	tegra_dc_writel(dc, V_PULSE_2_ENABLE, DC_DISP_DISP_SIGNAL_OPTIONS0);
+	val = tegra_dc_readl(dc, DC_DISP_DISP_SIGNAL_OPTIONS0);
+	val |= V_PULSE_2_ENABLE;
+	tegra_dc_writel(dc, val, DC_DISP_DISP_SIGNAL_OPTIONS0);
 #endif
 }
 
