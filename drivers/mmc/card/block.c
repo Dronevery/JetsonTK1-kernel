@@ -629,7 +629,7 @@ static int mmc_blk_ioctl_combo_cmd(struct block_device *bdev,
 	struct mmc_combo_cmd_info mcci = {0};
 	u8 num_cmd;
 	struct mmc_blk_ioc_data **ioc_data = NULL;
-	u32 usr_ptr;
+	struct mmc_ioc_cmd __user *usr_ptr;
 	struct mmc_card *card;
 	struct mmc_blk_data *md;
 	u32 status = 0;
@@ -673,11 +673,9 @@ static int mmc_blk_ioctl_combo_cmd(struct block_device *bdev,
 		goto cmd_done;
 	}
 
+	usr_ptr = (void * __user)mcci.mmc_ioc_cmd_list;
 	for (i = 0; i < num_cmd; i++) {
-		usr_ptr = (u32)mcci.mmc_ioc_cmd_list +
-			(i * sizeof(struct mmc_ioc_cmd));
-		ioc_data[i] = mmc_blk_ioctl_copy_from_user(
-				(struct mmc_ioc_cmd __user *)usr_ptr);
+		ioc_data[i] = mmc_blk_ioctl_copy_from_user(&usr_ptr[i]);
 		if (IS_ERR(ioc_data[i])) {
 			err = PTR_ERR(ioc_data[i]);
 			goto free_all;
@@ -709,11 +707,7 @@ static int mmc_blk_ioctl_combo_cmd(struct block_device *bdev,
 
 	/* copy to user if data and response */
 	for (i = 0; i < num_cmd; i++) {
-		usr_ptr = (u32)mcci.mmc_ioc_cmd_list +
-			(i * sizeof(struct mmc_ioc_cmd));
-		err = mmc_blk_ioctl_copy_to_user(
-				(struct mmc_ioc_cmd __user *)usr_ptr,
-				ioc_data[i]);
+		err = mmc_blk_ioctl_copy_to_user(&usr_ptr[i], ioc_data[i]);
 		if (err)
 			break;
 	}
