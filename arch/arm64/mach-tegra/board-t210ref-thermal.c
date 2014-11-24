@@ -62,7 +62,7 @@ static struct nct1008_platform_data t210ref_nct72_pdata = {
 #endif
 		},
 		[EXT] = {
-			.shutdown_limit = 115, /* C */
+			.shutdown_limit = 104, /* C */
 		}
 	}
 };
