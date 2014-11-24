@@ -1,7 +1,7 @@
 /*
  * drivers/video/tegra/dc/dp.c
  *
- * Copyright (c) 2011-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -2295,7 +2295,7 @@ static int tegra_dp_edid(struct tegra_dc_dp_data *dp)
 
 	memset(&specs, 0 , sizeof(specs));
 
-	err = tegra_edid_get_monspecs(dp->dp_edid, &specs);
+	err = tegra_edid_get_monspecs(dp->dp_edid, &specs, NULL);
 	if (err < 0) {
 		dev_err(&dc->ndev->dev,
 			"dp: Failed to get EDID data\n");

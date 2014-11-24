@@ -4,7 +4,7 @@
  * Copyright (C) 2010 Google, Inc.
  * Author: Erik Gilling <konkers@android.com>
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -298,5 +298,6 @@ struct tegra_dc {
 
 	struct notifier_block slgc_notifier;
 	struct sysedp_consumer *sysedpc;
+	bool	vedid;
 };
 #endif

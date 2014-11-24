@@ -124,16 +124,16 @@ struct tegra_edid_hdmi_eld {
 struct tegra_edid *tegra_edid_create(struct tegra_dc *dc,
 	i2c_transfer_func_t func);
 void tegra_edid_destroy(struct tegra_edid *edid);
-
 int tegra_edid_get_monspecs_test(struct tegra_edid *edid,
 				struct fb_monspecs *specs, u8 *edid_ptr);
-int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs);
 u16 tegra_edid_get_cd_flag(struct tegra_edid *edid);
 u16 tegra_edid_get_max_clk_rate(struct tegra_edid *edid);
 bool tegra_edid_is_scdc_present(struct tegra_edid *edid);
 bool tegra_edid_is_420db_present(struct tegra_edid *edid);
 bool tegra_edid_is_hfvsdb_present(struct tegra_edid *edid);
 u16 tegra_edid_get_ex_colorimetry(struct tegra_edid *edid);
+int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs,
+	u8 *vedid);
 int tegra_edid_get_eld(struct tegra_edid *edid, struct tegra_edid_hdmi_eld *elddata);
 u32 tegra_edid_lookup_quirks(const char *manufacturer, u32 model);
 

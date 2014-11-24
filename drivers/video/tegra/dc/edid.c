@@ -594,14 +594,19 @@ u16 tegra_edid_get_ex_colorimetry(struct tegra_edid *edid)
 	return edid->data->colorimetry;
 }
 
-int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
+int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs,
+u8 *vedid)
 {
 	int i;
 	int j;
 	int ret;
 	int extension_blocks;
 	struct tegra_edid_pvt *new_data, *old_data;
+	u8 checksum = 0;
 	u8 *data;
+
+	if (edid->dc->vedid)
+		return 0;
 
 	new_data = vmalloc(SZ_32K + sizeof(struct tegra_edid_pvt));
 	if (!new_data)
@@ -616,9 +621,20 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 
 	data = new_data->dc_edid.buf;
 
-	ret = tegra_edid_read_block(edid, 0, data);
-	if (ret)
-		goto fail;
+	if (vedid) {
+		memcpy(data, vedid, 128);
+		/* checksum new edid */
+		for (i = 0; i < 128; i++)
+			checksum += data[i];
+		if (checksum != 0) {
+			pr_err("%s: checksum failed\n", __func__);
+			return -EINVAL;
+		}
+	} else {
+		ret = tegra_edid_read_block(edid, 0, data);
+		if (ret)
+			goto fail;
+	}
 
 	memset(specs, 0x0, sizeof(struct fb_monspecs));
 	memset(&new_data->eld, 0x0, sizeof(new_data->eld));
@@ -637,9 +653,19 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 	extension_blocks = data[0x7e];
 
 	for (i = 1; i <= extension_blocks; i++) {
-		ret = tegra_edid_read_block(edid, i, data + i * 128);
-		if (ret < 0)
-			goto fail;
+		if (vedid) {
+			memcpy(data + i * 128, vedid, 128);
+			for (j = 0; j < 128; j++)
+				checksum += data[i * 128 + j];
+			if (checksum != 0) {
+				pr_err("%s: checksum failed\n", __func__);
+				goto fail;
+			}
+		} else {
+			ret = tegra_edid_read_block(edid, i, data + i * 128);
+			if (ret < 0)
+				goto fail;
+		}
 
 		if (data[i * 128] == 0x2) {
 			fb_edid_add_monspecs(data + i * 128, specs);
@@ -664,24 +690,27 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 				int k;
 				int l = specs->modedb_len;
 				struct fb_videomode *m;
-				m = kzalloc((specs->modedb_len + new_data->hdmi_vic_len) *
+				m = kzalloc((specs->modedb_len +
+				    new_data->hdmi_vic_len) *
 				    sizeof(struct fb_videomode), GFP_KERNEL);
 				if (!m)
-				    break;
+					break;
 				memcpy(m, specs->modedb, specs->modedb_len *
-				        sizeof(struct fb_videomode));
+					sizeof(struct fb_videomode));
 				for (k = 0; k < new_data->hdmi_vic_len; k++) {
 				    unsigned vic = new_data->hdmi_vic[k];
 				    if (vic >= HDMI_EXT_MODEDB_SIZE) {
 				        pr_warning("Unsupported HDMI VIC %d, ignoring\n", vic);
 				        continue;
 				    }
-				    memcpy(&m[l], &hdmi_ext_modes[vic], sizeof(m[l]));
+				    memcpy(&m[l], &hdmi_ext_modes[vic],
+						sizeof(m[l]));
 				    l++;
 				}
 				kfree(specs->modedb);
 				specs->modedb = m;
-				specs->modedb_len = specs->modedb_len + new_data->hdmi_vic_len;
+				specs->modedb_len = specs->modedb_len +
+							new_data->hdmi_vic_len;
 			}
 		}
 	}

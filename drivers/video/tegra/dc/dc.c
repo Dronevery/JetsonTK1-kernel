@@ -46,6 +46,7 @@
 #include <linux/of_irq.h>
 #include <linux/of_address.h>
 #include <linux/tegra_pm_domains.h>
+#include <linux/uaccess.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/display.h>
@@ -1282,46 +1283,56 @@ static const struct file_operations outtype_fops = {
 	.release	= single_release,
 };
 
-static int dbg_dc_edid_show(struct seq_file *s, void *unused)
+static int dbg_edid_show(struct seq_file *s, void *unused)
 {
 	struct tegra_dc *dc = s->private;
-	struct tegra_dc_edid *data;
-	u8 *buf;
-	int i;
 
-	data = tegra_edid_get_data(dc->edid);
-	if (!data) {
-		seq_puts(s, "No EDID\n");
-		return 0;
-	}
+	if (WARN_ON(!dc || !dc->out))
+		return -EINVAL;
 
-	buf = data->buf;
-
-	for (i = 0; i < data->len; i++) {
-		if (i % 16 == 0)
-			seq_printf(s, "edid[%03x] =", i);
-
-		seq_printf(s, " %02x", buf[i]);
-
-		if (i % 16 == 15)
-			seq_puts(s, "\n");
-	}
-
-	tegra_edid_put_data(data);
-
+	/* seq_put_decimal_ll(s, '\0', dc->edid); */
+	seq_putc(s, '\n');
 	return 0;
 }
 
-static int dbg_dc_edid_open(struct inode *inode, struct file *file)
+static int dbg_edid_open(struct inode *inode, struct file *file)
 {
-	return single_open(file, dbg_dc_edid_show, inode->i_private);
+	return single_open(file, dbg_edid_show, inode->i_private);
+}
+
+static ssize_t dbg_edid_write(struct file *file,
+const char __user *addr, size_t len, loff_t *pos)
+{
+	struct seq_file *m = file->private_data;
+	struct tegra_dc *dc = m ? m->private : NULL;
+	struct fb_monspecs mon_spec; /*TODO: currently a placeholder for monspec
+					held in tegra_hdmi */
+	u8 *vedid;
+	int ret;
+
+	if (WARN_ON(!dc || !dc->out))
+		return -EINVAL;
+
+	if (len < 128) { /* not a valid edid */
+		dc->vedid = false;
+		return -EINVAL;
+	}
+
+	/* store write data */
+	vedid = kmalloc(sizeof(char) * len, GFP_KERNEL);
+	ret = copy_from_user(vedid, addr, len);
+	if (ret < 0)
+		return ret;
+
+	tegra_edid_get_monspecs(dc->edid, &mon_spec, vedid);
+	kfree(vedid);
+	dc->vedid = true;
+	return len;
 }
 
 static const struct file_operations edid_fops = {
-	.open		= dbg_dc_edid_open,
-	.read		= seq_read,
-	.llseek		= seq_lseek,
-	.release	= single_release,
+	.open		= dbg_edid_open,
+	.write		= dbg_edid_write,
 };
 
 static int dbg_hotplug_show(struct seq_file *s, void *unused)
@@ -3145,6 +3156,8 @@ static int tegra_dc_init(struct tegra_dc *dc)
 
 	tegra_dc_io_end(dc);
 
+	dc->vedid = false;
+
 	return 0;
 }
 
@@ -4151,7 +4164,7 @@ static int tegra_dc_probe(struct platform_device *ndev)
 	    (dc->out->type == TEGRA_DC_OUT_HDMI)) {
 		struct fb_monspecs specs;
 		struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
-		if (!tegra_edid_get_monspecs(hdmi->edid, &specs)) {
+		if (!tegra_edid_get_monspecs(hdmi->edid, &specs, NULL)) {
 			struct tegra_dc_mode *dcmode = &dc->out->modes[0];
 			dcmode->pclk          = specs.modedb->pixclock;
 			dcmode->pclk          = PICOS2KHZ(dcmode->pclk);
@@ -4177,7 +4190,7 @@ static int tegra_dc_probe(struct platform_device *ndev)
 			dc->out && dc->out->type == TEGRA_DC_OUT_LVDS) {
 		struct fb_monspecs specs;
 		struct tegra_dc_lvds_data *lvds = tegra_dc_get_outdata(dc);
-		if (!tegra_edid_get_monspecs(lvds->edid, &specs))
+		if (!tegra_edid_get_monspecs(lvds->edid, &specs, NULL))
 			tegra_dc_set_fb_mode(dc, specs.modedb, false);
 	}
 
