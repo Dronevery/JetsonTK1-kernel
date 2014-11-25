@@ -1614,8 +1614,10 @@ static int tegra_dc_dp_init(struct tegra_dc *dc)
 		: of_find_node_by_path(DPAUX_NODE);
 
 	dp = devm_kzalloc(&dc->ndev->dev, sizeof(*dp), GFP_KERNEL);
-	if (!dp)
+	if (!dp) {
+		of_node_put(np_dp);
 		return -ENOMEM;
+	}
 
 	if (np) {
 		if (np_dp && (of_device_is_available(np_dp) ||
@@ -1737,6 +1739,7 @@ static int tegra_dc_dp_init(struct tegra_dc *dc)
 
 	tegra_dc_set_outdata(dc, dp);
 	tegra_dc_dp_debug_create(dp);
+	of_node_put(np_dp);
 
 	return 0;
 
@@ -1755,6 +1758,7 @@ err_release_resource_reg:
 		release_resource(res);
 err_free_dp:
 	devm_kfree(&dc->ndev->dev, dp);
+	of_node_put(np_dp);
 
 	return err;
 }
@@ -2426,6 +2430,7 @@ static void tegra_dc_dp_destroy(struct tegra_dc *dc)
 	if (!np_dp || !of_device_is_available(np_dp))
 		release_resource(dp->res);
 	devm_kfree(&dc->ndev->dev, dp);
+	of_node_put(np_dp);
 }
 
 static void tegra_dc_dp_disable(struct tegra_dc *dc)
