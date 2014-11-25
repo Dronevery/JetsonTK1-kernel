@@ -1251,6 +1251,48 @@ static const struct file_operations outtype_fops = {
 	.release	= single_release,
 };
 
+static int dbg_dc_edid_show(struct seq_file *s, void *unused)
+{
+	struct tegra_dc *dc = s->private;
+	struct tegra_dc_edid *data;
+	u8 *buf;
+	int i;
+
+	data = tegra_edid_get_data(dc->edid);
+	if (!data) {
+		seq_puts(s, "No EDID\n");
+		return 0;
+	}
+
+	buf = data->buf;
+
+	for (i = 0; i < data->len; i++) {
+		if (i % 16 == 0)
+			seq_printf(s, "edid[%03x] =", i);
+
+		seq_printf(s, " %02x", buf[i]);
+
+		if (i % 16 == 15)
+			seq_puts(s, "\n");
+	}
+
+	tegra_edid_put_data(data);
+
+	return 0;
+}
+
+static int dbg_dc_edid_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, dbg_dc_edid_show, inode->i_private);
+}
+
+static const struct file_operations edid_fops = {
+	.open		= dbg_dc_edid_open,
+	.read		= seq_read,
+	.llseek		= seq_lseek,
+	.release	= single_release,
+};
+
 static int dbg_hotplug_show(struct seq_file *s, void *unused)
 {
 	struct tegra_dc *dc = s->private;
@@ -1355,6 +1397,11 @@ static void tegra_dc_create_debugfs(struct tegra_dc *dc)
 
 	retval = debugfs_create_file("out_type", S_IRUGO, dc->debugdir, dc,
 		&outtype_fops);
+	if (!retval)
+		goto remove_out;
+
+	retval = debugfs_create_file("edid", S_IRUGO, dc->debugdir, dc,
+		&edid_fops);
 	if (!retval)
 		goto remove_out;
 
