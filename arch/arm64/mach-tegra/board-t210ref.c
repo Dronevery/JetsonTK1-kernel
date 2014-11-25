@@ -1,7 +1,7 @@
  /*
  * arch/arm64/mach-tegra/board-t210ref.c
  *
- * Copyright (c) 2013-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -398,8 +398,6 @@ static void __init tegra_t210ref_late_init(void)
 	tegra_io_dpd_enable(&pexclk2_io);
 
 	t210ref_camera_init();
-
-	t210ref_thermal_sensors_init();
 }
 
 static void __init tegra_t210ref_init_early(void)
