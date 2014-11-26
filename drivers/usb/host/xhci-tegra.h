@@ -1,7 +1,7 @@
 /*
  * xhci-tegra.h - Nvidia xHCI host controller related data
  *
- * Copyright (c) 2013-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -25,6 +25,9 @@
 #include <linux/circ_buf.h>
 #include <linux/device.h>
 #include <linux/notifier.h>
+#ifdef CONFIG_TEGRA_EHCI_BOOST_CPU_FREQ
+#include <linux/pm_qos.h>
+#endif
 
 #include <mach/xusb.h>
 
@@ -415,6 +418,16 @@ struct tegra_xhci_hcd {
 	struct tegra_prod_list *prod_list;
 	void __iomem *base_list[4];
 
+#ifdef CONFIG_TEGRA_EHCI_BOOST_CPU_FREQ
+	struct mutex boost_cpufreq_lock;
+	struct pm_qos_request boost_cpufreq_req;
+	struct pm_qos_request boost_cpuon_req;
+	struct work_struct boost_cpufreq_work;
+	struct delayed_work restore_cpufreq_work;
+	unsigned long cpufreq_last_boosted;
+	bool cpufreq_boosted;
+	bool restore_cpufreq_scheduled;
+#endif
 	bool init_done;
 	bool clock_enable_done;
 };
