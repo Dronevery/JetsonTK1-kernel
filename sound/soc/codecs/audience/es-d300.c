@@ -1620,7 +1620,7 @@ static int put_input_route_value(struct snd_kcontrol *kcontrol,
 #endif
 
 exit:
-	pr_err("put input reg %d val %d refcnt: %d\n",
+	pr_debug("put input reg %d val %d refcnt: %d\n",
 	     reg, mux, cachedcmd_list[escore->algo_type][reg].refcnt);
 
 	return rc;
@@ -1704,7 +1704,7 @@ static int put_output_route_value(struct snd_kcontrol *kcontrol,
 #endif
 
 exit:
-	pr_err("put output reg %d val %d refcnt: %d\n",
+	pr_debug("put output reg %d val %d refcnt: %d\n",
 	    reg, mux, cachedcmd_list[escore->algo_type][reg].refcnt);
 
 	return rc;
