@@ -1420,7 +1420,7 @@ static int put_input_route_value(struct snd_kcontrol *kcontrol,
 	int rc = 0;
 
 	if (mux >= ARRAY_SIZE(proc_block_input_texts) || mux < 0) {
-		pr_err("%s(): Invalid input mux:%d Max valid value:%d\n",
+		pr_err("%s(): Invalid input mux:%d Max valid value:%lu\n",
 			__func__, mux, ARRAY_SIZE(proc_block_input_texts));
 		return -EINVAL;
 	}
@@ -1478,7 +1478,7 @@ static int put_output_route_value(struct snd_kcontrol *kcontrol,
 	int prev_mux = cachedcmd_list[escore->algo_type][reg].reg;
 
 	if (mux >= ARRAY_SIZE(proc_block_output_texts) || mux < 0) {
-		pr_err("%s(): Invalid output mux:%d Max valid value:%d\n",
+		pr_err("%s(): Invalid output mux:%d Max valid value:%lu\n",
 			__func__, mux, ARRAY_SIZE(proc_block_output_texts));
 		return -EINVAL;
 	}
