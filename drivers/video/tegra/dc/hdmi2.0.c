@@ -611,7 +611,6 @@ static void tegra_hdmi_hotplug_notify(struct tegra_hdmi *hdmi,
 
 #ifdef CONFIG_SWITCH
 	switch_set_state(&hdmi->hpd_switch, is_asserted ? 1 : 0);
-	switch_set_state(&hdmi->audio_switch, is_asserted ? 1 : 0);
 #endif
 }
 
@@ -1725,6 +1724,9 @@ static void tegra_dc_hdmi_enable(struct tegra_dc *dc)
 	tegra_hdmi_controller_enable(hdmi);
 
 	hdmi->enabled = true;
+#ifdef CONFIG_SWITCH
+	switch_set_state(&hdmi->audio_switch, 1);
+#endif
 }
 
 static inline u32 tegra_hdmi_get_shift_clk_div(struct tegra_hdmi *hdmi)
@@ -1839,6 +1841,9 @@ static void tegra_dc_hdmi_disable(struct tegra_dc *dc)
 	struct tegra_hdmi *hdmi = tegra_dc_get_outdata(dc);
 
 	hdmi->enabled = false;
+#ifdef CONFIG_SWITCH
+	switch_set_state(&hdmi->audio_switch, 0);
+#endif
 
 	tegra_hdmi_config_clk(hdmi, TEGRA_HDMI_SAFE_CLK);
 	tegra_hdmi_controller_disable(hdmi);
