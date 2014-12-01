@@ -78,7 +78,8 @@
 #define DISABLE_MBOX2_FULL_INT	0x0
 #define ENABLE_MBOX2_FULL_INT	0xFFFFFFFF
 
-#define LOGGER_TIMEOUT	20 /* in ms */
+#define LOGGER_TIMEOUT		20 /* in ms */
+#define ADSP_WFE_TIMEOUT	5000 /* in ms */
 
 #define LOAD_ADSP_FREQ 51200000lu /* in Hz */
 
@@ -206,8 +207,7 @@ static int adsp_create_debug_logger(struct dentry *adsp_debugfs_root)
 	if (!debugfs_create_file("adsp_logger", S_IRUGO,
 					adsp_debugfs_root, &priv.logger,
 					&adsp_logger_operations)) {
-		dev_err(dev,
-		"unable to create adsp logger debug fs file\n");
+		dev_err(dev, "unable to create adsp logger debug fs file\n");
 		ret = -ENOENT;
 	}
 
@@ -278,13 +278,12 @@ void *nvadsp_alloc_coherent(size_t size, dma_addr_t *da, gfp_t flags)
 	dev = &priv.pdev->dev;
 	va = dma_alloc_coherent(dev, size, da, flags);
 	if (!va) {
-		dev_err(dev,
-			"unable to allocate the memory for size %u\n",
-							(u32)size);
+		dev_err(dev, "unable to allocate the memory for size %lu\n",
+				size);
 		goto end;
 	}
-	WARN(!is_adsp_dram_addr(*da),
-			"bus addr %llx beyond %x\n", *da, UINT_MAX);
+	WARN(!is_adsp_dram_addr(*da), "bus addr %llx beyond %x\n",
+				*da, UINT_MAX);
 end:
 	return va;
 }
@@ -338,14 +337,14 @@ static inline void dump_global_symbol_table(void)
 		return;
 	}
 	num_ent = table[0].addr;
-	dev_info(dev,
-	    "total number of entries in global symbol table %d\n", num_ent);
+	dev_info(dev, "total number of entries in global symbol table %d\n",
+			num_ent);
 
 	pr_info("NAME ADDRESS TYPE\n");
 	for (i = 1; i < num_ent; i++)
 		pr_info("%s %x %s\n", table[i].name, table[i].addr,
-				ELF32_ST_TYPE(table[i].info) == STT_FUNC ?
-						    "STT_FUNC" : "STT_OBJECT");
+			ELF32_ST_TYPE(table[i].info) == STT_FUNC ?
+				"STT_FUNC" : "STT_OBJECT");
 }
 
 static int
@@ -353,10 +352,8 @@ create_global_symbol_table(const struct firmware *fw)
 {
 	int i;
 	struct device *dev = &priv.pdev->dev;
-	struct elf32_shdr *sym_shdr =
-				nvadsp_get_section(fw, ".symtab");
-	struct elf32_shdr *str_shdr =
-				nvadsp_get_section(fw, ".strtab");
+	struct elf32_shdr *sym_shdr = nvadsp_get_section(fw, ".symtab");
+	struct elf32_shdr *str_shdr = nvadsp_get_section(fw, ".strtab");
 	const u8 *elf_data = fw->data;
 	const char *name_table;
 	/* The first entry stores the number of entries in the array */
@@ -368,10 +365,8 @@ create_global_symbol_table(const struct firmware *fw)
 	name_table = elf_data + str_shdr->sh_offset;
 
 	num_ent += sym_shdr->sh_size / sizeof(struct elf32_sym);
-	priv.adsp_glo_sym_tbl =
-		devm_kzalloc(dev,
-			sizeof(struct global_sym_info) * num_ent,
-			GFP_KERNEL);
+	priv.adsp_glo_sym_tbl = devm_kzalloc(dev,
+		sizeof(struct global_sym_info) * num_ent, GFP_KERNEL);
 	if (!priv.adsp_glo_sym_tbl)
 		return -ENOMEM;
 
@@ -401,7 +396,7 @@ struct global_sym_info *find_global_symbol(const char *sym_name)
 	int i;
 
 	if (unlikely(!table)) {
-		dev_info(dev, "symbol table not present\n");
+		dev_err(dev, "symbol table not present\n");
 		return NULL;
 	}
 	num_ent = table[0].addr;
@@ -425,9 +420,8 @@ static void *get_debug_ram(const struct firmware *fw, int *size)
 		return ERR_PTR(-EINVAL);
 	}
 
-	dev_dbg(dev,
-		"the %s is present at 0x%x\n",
-				DEBUG_RAM_REGION, shdr->sh_addr);
+	dev_dbg(dev, "the %s is present at 0x%x\n",
+		DEBUG_RAM_REGION, shdr->sh_addr);
 	addr = shdr->sh_addr;
 	*size = shdr->sh_size;
 	return nvadsp_da_to_va_mappings(addr, *size);
@@ -451,21 +445,18 @@ void *get_mailbox_shared_region(void)
 
 	ret = request_firmware(&fw, NVADSP_FIRMWARE, dev);
 	if (ret < 0) {
-		dev_info(dev,
-			"reqest firmware for %s failed with %d\n",
+		dev_err(dev, "reqest firmware for %s failed with %d\n",
 					NVADSP_FIRMWARE, ret);
 		return ERR_PTR(ret);
 	}
 
 	shdr = nvadsp_get_section(fw, MAILBOX_REGION);
 	if (!shdr) {
-		dev_info(dev, "section %s not found\n", MAILBOX_REGION);
+		dev_err(dev, "section %s not found\n", MAILBOX_REGION);
 		return ERR_PTR(-EINVAL);
 	}
 
-	dev_dbg(dev,
-		"the shared section is present at 0x%x\n",
-						shdr->sh_addr);
+	dev_dbg(dev, "the shared section is present at 0x%x\n", shdr->sh_addr);
 	addr = shdr->sh_addr;
 	size = shdr->sh_size;
 	return nvadsp_da_to_va_mappings(addr, size);
@@ -503,21 +494,20 @@ static int nvadsp_os_elf_load(const struct firmware *fw)
 		if (phdr->p_type != PT_LOAD)
 			continue;
 
-		dev_dbg(dev,
-		"phdr: type %d da 0x%x memsz 0x%x filesz 0x%x\n",
+		dev_dbg(dev, "phdr: type %d da 0x%x memsz 0x%x filesz 0x%x\n",
 				phdr->p_type, da, memsz, filesz);
 
 		va = nvadsp_da_to_va_mappings(da, filesz);
 		if (!va) {
 			dev_err(dev, "no va for da 0x%x filesz 0x%x\n",
-							da, filesz);
+					da, filesz);
 			ret = -EINVAL;
 			break;
 		}
 
 		if (filesz > memsz) {
 			dev_err(dev, "bad phdr filesz 0x%x memsz 0x%x\n",
-							filesz, memsz);
+					filesz, memsz);
 			ret = -EINVAL;
 			break;
 		}
@@ -578,8 +568,7 @@ static int allocate_memory_for_adsp_os(void)
 	size = plat_data->co_size;
 	dram_va = ioremap_nocache(addr, plat_data->co_size);
 	if (!dram_va) {
-		dev_err(dev, "remap failed for addr %lx\n",
-					(long)plat_data->co_pa);
+		dev_err(dev, "remap failed for addr %llx\n", plat_data->co_pa);
 		ret = -ENOMEM;
 		goto end;
 	}
@@ -622,35 +611,30 @@ int nvadsp_os_load(void)
 
 	ret = request_firmware(&fw, NVADSP_FIRMWARE, dev);
 	if (ret < 0) {
-		dev_err(dev,
-			"reqest firmware for %s failed with %d\n",
-					NVADSP_FIRMWARE, ret);
+		dev_err(dev, "reqest firmware for %s failed with %d\n",
+				NVADSP_FIRMWARE, ret);
 		goto end;
 	}
 
 	ret = create_global_symbol_table(fw);
 	if (ret) {
-		dev_err(dev,
-			"unable to create global symbol table\n");
+		dev_err(dev, "unable to create global symbol table\n");
 		goto release_firmware;
 	}
 
 	ret = allocate_memory_for_adsp_os();
 	if (ret) {
-		dev_err(dev,
-			"unable to allocate memory for adsp os\n");
+		dev_err(dev, "unable to allocate memory for adsp os\n");
 		goto release_firmware;
 	}
 
 	priv.logger.debug_ram_rdr =
 		get_debug_ram(fw, &priv.logger.debug_ram_sz);
 	if (IS_ERR_OR_NULL(priv.logger.debug_ram_rdr))
-		dev_err(dev,
-			"Ram debug logging facility not available\n");
+		dev_err(dev, "Ram debug logging facility not available\n");
 
 	/* hold the pointer to the device */
 	priv.logger.dev = dev;
-
 
 	dev_info(dev, "Loading ADSP OS firmware %s\n", NVADSP_FIRMWARE);
 
@@ -662,8 +646,7 @@ int nvadsp_os_load(void)
 
 	ret = dram_app_mem_init(ADSP_APP_MEM_SMMU_ADDR, ADSP_APP_MEM_SIZE);
 	if (ret) {
-		dev_err(dev,
-			"unable to allocate memory for allocating dynamic apps\n");
+		dev_err(dev, "Memory allocation dynamic apps failed\n");
 		goto deallocate_os_memory;
 	}
 	ptr = get_mailbox_shared_region();
@@ -748,8 +731,11 @@ static int __nvadsp_os_start(void)
 #endif
 end:
 	return ret;
+
+#ifdef CONFIG_TEGRA_ADSP_DFS
 err:
 	__nvadsp_os_stop(true);
+#endif
 	return ret;
 }
 
@@ -806,8 +792,7 @@ static int __nvadsp_os_suspend(void)
 	ape_actmon_exit(priv.pdev);
 #endif
 
-	ret = nvadsp_mbox_open(&adsp_com_mbox, &com_mid,
-			       "adsp_com_mbox",
+	ret = nvadsp_mbox_open(&adsp_com_mbox, &com_mid, "adsp_com_mbox",
 			       NULL, NULL);
 	if (ret) {
 		dev_err(dev, "failed to open adsp com mbox\n");
@@ -863,8 +848,13 @@ static void __nvadsp_os_stop(bool reload)
 #endif
 
 	writel(ENABLE_MBOX2_FULL_INT, priv.misc_base + HWMBOX2_REG);
-	wait_for_completion(&entered_wfe);
+	err = wait_for_completion_interruptible_timeout(&entered_wfe,
+		msecs_to_jiffies(ADSP_WFE_TIMEOUT));
 	writel(DISABLE_MBOX2_FULL_INT, priv.misc_base + HWMBOX2_REG);
+	if (WARN_ON(err <= 0)) {
+		dev_err(dev, "ADSP is unable to enter wfe state\n");
+		goto end;
+	}
 
 	tegra_periph_reset_assert(drv_data->adsp_clk);
 
@@ -880,11 +870,10 @@ static void __nvadsp_os_stop(bool reload)
 			dev_err(dev, "failed to reload %s\n", NVADSP_FIRMWARE);
 	}
 
+end:
 	err = pm_runtime_put_sync(dev);
 	if (err)
-		pr_err("failed in pm_runtime_put_sync\n");
-
-	return;
+		dev_err(dev, "failed in pm_runtime_put_sync\n");
 }
 
 
@@ -1016,28 +1005,13 @@ int nvadsp_os_probe(struct platform_device *pdev)
 #if !CONFIG_SYSTEM_FPGA
 	priv.reset_reg = ioremap(APE_FPGA_MISC_RST_DEVICES, 1);
 	if (!priv.reset_reg) {
-		dev_info(dev, "unable to map reset addr\n");
+		dev_err(dev, "unable to map reset addr\n");
 		ret = -EINVAL;
 		goto end;
 	}
 #endif
-	priv.pdev = pdev;
 	priv.misc_base = drv_data->base_regs[AMISC];
 	priv.dram_region = drv_data->dram_region;
-
-#ifdef CONFIG_DEBUG_FS
-	priv.logger.dev = &priv.pdev->dev;
-
-	if (adsp_create_debug_logger(drv_data->adsp_debugfs_root))
-		dev_err(dev,
-			"unable to create adsp debug logger file\n");
-#ifdef CONFIG_TEGRA_ADSP_CONSOLE
-	priv.console.dev = &priv.pdev->dev;
-	if (adsp_create_cnsl(drv_data->adsp_debugfs_root, &priv.console))
-		dev_err(dev,
-		"unable to create adsp console file\n");
-#endif /* CONFIG_TEGRA_ADSP_CONSOLE */
-#endif /* CONFIG_DEBUG_FS */
 
 	ret = devm_request_irq(dev, wdt_virq, adsp_wdt_handler,
 			IRQF_TRIGGER_RISING, "adsp watchdog", &priv);
@@ -1065,6 +1039,19 @@ int nvadsp_os_probe(struct platform_device *pdev)
 	INIT_WORK(&priv.restart_os_work, nvadsp_os_restart);
 	mutex_init(&priv.fw_load_lock);
 	mutex_init(&priv.os_run_lock);
+
+	priv.pdev = pdev;
+#ifdef CONFIG_DEBUG_FS
+	priv.logger.dev = &pdev->dev;
+	if (adsp_create_debug_logger(drv_data->adsp_debugfs_root))
+		dev_err(dev, "unable to create adsp debug logger file\n");
+#ifdef CONFIG_TEGRA_ADSP_CONSOLE
+	priv.console.dev = &pdev->dev;
+	if (adsp_create_cnsl(drv_data->adsp_debugfs_root, &priv.console))
+		dev_err(dev, "unable to create adsp console file\n");
+#endif /* CONFIG_TEGRA_ADSP_CONSOLE */
+#endif /* CONFIG_DEBUG_FS */
+
 end:
 	return ret;
 }
