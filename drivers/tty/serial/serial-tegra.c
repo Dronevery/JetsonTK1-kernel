@@ -85,6 +85,29 @@
 #define TEGRA_TX_PIO				1
 #define TEGRA_TX_DMA				2
 
+/** BT parser data **/
+#define TEGRA_MAX_LAST_RX_DATA (8*1024)
+
+#define HCI_HEADER1		0x2
+#define HCI_HEADER1_LEN	4
+#define HCI_HEADER2		0x4
+#define HCI_HEADER2_LEN	2
+enum {
+	HCI_RX_MSGTYPE_ST,
+	HCI_RX_LEN_ST,
+	HCI_RX_DATA_ST,
+};
+
+struct bt_helper_data {
+	int receive_state;
+	int hdr_cnt;
+	int hdr_size;
+	u8 header[4];
+	u16 len_pkt;
+};
+
+/** BT parser data **/
+
 /**
  * tegra_uart_chip_data: SOC specific data.
  *
@@ -139,7 +162,136 @@ struct tegra_uart_port {
 	struct timer_list           timer;
 	int                 timer_timeout_jiffies;
 	bool                enable_rx_buffer_throttle;
+	struct bt_helper_data  bt_data;
+	bool                   enable_bt_parser;
+	char rx_data[TEGRA_MAX_LAST_RX_DATA];
+	char rx_data_type[TEGRA_MAX_LAST_RX_DATA];
+	int rx_wr_index;
+	int rx_rd_index;
 };
+
+/** BT Packet Parser **/
+int bt_parse_hci_packet(char rx_ch, struct bt_helper_data *hdata, char *str)
+{
+	int ret = 0;
+
+	if (hdata->receive_state == HCI_RX_DATA_ST) {
+		if (hdata->len_pkt == 0) {
+			if ((rx_ch != HCI_HEADER1) && (rx_ch != HCI_HEADER2)) {
+				pr_err("%s:  Unknown BT HCI packet.. 0x%x\n",
+						str, rx_ch);
+				hdata->receive_state = HCI_RX_MSGTYPE_ST;
+				hdata->hdr_cnt = 0;
+				ret = 1;
+			} else {
+				hdata->receive_state = HCI_RX_MSGTYPE_ST;
+				hdata->hdr_cnt  = 0;
+			}
+		}
+		hdata->len_pkt--;
+	}
+
+	if (hdata->receive_state == HCI_RX_LEN_ST) {
+		hdata->header[hdata->hdr_cnt] = rx_ch;
+		hdata->hdr_cnt++;
+		if (hdata->hdr_cnt == hdata->hdr_size) {
+			if (hdata->hdr_cnt == HCI_HEADER2_LEN)
+				hdata->len_pkt = hdata->header[1];
+			if (hdata->hdr_cnt == HCI_HEADER1_LEN)
+				hdata->len_pkt = (hdata->header[3] << 8) |
+					(hdata->header[2]);
+			hdata->receive_state = HCI_RX_DATA_ST;
+		}
+	}
+
+	if ((rx_ch == HCI_HEADER1 || rx_ch == HCI_HEADER2)
+			&& (hdata->receive_state == HCI_RX_MSGTYPE_ST)) {
+		hdata->receive_state = HCI_RX_LEN_ST;
+		hdata->len_pkt = 0;
+		hdata->hdr_cnt = 0;
+		memset(hdata->header, 0, 4);
+		if (rx_ch == HCI_HEADER1)
+			hdata->hdr_size = HCI_HEADER1_LEN;
+		if (rx_ch == HCI_HEADER2)
+			hdata->hdr_size = HCI_HEADER2_LEN;
+	}
+
+	return ret;
+}
+
+#define inc_rx_index(n, m)  \
+do { \
+	if ((n + 1) == TEGRA_MAX_LAST_RX_DATA) \
+		m = 1; \
+	n = (((n) + 1) % (TEGRA_MAX_LAST_RX_DATA)); \
+} while (0)
+#define put_rx_data(t, rx_ch, dma_type) \
+do { \
+	t->rx_data[t->rx_wr_index] = rx_ch; \
+	t->rx_data_type[t->rx_wr_index] = dma_type; \
+	inc_rx_index(t->rx_wr_index, t->rx_rd_index); \
+} while (0)
+
+void dump_last_recv_data(struct tegra_uart_port *tup, int n)
+{
+	int total_recv_data = tup->rx_wr_index;
+	int rd_index;
+	int i, j;
+	unsigned char str[150];
+	int remain;
+
+	if (tup->rx_rd_index)
+		total_recv_data = TEGRA_MAX_LAST_RX_DATA;
+	total_recv_data = min(n, total_recv_data);
+	if (!total_recv_data) {
+		pr_err("%s: No data for Print", __func__);
+		return;
+	}
+	if (tup->rx_wr_index)
+		rd_index = tup->rx_wr_index - 1;
+	else
+		rd_index = TEGRA_MAX_LAST_RX_DATA - 1;
+
+	pr_err("DUMPING LAST RECVD UART packets size %d and asked %d\n",
+			total_recv_data, n);
+	for (i = 0; i < total_recv_data; ) {
+		remain = min(total_recv_data - i, 16);
+		for (j = 0; j < remain; ++j) {
+			sprintf(str + j * 6, "%02x(%d) ",
+					tup->rx_data[rd_index],
+					(tup->rx_data_type[rd_index]));
+			if (rd_index)
+				rd_index--;
+			else
+				rd_index = TEGRA_MAX_LAST_RX_DATA - 1;
+		}
+		str[j * 6] = '\0';
+		pr_err("%s\n", str);
+		i += remain;
+	}
+}
+
+void dump_recd_dma_buffer(unsigned char *buf, int count)
+{
+	unsigned char str[250];
+	int rd_index = 0, i, j;
+	int remain;
+
+	pr_err("## DUMPING CURRENT DMA BUFFER OF SIZE: %d ##\n", count);
+	for (i = 0; i < count; ) {
+		remain = min(count - i, 10);
+		for (j = 0; j < remain; ++j) {
+			sprintf(str + j * 10, "%02x(%04x)    ", buf[rd_index],
+					rd_index);
+			rd_index++;
+		}
+		str[j * 10] = '\0';
+		pr_err("%s\n", str);
+		i += remain;
+	}
+}
+
+/** BT Packet Parser **/
 
 static void tegra_uart_start_next_tx(struct tegra_uart_port *tup);
 static int tegra_uart_start_rx_dma(struct tegra_uart_port *tup);
@@ -531,6 +683,11 @@ static void tegra_uart_handle_rx_pio(struct tegra_uart_port *tup,
 		tup->uport.icount.rx++;
 
 		if (!uart_handle_sysrq_char(&tup->uport, ch) && tty) {
+			if (tup->enable_bt_parser) {
+				put_rx_data(tup, ch, 0);
+				bt_parse_hci_packet(ch, &tup->bt_data,
+						"serial-pio");
+			}
 			copied = tty_insert_flip_char_lock(tty, ch, flag);
 			if (copied != 1)
 				dev_err(tup->uport.dev, "RxData PIO to tty layer failed\n");
@@ -570,6 +727,8 @@ static void tegra_uart_copy_rx_to_tty(struct tegra_uart_port *tup,
 		struct tty_port *tty, int count)
 {
 	int copied;
+	int i;
+	int ret;
 
 	tup->uport.icount.rx += count;
 	if (!tty) {
@@ -579,10 +738,30 @@ static void tegra_uart_copy_rx_to_tty(struct tegra_uart_port *tup,
 	dma_sync_single_for_cpu(tup->uport.dev, tup->rx_dma_buf_phys,
 				TEGRA_UART_RX_DMA_BUFFER_SIZE, DMA_FROM_DEVICE);
 
+	if (tup->enable_bt_parser) {
+		unsigned char *dma_buff;
+		dma_buff = (unsigned char *)(tup->rx_dma_buf_virt);
+		for (i = 0; i < count; i++) {
+			put_rx_data(tup, *(dma_buff + i), 1);
+			ret = bt_parse_hci_packet(*(dma_buff + i),
+					&tup->bt_data, "serial-dma");
+			if (ret) {
+				dump_recd_dma_buffer(dma_buff, count);
+				dump_last_recv_data(tup, 4096);
+				break;
+			}
+		}
+	}
+
 	copied = tty_insert_flip_string_lock(tty,
 			((unsigned char *)(tup->rx_dma_buf_virt)), count);
 	if (copied != count)
 		dev_err(tup->uport.dev, "RxData DMA copy to tty layer failed\n");
+
+	if (tup->enable_bt_parser)
+		memset((unsigned char *)(tup->rx_dma_buf_virt), 0,
+				TEGRA_UART_RX_DMA_BUFFER_SIZE);
+
 	dma_sync_single_for_device(tup->uport.dev, tup->rx_dma_buf_phys,
 				TEGRA_UART_RX_DMA_BUFFER_SIZE, DMA_TO_DEVICE);
 }
@@ -900,6 +1079,11 @@ static int tegra_uart_hw_init(struct tegra_uart_port *tup)
 	tup->lcr_shadow = 0;
 	tup->ier_shadow = 0;
 	tup->current_baud = 0;
+
+	if (tup->enable_bt_parser) {
+		tup->rx_wr_index = 0;
+		tup->rx_rd_index = 0;
+	}
 
 	clk_prepare_enable(tup->uart_clk);
 
@@ -1343,6 +1527,8 @@ static int tegra_uart_parse_dt(struct platform_device *pdev,
 			"nvidia,enable-rx-buffer-throttling");
 	if (tup->enable_rx_buffer_throttle)
 		dev_info(&pdev->dev, "Rx buffer throttling enabled\n");
+	tup->enable_bt_parser = of_property_read_bool(np,
+			"nvidia,enable-bt-parser");
 
 	return 0;
 }
