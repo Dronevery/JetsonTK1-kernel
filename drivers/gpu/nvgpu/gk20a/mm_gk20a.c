@@ -87,6 +87,7 @@ static inline u32 lo32(u64 f)
 	return (u32)(f & 0xffffffff);
 }
 
+void __gk20a_mm_tlb_invalidate(struct vm_gk20a *vm);;
 static struct mapped_buffer_node *find_mapped_buffer_locked(
 					struct rb_root *root, u64 addr);
 static struct mapped_buffer_node *find_mapped_buffer_reverse_locked(
@@ -1690,6 +1691,7 @@ static int update_gmmu_ptes_locked(struct vm_gk20a *vm,
 	u32 page_size  = vm->gmmu_page_sizes[pgsz_idx];
 	u64 addr = 0;
 	u64 space_to_skip = buffer_offset;
+	bool set_tlb_dirty = false;
 
 	pde_range_from_vaddr_range(vm, first_vaddr, last_vaddr,
 				   &pde_lo, &pde_hi);
@@ -1733,6 +1735,8 @@ static int update_gmmu_ptes_locked(struct vm_gk20a *vm,
 		void *pte_kv_cur;
 
 		struct page_table_gk20a *pte = vm->pdes.ptes[pgsz_idx] + pde_i;
+
+		set_tlb_dirty = true;
 
 		if (pde_i == pde_lo)
 			pte_lo = pte_index_from_vaddr(vm, first_vaddr,
@@ -1827,6 +1831,9 @@ static int update_gmmu_ptes_locked(struct vm_gk20a *vm,
 			/* rewrite pde */
 			update_gmmu_pde_locked(vm, pde_i);
 
+			__gk20a_mm_tlb_invalidate(vm);
+			set_tlb_dirty = false;
+
 			free_gmmu_pages(vm, pte_ref_ptr, pte->sgt,
 				vm->page_table_sizing[pgsz_idx].order,
 				pte->size);
@@ -1836,8 +1843,10 @@ static int update_gmmu_ptes_locked(struct vm_gk20a *vm,
 	}
 
 	smp_mb();
-	vm->tlb_dirty = true;
-	gk20a_dbg_fn("set tlb dirty");
+	if (set_tlb_dirty) {
+		vm->tlb_dirty = true;
+		gk20a_dbg_fn("set tlb dirty");
+	}
 
 	return 0;
 
@@ -3026,7 +3035,7 @@ int gk20a_vm_find_buffer(struct vm_gk20a *vm, u64 gpu_va,
 	return 0;
 }
 
-void gk20a_mm_tlb_invalidate(struct vm_gk20a *vm)
+void __gk20a_mm_tlb_invalidate(struct vm_gk20a *vm)
 {
 	struct gk20a *g = gk20a_from_vm(vm);
 	u32 addr_lo = u64_lo32(gk20a_mm_iova_addr(vm->pdes.sgt->sgl) >> 12);
@@ -3036,21 +3045,8 @@ void gk20a_mm_tlb_invalidate(struct vm_gk20a *vm)
 
 	gk20a_dbg_fn("");
 
-	/* pagetables are considered sw states which are preserved after
-	   prepare_poweroff. When gk20a deinit releases those pagetables,
-	   common code in vm unmap path calls tlb invalidate that touches
-	   hw. Use the power_on flag to skip tlb invalidation when gpu
-	   power is turned off */
-
 	if (!g->power_on)
 		return;
-
-	/* No need to invalidate if tlb is clean */
-	mutex_lock(&vm->update_gmmu_lock);
-	if (!vm->tlb_dirty) {
-		mutex_unlock(&vm->update_gmmu_lock);
-		return;
-	}
 
 	mutex_lock(&tlb_lock);
 	do {
@@ -3090,8 +3086,33 @@ void gk20a_mm_tlb_invalidate(struct vm_gk20a *vm)
 
 out:
 	mutex_unlock(&tlb_lock);
+}
+
+void gk20a_mm_tlb_invalidate(struct vm_gk20a *vm)
+{
+	struct gk20a *g = gk20a_from_vm(vm);
+
+	gk20a_dbg_fn("");
+
+	/* pagetables are considered sw states which are preserved after
+	   prepare_poweroff. When gk20a deinit releases those pagetables,
+	   common code in vm unmap path calls tlb invalidate that touches
+	   hw. Use the power_on flag to skip tlb invalidation when gpu
+	   power is turned off */
+
+	if (!g->power_on)
+		return;
+
+	/* No need to invalidate if tlb is clean */
+	mutex_lock(&vm->update_gmmu_lock);
+	if (!vm->tlb_dirty) {
+		mutex_unlock(&vm->update_gmmu_lock);
+		return;
+	}
 	vm->tlb_dirty = false;
 	mutex_unlock(&vm->update_gmmu_lock);
+
+	__gk20a_mm_tlb_invalidate(vm);
 }
 
 int gk20a_mm_suspend(struct gk20a *g)
@@ -3130,4 +3151,3 @@ void gk20a_init_mm(struct gpu_ops *gops)
 	gops->mm.l2_flush = gk20a_mm_l2_flush;
 	gops->mm.tlb_invalidate = gk20a_mm_tlb_invalidate;
 }
-
