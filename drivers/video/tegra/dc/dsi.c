@@ -5239,7 +5239,7 @@ static long tegra_dc_dsi_setup_clk(struct tegra_dc *dc, struct clk *clk)
 	} else {
 		if (dc->pdata->default_out->dsi->dsi_instance) {
 			parent_clk = clk_get_sys(NULL,
-				dc->out->parent_clk ? : "pll_d2_out0");
+				dc->out->parent_clk ? : "pll_d2");
 			base_clk = clk_get_parent(parent_clk);
 		} else {
 			parent_clk = clk_get_sys(NULL,
