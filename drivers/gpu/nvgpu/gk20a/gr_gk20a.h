@@ -336,6 +336,28 @@ struct gk20a_ctxsw_bootloader_desc {
 	u32 entry_point;
 };
 
+struct fecs_method_op_gk20a {
+	struct {
+		u32 addr;
+		u32 data;
+	} method;
+
+	struct {
+		u32 id;
+		u32 data;
+		u32 clr;
+		u32 *ret;
+		u32 ok;
+		u32 fail;
+	} mailbox;
+
+	struct {
+		u32 ok;
+		u32 fail;
+	} cond;
+
+};
+
 struct gpu_ops;
 int gr_gk20a_load_golden_ctx_image(struct gk20a *g,
 					struct channel_gk20a *c);
@@ -456,4 +478,12 @@ void gk20a_suspend_all_sms(struct gk20a *g);
 int gk20a_gr_lock_down_sm(struct gk20a *g,
 				 u32 gpc, u32 tpc, u32 global_esr_mask);
 bool gk20a_is_channel_ctx_resident(struct channel_gk20a *ch);
+int gr_gk20a_init_ctx_state(struct gk20a *g);
+int gr_gk20a_submit_fecs_method_op(struct gk20a *g,
+				   struct fecs_method_op_gk20a op);
+int gr_gk20a_alloc_gr_ctx(struct gk20a *g,
+			  struct gr_ctx_desc **__gr_ctx, struct vm_gk20a *vm,
+			  u32 padding);
+void gr_gk20a_free_gr_ctx(struct gk20a *g,
+			  struct vm_gk20a *vm, struct gr_ctx_desc *gr_ctx);
 #endif /*__GR_GK20A_H__*/

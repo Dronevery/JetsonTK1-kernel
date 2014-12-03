@@ -817,4 +817,7 @@ void gm20b_init_gr(struct gpu_ops *gops)
 	gops->gr.is_tpc_addr = gr_gm20b_is_tpc_addr;
 	gops->gr.get_tpc_num = gr_gm20b_get_tpc_num;
 	gops->gr.detect_sm_arch = gr_gm20b_detect_sm_arch;
+	gops->gr.init_ctx_state = gr_gk20a_init_ctx_state;
+	gops->gr.alloc_gr_ctx = gr_gk20a_alloc_gr_ctx;
+	gops->gr.free_gr_ctx = gr_gk20a_free_gr_ctx;
 }

@@ -139,6 +139,16 @@ struct gpu_ops {
 		bool (*is_tpc_addr)(u32 addr);
 		u32 (*get_tpc_num)(u32 addr);
 		void (*detect_sm_arch)(struct gk20a *g);
+		int (*init_ctx_state)(struct gk20a *g);
+		int (*alloc_gr_ctx)(struct gk20a *g,
+			  struct gr_ctx_desc **__gr_ctx, struct vm_gk20a *vm,
+			  u32 padding);
+		void (*free_gr_ctx)(struct gk20a *g,
+			  struct vm_gk20a *vm,
+			  struct gr_ctx_desc *gr_ctx);
+		void (*update_ctxsw_preemption_mode)(struct gk20a *g,
+				struct channel_ctx_gk20a *ch_ctx,
+				void *ctx_ptr);
 	} gr;
 	const char *name;
 	struct {
