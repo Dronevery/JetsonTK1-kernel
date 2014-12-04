@@ -24,7 +24,7 @@
 		 * interrupts =
 		 * #interrupt-names =
 		 */
-		status = "okay";
+		status = "disabled";
 		sensor-params-tall       = <76>;
 		sensor-params-tiddq      = <1>;
 		sensor-params-ten-count  = <16>;
