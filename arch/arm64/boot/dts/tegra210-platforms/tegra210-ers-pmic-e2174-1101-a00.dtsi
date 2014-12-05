@@ -346,11 +346,13 @@
 			reg = <0x55>;
 			ti,design-capacity = <7700>;
 			ti,design-energy = <27720>;
-			ti,taper-rate = <167>;
-			ti,terminate-voltage = <3150>;
+			ti,taper-rate = <180>;
+			ti,terminate-voltage = <2800>;
 			ti,v-at-chg-term = <4190>;
 			ti,cc-gain = <0x7F738FE1>;
 			ti,cc-delta = <0x940A8F4A>;
+			ti,qmax-cell = <7800>;
+			ti,reserve-cap-mah = <100>;
 		};
 	};
 
