@@ -1336,7 +1336,7 @@ const char __user *addr, size_t len, loff_t *pos)
 	if (WARN_ON(!dc || !dc->out))
 		return -EINVAL;
 
-	if (len < 128) { /* not a valid edid */
+	if (len < 128) { /* invalid edid, turn off vedid */
 		dc->vedid = false;
 		tegra_edid_get_monspecs(dc->edid, &mon_spec, NULL);
 		return 1;
