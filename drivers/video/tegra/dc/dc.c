@@ -1672,22 +1672,32 @@ static int _tegra_dc_config_frame_end_intr(struct tegra_dc *dc, bool enable)
 	return 0;
 }
 
-int tegra_dc_update_cmu_aligned(struct tegra_dc *dc, struct tegra_dc_cmu *cmu)
+static int _tegra_dc_update_cmu_aligned(struct tegra_dc *dc,
+				struct tegra_dc_cmu *cmu,
+				bool force)
 {
-	mutex_lock(&dc->lock);
-	if (!dc->enabled) {
-		mutex_unlock(&dc->lock);
+	if (!dc->cmu_enabled)
 		return 0;
-	}
 
 	memcpy(&dc->cmu_shadow, cmu, sizeof(dc->cmu));
 	dc->cmu_shadow_dirty = true;
+	dc->cmu_shadow_force_update = force;
 	_tegra_dc_config_frame_end_intr(dc, true);
-
-	mutex_unlock(&dc->lock);
 
 	return 0;
 }
+
+int tegra_dc_update_cmu_aligned(struct tegra_dc *dc, struct tegra_dc_cmu *cmu)
+{
+	int ret;
+
+	mutex_lock(&dc->lock);
+	ret = _tegra_dc_update_cmu_aligned(dc, cmu, false);
+	mutex_unlock(&dc->lock);
+
+	return ret;
+}
+
 EXPORT_SYMBOL(tegra_dc_update_cmu_aligned);
 
 static struct tegra_dc_cmu *tegra_dc_get_cmu(struct tegra_dc *dc)
@@ -2401,7 +2411,8 @@ static void tegra_dc_vblank(struct work_struct *work)
 }
 
 #define CSC_UPDATE_IF_CHANGED(entry, ENTRY) do { \
-		if (cmu_active->csc.entry != cmu_shadow->csc.entry) { \
+		if (cmu_active->csc.entry != cmu_shadow->csc.entry || \
+			dc->cmu_shadow_force_update) { \
 			cmu_active->csc.entry = cmu_shadow->csc.entry; \
 			tegra_dc_writel(dc, \
 				cmu_active->csc.entry, \
@@ -2429,6 +2440,16 @@ static void tegra_dc_frame_end(struct work_struct *work)
 		struct tegra_dc_cmu *cmu_active = &dc->cmu;
 		struct tegra_dc_cmu *cmu_shadow = &dc->cmu_shadow;
 
+		for (i = 0; i < 256; i++) {
+			if (cmu_active->lut1[i] != cmu_shadow->lut2[i] ||
+				dc->cmu_shadow_force_update) {
+				cmu_active->lut1[i] = cmu_shadow->lut1[i];
+				val = LUT1_ADDR(i) |
+					LUT1_DATA(cmu_shadow->lut1[i]);
+				tegra_dc_writel(dc, val, DC_COM_CMU_LUT1);
+			}
+		}
+
 		CSC_UPDATE_IF_CHANGED(krr, KRR);
 		CSC_UPDATE_IF_CHANGED(kgr, KGR);
 		CSC_UPDATE_IF_CHANGED(kbr, KBR);
@@ -2440,7 +2461,8 @@ static void tegra_dc_frame_end(struct work_struct *work)
 		CSC_UPDATE_IF_CHANGED(kbb, KBB);
 
 		for (i = 0; i < 960; i++)
-			if (cmu_active->lut2[i] != cmu_shadow->lut2[i]) {
+			if (cmu_active->lut2[i] != cmu_shadow->lut2[i] ||
+				dc->cmu_shadow_force_update) {
 				cmu_active->lut2[i] = cmu_shadow->lut2[i];
 				val = LUT2_ADDR(i) |
 					LUT2_DATA(cmu_active->lut2[i]);
@@ -2448,6 +2470,7 @@ static void tegra_dc_frame_end(struct work_struct *work)
 			}
 
 		dc->cmu_shadow_dirty = false;
+		dc->cmu_shadow_force_update = false;
 		_tegra_dc_config_frame_end_intr(dc, false);
 	}
 
@@ -2990,7 +3013,7 @@ static int tegra_dc_init(struct tegra_dc *dc)
 #endif
 
 #ifdef CONFIG_TEGRA_DC_CMU
-	_tegra_dc_update_cmu(dc, tegra_dc_get_cmu(dc));
+	_tegra_dc_update_cmu_aligned(dc, tegra_dc_get_cmu(dc), true);
 #endif
 	tegra_dc_set_color_control(dc);
 	for_each_set_bit(i, &dc->valid_windows, DC_N_WINDOWS) {
@@ -4070,8 +4093,6 @@ static int tegra_dc_probe(struct platform_device *ndev)
 	pm_runtime_enable(&ndev->dev);
 
 #ifdef CONFIG_TEGRA_DC_CMU
-	/* if bootloader leaves this head enabled, then skip CMU programming. */
-	dc->cmu_dirty = (dc->pdata->flags & TEGRA_DC_FLAG_ENABLED) == 0;
 	dc->cmu_enabled = dc->pdata->cmu_enable;
 #endif
 

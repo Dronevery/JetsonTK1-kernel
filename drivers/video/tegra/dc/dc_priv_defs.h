@@ -198,6 +198,7 @@ struct tegra_dc {
 	struct tegra_dc_cmu		cmu_shadow;
 	bool				cmu_dirty;
 	bool				cmu_shadow_dirty;
+	bool				cmu_shadow_force_update;
 	bool				cmu_enabled;
 #endif
 	wait_queue_head_t		wq;
