@@ -2515,7 +2515,7 @@ static void tegra_dc_frame_end(struct work_struct *work)
 		struct tegra_dc_cmu *cmu_shadow = &dc->cmu_shadow;
 
 		for (i = 0; i < 256; i++) {
-			if (cmu_active->lut1[i] != cmu_shadow->lut2[i] ||
+			if (cmu_active->lut1[i] != cmu_shadow->lut1[i] ||
 				dc->cmu_shadow_force_update) {
 				cmu_active->lut1[i] = cmu_shadow->lut1[i];
 				val = LUT1_ADDR(i) |
