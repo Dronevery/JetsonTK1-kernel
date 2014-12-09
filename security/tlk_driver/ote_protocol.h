@@ -117,6 +117,7 @@ enum {
 	TE_SMC_OPEN_SESSION		= 0x30000001,
 	TE_SMC_CLOSE_SESSION		= 0x30000002,
 	TE_SMC_LAUNCH_OPERATION		= 0x30000003,
+	TE_SMC_TA_EVENT			= 0x30000004,
 
 	/* Trusted OS calls */
 	TE_SMC_REGISTER_REQ_BUF		= 0x32000002,
@@ -236,6 +237,12 @@ void te_launch_operation(struct te_launchop *cmd,
 struct te_ss_op {
 	uint32_t	req_size;
 	uint8_t		data[SS_OP_MAX_DATA_SIZE];
+};
+
+enum ta_event_id {
+	TA_EVENT_RESTORE_KEYS = 0,
+
+	TA_EVENT_MASK = (1 << TA_EVENT_RESTORE_KEYS),
 };
 
 int te_handle_ss_ioctl(struct file *file, unsigned int ioctl_num,
