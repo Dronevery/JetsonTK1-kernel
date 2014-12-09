@@ -7267,7 +7267,7 @@ static void dhd_hang_process(void *dhd_info, void *event_info, u8 event)
 	dhd_info_t *dhd;
 	struct net_device *dev;
 
-	dhd = (dhd_info_t *)dhd_info;
+	dhd = (dhd_info_t *)((dhd_pub_t *)dhd_info)->info;
 	dev = dhd->iflist[0]->net;
 
 	if (dev) {
