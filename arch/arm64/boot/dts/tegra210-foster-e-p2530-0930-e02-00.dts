@@ -33,4 +33,7 @@
 		compatible = "pwm-leds";
 		status = "disabled";
 	};
+	rollback-protection {
+		status = "okay";
+	};
 };

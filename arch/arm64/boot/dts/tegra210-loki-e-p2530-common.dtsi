@@ -425,4 +425,8 @@
 		nvidia,throttle_depth = <75>;
 		nvidia,cap_method = <3>;
 	};
+
+	rollback-protection {
+		status = "okay";
+	};
 };

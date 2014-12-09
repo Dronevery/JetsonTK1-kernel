@@ -33,4 +33,7 @@
 			status = "disabled";
 		};
 	};
+	rollback-protection {
+		status = "okay";
+	};
 };
