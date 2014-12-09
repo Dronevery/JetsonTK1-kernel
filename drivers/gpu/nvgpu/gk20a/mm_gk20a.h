@@ -162,7 +162,11 @@ struct gr_ctx_desc {
 	u64 iova;
 	size_t size;
 	u64 gpu_va;
+	int preempt_mode;
 };
+
+#define NVGPU_GR_PREEMPTION_MODE_WFI		0
+#define NVGPU_GR_PREEMPTION_MODE_CTA		2
 
 struct compbit_store_desc {
 	struct page **pages;
