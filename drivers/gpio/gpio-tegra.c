@@ -90,6 +90,7 @@ struct tegra_gpio_bank {
 static struct irq_domain *irq_domain;
 static void __iomem *regs;
 
+static bool bypass_pinconfig;
 static u32 tegra_gpio_bank_count;
 static u32 tegra_gpio_bank_stride;
 static u32 tegra_gpio_upper_offset;
@@ -179,6 +180,11 @@ static int tegra_gpio_direction_input(struct gpio_chip *chip, unsigned offset)
 	tegra_gpio_mask_write(GPIO_MSK_OE(offset), offset, 0);
 	tegra_gpio_enable(offset);
 
+	if (bypass_pinconfig) {
+		pr_info("%s(): ignoring pinctrl configuration\n", __func__);
+		return 0;
+	}
+
 	ret = pinctrl_gpio_direction_input(chip->base + offset);
 	if (ret < 0)
 		dev_err(chip->dev,
@@ -195,6 +201,11 @@ static int tegra_gpio_direction_output(struct gpio_chip *chip, unsigned offset,
 	tegra_gpio_set(chip, offset, value);
 	tegra_gpio_mask_write(GPIO_MSK_OE(offset), offset, 1);
 	tegra_gpio_enable(offset);
+
+	if (bypass_pinconfig) {
+		pr_info("%s(): ignoring pinctrl configuration\n", __func__);
+		return 0;
+	}
 
 	ret = pinctrl_gpio_direction_output(chip->base + offset);
 	if (ret < 0)
@@ -362,6 +373,7 @@ static void tegra_gpio_resume(void)
 	int b;
 	int p;
 
+	bypass_pinconfig = false;
 	local_irq_save(flags);
 
 	for (b = 0; b < tegra_gpio_bank_count; b++) {
@@ -416,6 +428,7 @@ static int tegra_gpio_suspend(void)
 	}
 	local_irq_restore(flags);
 
+	bypass_pinconfig = true;
 	of_gpiochip_suspend(&tegra_gpio_chip);
 	return 0;
 }
