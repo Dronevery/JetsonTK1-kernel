@@ -1692,9 +1692,6 @@ static void tegra_sdhci_set_clock(struct sdhci_host *sdhci, unsigned int clock)
 		mmc_hostname(sdhci->mmc), clock, tegra_host->clk_enabled);
 	if (clock) {
 		if (!tegra_host->clk_enabled) {
-#ifndef CONFIG_MMC_PM_DOMAIN
-			pm_runtime_get_sync(&pdev->dev);
-#endif
 			ret = clk_prepare_enable(pltfm_host->clk);
 			if (ret) {
 				dev_err(mmc_dev(sdhci->mmc),
@@ -1702,8 +1699,11 @@ static void tegra_sdhci_set_clock(struct sdhci_host *sdhci, unsigned int clock)
 				mutex_unlock(&tegra_host->set_clock_mutex);
 				return;
 			}
+#ifndef CONFIG_MMC_PM_DOMAIN
+			pm_runtime_get_sync(&pdev->dev);
+#endif
 			tegra_host->clk_enabled = true;
-			sdhci->is_clk_on = tegra_host->clk_enabled;
+			sdhci->is_clk_on = true;
 			ctrl = sdhci_readb(sdhci, SDHCI_VNDR_CLK_CTRL);
 			ctrl |= SDHCI_VNDR_CLK_CTRL_SDMMC_CLK;
 			sdhci_writeb(sdhci, ctrl, SDHCI_VNDR_CLK_CTRL);
@@ -1752,12 +1752,13 @@ static void tegra_sdhci_set_clock(struct sdhci_host *sdhci, unsigned int clock)
 		ctrl = sdhci_readb(sdhci, SDHCI_VNDR_CLK_CTRL);
 		ctrl &= ~SDHCI_VNDR_CLK_CTRL_SDMMC_CLK;
 		sdhci_writeb(sdhci, ctrl, SDHCI_VNDR_CLK_CTRL);
-		clk_disable_unprepare(pltfm_host->clk);
+
 		tegra_host->clk_enabled = false;
-		sdhci->is_clk_on = tegra_host->clk_enabled;
+		sdhci->is_clk_on = false;
 #ifndef CONFIG_MMC_PM_DOMAIN
 		pm_runtime_put_sync(&pdev->dev);
 #endif
+		clk_disable_unprepare(pltfm_host->clk);
 	}
 	mutex_unlock(&tegra_host->set_clock_mutex);
 }
@@ -5173,7 +5174,7 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	}
 	pltfm_host->priv = tegra_host;
 	tegra_host->clk_enabled = true;
-	host->is_clk_on = tegra_host->clk_enabled;
+	host->is_clk_on = true;
 	mutex_init(&tegra_host->set_clock_mutex);
 
 	tegra_host->max_clk_limit = plat->max_clk_limit;
