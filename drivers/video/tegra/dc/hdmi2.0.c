@@ -532,9 +532,11 @@ static void tegra_hdmi_ddc_power_toggle(int value)
 		return;
 
 	if (value == 0) {
+		dc_hdmi->dc->cmu_enabled = true;
 		_tegra_hdmi_ddc_disable(dc_hdmi);
 		tegra_powergate_partition(TEGRA_POWERGATE_SOR);
 	} else if (value == 1) {
+		dc_hdmi->dc->cmu_enabled = false;
 		tegra_unpowergate_partition(TEGRA_POWERGATE_SOR);
 		_tegra_hdmi_ddc_enable(dc_hdmi);
 	}
