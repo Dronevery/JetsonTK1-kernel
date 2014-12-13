@@ -509,7 +509,7 @@ static struct snd_soc_dai_driver tegra210_admaif_dais[10] = {
 	ADMAIF_DAI(10),
 };
 
-#define ADMAIF_CODEC_DAI(id)						\
+#define ADMAIF_CODEC_FIFO_DAI(id)					\
 	{								\
 		.name = "ADMAIF" #id " FIFO",				\
 		.playback = {						\
@@ -533,7 +533,9 @@ static struct snd_soc_dai_driver tegra210_admaif_dais[10] = {
 				SNDRV_PCM_FMTBIT_S32_LE,		\
 		},							\
 		.ops = &tegra210_admaif_dai_ops,			\
-	},								\
+	}
+
+#define ADMAIF_CODEC_CIF_DAI(id)					\
 	{								\
 		.name = "ADMAIF" #id " CIF",				\
 		.playback = {						\
@@ -559,16 +561,26 @@ static struct snd_soc_dai_driver tegra210_admaif_dais[10] = {
 	}
 
 static struct snd_soc_dai_driver tegra210_admaif_codec_dais[] = {
-	ADMAIF_CODEC_DAI(1),
-	ADMAIF_CODEC_DAI(2),
-	ADMAIF_CODEC_DAI(3),
-	ADMAIF_CODEC_DAI(4),
-	ADMAIF_CODEC_DAI(5),
-	ADMAIF_CODEC_DAI(6),
-	ADMAIF_CODEC_DAI(7),
-	ADMAIF_CODEC_DAI(8),
-	ADMAIF_CODEC_DAI(9),
-	ADMAIF_CODEC_DAI(10),
+	ADMAIF_CODEC_FIFO_DAI(1),
+	ADMAIF_CODEC_FIFO_DAI(2),
+	ADMAIF_CODEC_FIFO_DAI(3),
+	ADMAIF_CODEC_FIFO_DAI(4),
+	ADMAIF_CODEC_FIFO_DAI(5),
+	ADMAIF_CODEC_FIFO_DAI(6),
+	ADMAIF_CODEC_FIFO_DAI(7),
+	ADMAIF_CODEC_FIFO_DAI(8),
+	ADMAIF_CODEC_FIFO_DAI(9),
+	ADMAIF_CODEC_FIFO_DAI(10),
+	ADMAIF_CODEC_CIF_DAI(1),
+	ADMAIF_CODEC_CIF_DAI(2),
+	ADMAIF_CODEC_CIF_DAI(3),
+	ADMAIF_CODEC_CIF_DAI(4),
+	ADMAIF_CODEC_CIF_DAI(5),
+	ADMAIF_CODEC_CIF_DAI(6),
+	ADMAIF_CODEC_CIF_DAI(7),
+	ADMAIF_CODEC_CIF_DAI(8),
+	ADMAIF_CODEC_CIF_DAI(9),
+	ADMAIF_CODEC_CIF_DAI(10),
 };
 
 #define ADMAIF_WIDGETS(id)					\
