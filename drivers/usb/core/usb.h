@@ -185,6 +185,7 @@ extern void usb_set_hub_port_connect_type(struct usb_device *hdev, int port1,
 	enum usb_port_connect_type type);
 extern void usb_hub_adjust_deviceremovable(struct usb_device *hdev,
 		struct usb_hub_descriptor *desc);
+extern void xhci_platform_reinit(void);
 
 #ifdef CONFIG_ACPI
 extern int usb_acpi_register(void);
