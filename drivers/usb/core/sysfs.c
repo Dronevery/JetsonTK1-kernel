@@ -398,6 +398,20 @@ set_autosuspend(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(autosuspend, S_IRUGO | S_IWUSR,
 		show_autosuspend, set_autosuspend);
 
+static ssize_t
+set_hcd_reinit(struct device *dev, struct device_attribute *attr,
+		const char *buf, size_t count)
+{
+	int value;
+
+	if (sscanf(buf, "%d", &value) == 1)
+		xhci_platform_reinit();
+
+	return count;
+}
+static DEVICE_ATTR(hcd_reinit, S_IRUGO | S_IWUSR,
+		NULL, set_hcd_reinit);
+
 static const char on_string[] = "on";
 static const char auto_string[] = "auto";
 
@@ -508,6 +522,7 @@ static struct attribute_group usb2_hardware_lpm_attr_group = {
 
 static struct attribute *power_attrs[] = {
 	&dev_attr_autosuspend.attr,
+	&dev_attr_hcd_reinit.attr,
 	&dev_attr_level.attr,
 	&dev_attr_connected_duration.attr,
 	&dev_attr_active_duration.attr,

@@ -1353,8 +1353,8 @@ struct urb_priv {
 #define	ERST_ENTRIES	1
 /* Poll every 60 seconds */
 #define	POLL_TIMEOUT	60
-/* Stop endpoint command timeout (secs) for URB cancellation watchdog timer */
-#define XHCI_STOP_EP_CMD_TIMEOUT	5
+/* Stop endpoint command timeout (ms) for URB cancellation watchdog timer */
+#define XHCI_STOP_EP_CMD_TIMEOUT	(msecs_to_jiffies(1100))
 /* XXX: Make these module parameters */
 
 struct s3_save {
@@ -1858,5 +1858,6 @@ struct xhci_ep_ctx *xhci_get_ep_ctx(struct xhci_hcd *xhci, struct xhci_container
 
 /* xHCI quirks */
 bool xhci_compliance_mode_recovery_timer_quirk_check(void);
+extern void xhci_platform_reinit(void);
 
 #endif /* __LINUX_XHCI_HCD_H */
