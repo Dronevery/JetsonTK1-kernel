@@ -6639,6 +6639,7 @@ struct sk_buff *__cfg80211_alloc_event_skb(struct wiphy *wiphy,
 	default:
 		WARN_ON(1);
 		return NULL;
+
 	}
 	return __cfg80211_alloc_vendor_skb(rdev, approxlen, 0, 0,
 					   cmd, attr, info, gfp);
@@ -6650,6 +6651,9 @@ void __cfg80211_send_event_skb(struct sk_buff *skb, gfp_t gfp)
 	struct cfg80211_registered_device *rdev = ((void **)skb->cb)[0];
 	void *hdr = ((void **)skb->cb)[1];
 	struct nlattr *data = ((void **)skb->cb)[2];
+
+	/* clear CB data for netlink core to own from now on */
+	memset(skb->cb, 0, sizeof(skb->cb));
 
 	nla_nest_end(skb, data);
 	genlmsg_end(skb, hdr);
