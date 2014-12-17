@@ -14,4 +14,7 @@
 		/* XHCI UTMI */
 		nvidia,phy-type=<2>;
 	};
+	touch-leds-pwm-rework {
+		status = "okay";
+	};
 };

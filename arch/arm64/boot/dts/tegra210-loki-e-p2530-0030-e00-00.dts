@@ -66,4 +66,8 @@
 			};
 		};
 	};
+
+	touch-leds-pwm-rework {
+		status = "disabled";
+	};
 };
