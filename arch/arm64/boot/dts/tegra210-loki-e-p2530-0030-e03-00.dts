@@ -3,4 +3,8 @@
 
 / {
 	nvidia,dtsfilename = __FILE__;
+
+	touch-leds-pwm-rework {
+		status = "okay";
+	};
 };
