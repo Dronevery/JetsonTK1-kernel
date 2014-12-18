@@ -19,6 +19,22 @@
 #include <linux/module.h>
 
 static struct rc_map_table foster_table[] = {
+	{ 0x807e12, KEY_VOLUMEUP },
+	{ 0x807e15, KEY_VOLUMEDOWN },
+	{ 0x807e0c, KEY_UP },
+	{ 0x807e0e, KEY_DOWN },
+	{ 0x807e0b, KEY_LEFT },
+	{ 0x807e0d, KEY_RIGHT },
+	{ 0x807e03, KEY_HOMEPAGE },
+	{ 0x807e07, KEY_POWER },
+	{ 0x807e11, KEY_ENTER },
+	{ 0x807e09, KEY_BACK },
+	{ 0x807e14, KEY_MUTE },
+	{ 0x807e08, KEY_PLAYPAUSE },
+	{ 0x807e0f, KEY_FASTFORWARD },
+	{ 0x807e0a, KEY_REWIND },
+
+	/* Following keymaps are for internal Testing */
 	{ 0x310c, KEY_0 },
 	{ 0x3103, KEY_1 },
 	{ 0x3104, KEY_2 },
