@@ -419,8 +419,10 @@ void gk20a_channel_abort(struct channel_gk20a *ch)
 	bool released_job_semaphore = false;
 
 	/* ensure no fences are pending */
+	mutex_lock(&ch->submit_lock);
 	if (ch->sync)
 		ch->sync->set_min_eq_max(ch->sync);
+	mutex_unlock(&ch->submit_lock);
 
 	/* release all job semaphores (applies only to jobs that use
 	   semaphore synchronization) */
