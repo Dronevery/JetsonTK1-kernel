@@ -1,7 +1,7 @@
 /*
  * arch/arm64/boot/dts/tegra210-ers-e2220-1199-a00-00.dts
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,24 @@
 
 / {
 	nvidia,dtsfilename = __FILE__;
+
+	xusb@70090000 {
+		status = "disabled";
+	};
+
+	spi@7000d400 {
+		status = "disabled";
+	};
+
+	spi@7000d600 {
+		status = "disabled";
+	};
+
+	spi@7000d800 {
+		status = "disabled";
+	};
+
+	spi@7000da00 {
+		status = "disabled";
+	};
 };
