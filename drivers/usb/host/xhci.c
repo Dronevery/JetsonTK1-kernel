@@ -3790,6 +3790,7 @@ int xhci_address_device(struct usb_hcd *hcd, struct usb_device *udev)
 		ret = -EINVAL;
 		break;
 	case COMP_TX_ERR:
+		gamepad_reset_war();
 		dev_warn(&udev->dev, "Device not responding to set address.\n");
 		ret = -EPROTO;
 		break;
