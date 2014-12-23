@@ -404,8 +404,10 @@ set_hcd_reinit(struct device *dev, struct device_attribute *attr,
 {
 	int value;
 
-	if (sscanf(buf, "%d", &value) == 1)
+	if (sscanf(buf, "%d", &value) == 1) {
+		otgwl_acquire_temp_lock();
 		xhci_platform_reinit();
+	}
 
 	return count;
 }
