@@ -3,7 +3,7 @@
  *
  * arch/arm64/boot/dts/tegra210-ers-e2190-1100-a00-00.dts
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 #include "tegra210-platforms/tegra210-ers-hdmi-e2190-1100-a00.dtsi"
 #include "tegra210-platforms/tegra210-ers-keys-e2141-1100-a00.dtsi"
 #include "tegra210-platforms/tegra210-edp.dtsi"
+#include "tegra210-platforms/tegra210-ers-thermal-nct72-e2220-1100-a00.dtsi"
+#include "tegra210-platforms/tegra210-thermal-Tboard-Tdiode.dtsi"
 
 / {
 	model = "e2190";
@@ -278,6 +280,12 @@
 
 		PMIC-Die-max77621-1 {
 			thermal-sensors = <&gpu_max77621_reg>;
+			status = "okay";
+		};
+		Tboard_tegra {
+			status = "okay";
+		};
+		Tdiode_tegra {
 			status = "okay";
 		};
 	};
