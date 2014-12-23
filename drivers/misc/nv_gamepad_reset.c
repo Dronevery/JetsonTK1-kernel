@@ -85,6 +85,31 @@ static int gamepad_reset_remove(struct platform_device *pdev)
 	return 0;
 }
 
+int gamepad_reset_gpio;
+void gamepad_reset_war(void)
+{
+	int ret;
+
+	ret = gpio_request(gamepad_reset_gpio, "GAMEPAD_RST");
+	if (ret < 0) {
+		pr_err("%s: gpio_request failed %d\n", __func__, ret);
+		return;
+	}
+
+	ret = gpio_direction_output(gamepad_reset_gpio, 1);
+	if (ret < 0) {
+		gpio_free(gamepad_reset_gpio);
+		pr_err("%s: gpio_direction_output failed %d\n", __func__, ret);
+		return;
+	}
+
+	gpio_set_value(gamepad_reset_gpio, 0);
+	udelay(RESET_DELAY);
+	gpio_set_value(gamepad_reset_gpio, 1);
+	gpio_free(gamepad_reset_gpio);
+}
+EXPORT_SYMBOL(gamepad_reset_war);
+
 static int gamepad_reset_probe(struct platform_device *pdev)
 {
 	int ret;
@@ -124,6 +149,7 @@ static int gamepad_reset_probe(struct platform_device *pdev)
 	}
 	data->reset_gpio = pdata->reset_gpio;
 #endif
+	gamepad_reset_gpio = data->reset_gpio;
 
 	platform_set_drvdata(pdev, data);
 

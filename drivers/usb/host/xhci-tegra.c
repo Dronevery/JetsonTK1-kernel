@@ -5016,6 +5016,8 @@ static void xhci_reinit_work(struct work_struct *work)
 		tegra_xhci_unregister_plat();
 		udelay(10);
 		tegra_xhci_register_plat();
+		udelay(10);
+		gamepad_reset_war();
 	}
 }
 
