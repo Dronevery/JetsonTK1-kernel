@@ -103,6 +103,7 @@ void gamepad_reset_war(void)
 		return;
 	}
 
+	pr_info("%s: xusb WAR - resetting gamepad\n", __func__);
 	gpio_set_value(gamepad_reset_gpio, 0);
 	udelay(RESET_DELAY);
 	gpio_set_value(gamepad_reset_gpio, 1);
