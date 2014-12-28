@@ -190,3 +190,10 @@ void tegra_bpmp_enable_suspend(int mode, int flags)
 	int r = bpmp_post(MRQ_ENABLE_SUSPEND, &mb, sizeof(mb));
 	WARN_ON(r);
 }
+
+void tegra_bpmp_pasr_mask(uint32_t phys)
+{
+	int mb[] = { phys };
+	int r = bpmp_post(MRQ_PASR_MASK, &mb, sizeof(mb));
+	WARN_ON(r);
+}
