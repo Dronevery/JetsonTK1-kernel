@@ -1369,8 +1369,9 @@ static int inv_icm_check_gyro_self_test(struct nvi_state *st,
 
 	ret_val = 0;
 	regs = st->st_data_gyro;
-	pr_debug("%s data: %02x %02x %02x\n", __func__,
-		 regs[0], regs[1], regs[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s data: %02x %02x %02x\n",
+			 __func__, regs[0], regs[1], regs[2]);
 	for (i = 0; i < AXIS_N; i++) {
 		if (regs[i] != 0) {
 			st_shift_prod[i] = icm_st_tb[regs[i] - 1];
@@ -1379,8 +1380,10 @@ static int inv_icm_check_gyro_self_test(struct nvi_state *st,
 			otp_value_zero = 1;
 		}
 	}
-	pr_debug("%s st_shift_prod: %+d %+d %+d\n", __func__,
-		 st_shift_prod[0], st_shift_prod[1], st_shift_prod[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev,
+			 "%s st_shift_prod: %+d %+d %+d\n", __func__,
+			 st_shift_prod[0], st_shift_prod[1], st_shift_prod[2]);
 	for (i = 0; i < AXIS_N; i++) {
 		st_shift_cust[i] = st_avg[i] - reg_avg[i];
 		if (!otp_value_zero) {
@@ -1388,8 +1391,10 @@ static int inv_icm_check_gyro_self_test(struct nvi_state *st,
 			if (st_shift_cust[i] < (ICM_GYRO_CT_SHIFT_DELTA *
 						st_shift_prod[i])) {
 				ret_val = 1;
-				pr_debug("%s criteria A axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL A axis %d\n",
+						 __func__, i);
 			}
 		} else {
 			/* Self Test Pass/Fail Criteria B */
@@ -1397,13 +1402,17 @@ static int inv_icm_check_gyro_self_test(struct nvi_state *st,
 						ICM_SELFTEST_GYRO_SENS *
 						ICM_ST_PRECISION)) {
 				ret_val = 1;
-				pr_debug("%s criteria B axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL B axis %d\n",
+						 __func__, i);
 			}
 		}
 	}
-	pr_debug("%s st_shift_cust: %+d %+d %+d\n", __func__,
-		 st_shift_cust[0], st_shift_cust[1], st_shift_cust[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s st_shift_cust: %+d %+d %+d\n",
+			 __func__,
+			 st_shift_cust[0], st_shift_cust[1], st_shift_cust[2]);
 	if (ret_val == 0) {
 		/* Self Test Pass/Fail Criteria C */
 		for (i = 0; i < AXIS_N; i++) {
@@ -1411,8 +1420,10 @@ static int inv_icm_check_gyro_self_test(struct nvi_state *st,
 					       ICM_SELFTEST_GYRO_SENS *
 					       ICM_ST_PRECISION)) {
 				ret_val = 1;
-				pr_debug("%s criteria C axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL C axis %d\n",
+						 __func__, i);
 			}
 		}
 	}
@@ -1439,8 +1450,9 @@ static int inv_icm_check_accel_self_test(struct nvi_state *st,
 
 	ret_val = 0;
 	regs = st->st_data_accel;
-	pr_debug("%s data: %02x %02x %02x\n", __func__,
-		 regs[0], regs[1], regs[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s data: %02x %02x %02x\n",
+			 __func__, regs[0], regs[1], regs[2]);
 	for (i = 0; i < AXIS_N; i++) {
 		if (regs[i] != 0) {
 			st_shift_prod[i] = icm_st_tb[regs[i] - 1];
@@ -1449,8 +1461,10 @@ static int inv_icm_check_accel_self_test(struct nvi_state *st,
 			otp_value_zero = 1;
 		}
 	}
-	pr_debug("%s st_shift_prod: %+d %+d %+d\n", __func__,
-		 st_shift_prod[0], st_shift_prod[1], st_shift_prod[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev,
+			 "%s st_shift_prod: %+d %+d %+d\n", __func__,
+			 st_shift_prod[0], st_shift_prod[1], st_shift_prod[2]);
 	if (!otp_value_zero) {
 		/* Self Test Pass/Fail Criteria A */
 		for (i = 0; i < AXIS_N; i++) {
@@ -1458,14 +1472,18 @@ static int inv_icm_check_accel_self_test(struct nvi_state *st,
 			if (st_shift_cust[i] < (ICM_ACCEL_ST_SHIFT_DELTA_MIN *
 						st_shift_prod[i])) {
 				ret_val = 1;
-				pr_debug("%s criteria A (min) axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL A (min) axis %d\n",
+						 __func__, i);
 			}
 			if (st_shift_cust[i] > (ICM_ACCEL_ST_SHIFT_DELTA_MAX *
 						st_shift_prod[i])) {
 				ret_val = 1;
-				pr_debug("%s criteria A (max) axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL A (max) axis %d\n",
+						 __func__, i);
 			}
 		}
 	} else {
@@ -1475,13 +1493,17 @@ static int inv_icm_check_accel_self_test(struct nvi_state *st,
 			if ((st_shift_cust[i] < ICM_ACCEL_ST_AL_MIN) ||
 				    (st_shift_cust[i] > ICM_ACCEL_ST_AL_MAX)) {
 				ret_val = 1;
-				pr_debug("%s criteria B axis %d FAIL\n",
-					 __func__, i);
+				if (st->dbg & NVI_DBG_SPEW_MSG)
+					dev_info(&st->i2c->dev,
+						 "%s FAIL B axis %d\n",
+						 __func__, i);
 			}
 		}
 	}
-	pr_debug("%s st_shift_cust: %+d %+d %+d\n", __func__,
-		 st_shift_cust[0], st_shift_cust[1], st_shift_cust[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s st_shift_cust: %+d %+d %+d\n",
+			 __func__,
+			 st_shift_cust[0], st_shift_cust[1], st_shift_cust[2]);
 	return ret_val;
 }
 
@@ -1613,7 +1635,9 @@ static int inv_icm_selftest_read_samples(struct nvi_state *st, int dev,
 			return r;
 
 		fifo_count = be16_to_cpup((__be16 *)(&d[0]));
-		pr_debug("%s fifo_count=%d\n", __func__, fifo_count);
+		if (st->dbg & NVI_DBG_SPEW_MSG)
+			dev_info(&st->i2c->dev, "%s fifo_count=%d\n",
+				 __func__, fifo_count);
 		if (ICM_MAX_PACKETS * BYTES_PER_SENSOR < fifo_count) {
 			r = nvi_i2c_rd(st, st->hal->reg->fifo_r_w.bank,
 				       st->hal->reg->fifo_r_w.reg,
@@ -1635,8 +1659,11 @@ static int inv_icm_selftest_read_samples(struct nvi_state *st, int dev,
 				vals[j] = (s16)be16_to_cpup((__be16 *)(&d[t]));
 				sum_result[j] += vals[j];
 			}
-			pr_debug("%s %s %d: %+d %+d %+d\n", __func__,
-				 dev_name, *s, vals[0], vals[1], vals[2]);
+			if (st->dbg & NVI_DBG_SPEW_MSG)
+				dev_info(&st->i2c->dev,
+					 "%s %s %d: %+d %+d %+d\n",
+					 __func__, dev_name,
+					 *s, vals[0], vals[1], vals[2]);
 			(*s)++;
 			i++;
 		}
@@ -1687,8 +1714,9 @@ static int inv_icm_do_test_accel(struct nvi_state *st,
 		accel_st_result[j] = accel_st_result[j] / accel_s;
 		accel_st_result[j] *= ICM_ST_PRECISION;
 	}
-	pr_debug("%s %d, %d, %d\n", __func__,
-		 accel_result[0], accel_result[1], accel_result[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s %d, %d, %d\n", __func__,
+			 accel_result[0], accel_result[1], accel_result[2]);
 
 	return 0;
 }
@@ -1734,8 +1762,9 @@ static int inv_icm_do_test_gyro(struct nvi_state *st, int *gyro_result,
 		gyro_st_result[j] = gyro_st_result[j] / gyro_s;
 		gyro_st_result[j] *= ICM_ST_PRECISION;
 	}
-	pr_debug("%s %d, %d, %d\n", __func__,
-		 gyro_result[0], gyro_result[1], gyro_result[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s %d, %d, %d\n", __func__,
+			 gyro_result[0], gyro_result[1], gyro_result[2]);
 	return 0;
 }
 
@@ -1770,14 +1799,19 @@ int inv_icm_self_test(struct nvi_state *st)
 	if (result)
 		return result;
 
-	pr_debug("%s gyro bias_regular: %+d %+d %+d\n", __func__,
-		 gyro_bias_regular[0], gyro_bias_regular[1],
-		 gyro_bias_regular[2]);
-	pr_debug("%s gyro bias_st: %+d %+d %+d\n", __func__,
-		 gyro_bias_st[0], gyro_bias_st[1], gyro_bias_st[2]);
+	if (st->dbg & NVI_DBG_SPEW_MSG) {
+		dev_info(&st->i2c->dev, "%s gyro bias_regular: %+d %+d %+d\n",
+			 __func__, gyro_bias_regular[0], gyro_bias_regular[1],
+			 gyro_bias_regular[2]);
+		dev_info(&st->i2c->dev, "%s gyro bias_st: %+d %+d %+d\n",
+			 __func__, gyro_bias_st[0], gyro_bias_st[1],
+			 gyro_bias_st[2]);
+	}
 	gyro_result = inv_icm_check_gyro_self_test(st, gyro_bias_regular,
 						   gyro_bias_st);
-	pr_debug("%s gyro_result %hhd\n", __func__, gyro_result);
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s gyro_result %hhd\n",
+			 __func__, gyro_result);
 
 	test_times = ICM_ST_TRY_TIMES;
 	while (test_times > 0) {
@@ -1791,20 +1825,23 @@ int inv_icm_self_test(struct nvi_state *st)
 	if (result)
 		return result;
 
-	pr_debug("%s accel bias_regular: %+d %+d %+d\n", __func__,
-		 accel_bias_regular[0], accel_bias_regular[1],
-		 accel_bias_regular[2]);
-	pr_debug("%s accel bias_st: %+d %+d %+d\n", __func__,
-		 accel_bias_st[0], accel_bias_st[1], accel_bias_st[2]);
-
+	if (st->dbg & NVI_DBG_SPEW_MSG) {
+		dev_info(&st->i2c->dev, "%s accel bias_regular: %+d %+d %+d\n",
+			 __func__, accel_bias_regular[0],
+			 accel_bias_regular[1], accel_bias_regular[2]);
+		dev_info(&st->i2c->dev, "%s accel bias_st: %+d %+d %+d\n",
+			 __func__, accel_bias_st[0], accel_bias_st[1],
+			 accel_bias_st[2]);
+	}
 	for (i = 0; i < AXIS_N; i++) {
 		st->gyro_bias[i] = gyro_bias_regular[i] / ICM_ST_PRECISION;
 		st->accel_bias[i] = accel_bias_regular[i] / ICM_ST_PRECISION;
 	}
 	accel_result = inv_icm_check_accel_self_test(st, accel_bias_regular,
 						     accel_bias_st);
-	pr_debug("%s accel_result %hhd\n", __func__, accel_result);
-
+	if (st->dbg & NVI_DBG_SPEW_MSG)
+		dev_info(&st->i2c->dev, "%s accel_result %hhd\n",
+			 __func__, accel_result);
 	return (accel_result << DEF_ST_ACCEL_RESULT_SHIFT) | gyro_result;
 }
 
