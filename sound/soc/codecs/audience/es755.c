@@ -2248,6 +2248,17 @@ static int es755_codec_intr(struct notifier_block *self, unsigned long action,
 			}
 
 			accdet_status_reg.value = value;
+
+			/* Ignore interurpt if
+			 * plugdet_fsm2 = 1 and plugdet_fsm1 = 0
+			 */
+			if (accdet_status_reg.fields.plug_det_fsm2 &&
+				!accdet_status_reg.fields.plug_det_fsm1) {
+				pr_debug("%s(): Found PLUG_LOCK, ignore it\n",
+				       __func__);
+				goto intr_exit;
+			}
+
 			impd_level = accdet_status_reg.fields.impd_level;
 
 			value = escore_read(NULL, ES_ACCDET_CONFIG);
@@ -2381,6 +2392,24 @@ static int es755_codec_intr(struct notifier_block *self, unsigned long action,
 				break;
 			}
 		} else if (ES_UNPLUG_EVENT(value)) {
+			value = escore_read(NULL, ES_GET_ACCDET_STATUS);
+			if (value < 0) {
+				pr_err("%s(): Accessory detect status fail %d",
+				       __func__, value);
+				goto intr_exit;
+			}
+			accdet_status_reg.value = value;
+
+			/* Ignore interurpt if
+			 * plugdet_fsm2 = 1 and plugdet_fsm1 = 1
+			 */
+			if (accdet_status_reg.fields.plug_det_fsm2 &&
+				accdet_status_reg.fields.plug_det_fsm1) {
+				pr_info("%s(): Found UNPLUG_LOCK, ignore it\n",
+				       __func__);
+				goto intr_exit;
+			}
+
 			pr_info("%s(): Unplug detected\n", __func__);
 
 			escore->button_config_required = 0;
