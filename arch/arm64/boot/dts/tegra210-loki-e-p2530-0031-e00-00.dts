@@ -25,8 +25,22 @@
 	nvidia,dtsfilename = __FILE__;
 
 	modem {
-		/* pre boost regulator gpio */
+		compatible = "nvidia,icera-i500";
+		nvidia,boot-gpio = <&gpio TEGRA_GPIO(K, 6) GPIO_ACTIVE_LOW>;
+		nvidia,mdm-power-report-gpio = <&gpio TEGRA_GPIO(L, 1) GPIO_ACTIVE_LOW>;
+		nvidia,reset-gpio = <&gpio TEGRA_GPIO(L, 0) GPIO_ACTIVE_LOW>;
+		nvidia,mdm-en-gpio = <&gpio TEGRA_GPIO(K, 7) GPIO_ACTIVE_HIGH>;
 		nvidia,pre-boost-gpio = <&gpio TEGRA_GPIO(E, 5) GPIO_ACTIVE_HIGH>;
+		nvidia,num-temp-sensors = <3>;
+		/* using XHCI UTMI */
+		nvidia,phy-type = <2>;
+		status = "disabled";
+	};
+
+	xusb@70090000 {
+		/* enable UTMI pad 1 */
+		nvidia,portmap = <0x600>;
+		usb_vbus1-supply = <&battery_reg>;
 	};
 
 	touch-leds-pwm-rework {
