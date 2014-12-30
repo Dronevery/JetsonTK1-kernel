@@ -4772,25 +4772,25 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 			pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 			"sdmmc_schmitt_enable");
 		if (IS_ERR_OR_NULL(tegra_host->schmitt_enable[0]))
-			dev_warn(dev, "Missing schmitt enable state\n");
+			dev_dbg(dev, "Missing schmitt enable state\n");
 
 		tegra_host->schmitt_enable[1] =
 			pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 			"sdmmc_clk_schmitt_enable");
 		if (IS_ERR_OR_NULL(tegra_host->schmitt_enable[1]))
-			dev_warn(dev, "Missing clk schmitt enable state\n");
+			dev_dbg(dev, "Missing clk schmitt enable state\n");
 
 		tegra_host->schmitt_disable[0] =
 			pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 			"sdmmc_schmitt_disable");
 		if (IS_ERR_OR_NULL(tegra_host->schmitt_disable[0]))
-			dev_warn(dev, "Missing schmitt disable state\n");
+			dev_dbg(dev, "Missing schmitt disable state\n");
 
 		tegra_host->schmitt_disable[1] =
 			pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 			"sdmmc_clk_schmitt_disable");
 		if (IS_ERR_OR_NULL(tegra_host->schmitt_disable[1]))
-			dev_warn(dev, "Missing clk schmitt disable state\n");
+			dev_dbg(dev, "Missing clk schmitt disable state\n");
 
 		for (i = 0; i < 2; i++) {
 			if (!IS_ERR_OR_NULL(tegra_host->schmitt_disable[i])) {
@@ -4806,7 +4806,7 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 		pctl_state = pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 						"sdcard_default_mode");
 		if (IS_ERR_OR_NULL(pctl_state)) {
-			dev_warn(dev, "Missing default mode pad control state\n");
+			dev_dbg(dev, "Missing default mode pad control state\n");
 		}
 		else {
 			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_LEGACY] = pctl_state;
@@ -4831,7 +4831,7 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 		pctl_state = pinctrl_lookup_state(tegra_host->pinctrl_sdmmc,
 						"sdcard_uhs_sdr104_mode");
 		if (IS_ERR_OR_NULL(pctl_state)) {
-			dev_warn(dev, "Missing sdr104 pad control state\n");
+			dev_dbg(dev, "Missing sdr104 pad control state\n");
 		}
 		else {
 			tegra_host->sdmmc_pad_ctrl[MMC_TIMING_UHS_SDR104] = pctl_state;
@@ -4842,7 +4842,7 @@ static int sdhci_tegra_init_pinctrl_info(struct device *dev,
 			ret = pinctrl_select_state(tegra_host->pinctrl_sdmmc,
 					tegra_host->sdmmc_pad_ctrl[MMC_TIMING_MMC_HS]);
 			if (ret < 0)
-				dev_warn(dev, "setting default pad state failed\n");
+				dev_dbg(dev, "setting default pad state failed\n");
 		}
 	}
 
