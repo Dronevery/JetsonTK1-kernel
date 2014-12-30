@@ -3640,8 +3640,11 @@ static const struct hc_driver tegra_plat_xhci_driver = {
 	.bus_resume =		tegra_xhci_bus_resume,
 #endif
 
+/* TODO: temporarily disable U1/U2 for T210, enable it later */
+#if !defined(CONFIG_ARCH_TEGRA_21x_SOC)
 	.enable_usb3_lpm_timeout =	xhci_enable_usb3_lpm_timeout,
 	.disable_usb3_lpm_timeout =	xhci_disable_usb3_lpm_timeout,
+#endif
 	.reset_sspi = tegra_xhci_reset_sspi,
 };
 
