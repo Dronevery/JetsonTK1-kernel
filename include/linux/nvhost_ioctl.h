@@ -263,7 +263,7 @@ struct nvhost_channel_map_buffer_args {
 #define NVHOST_IOCTL_CHANNEL_NULL_KICKOFF	\
 	_IOR(NVHOST_IOCTL_MAGIC, 6, struct nvhost_get_param_args)
 #define NVHOST_IOCTL_CHANNEL_GET_CLK_RATE		\
-	_IOR(NVHOST_IOCTL_MAGIC, 9, struct nvhost_clk_rate_args)
+	_IOWR(NVHOST_IOCTL_MAGIC, 9, struct nvhost_clk_rate_args)
 #define NVHOST_IOCTL_CHANNEL_SET_CLK_RATE		\
 	_IOW(NVHOST_IOCTL_MAGIC, 10, struct nvhost_clk_rate_args)
 #define NVHOST_IOCTL_CHANNEL_SET_TIMEOUT	\
