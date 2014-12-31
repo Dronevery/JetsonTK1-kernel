@@ -1,7 +1,7 @@
 /*
  * GK20A memory management
  *
- * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -2619,7 +2619,7 @@ int gk20a_dmabuf_get_state(struct dma_buf *dmabuf, struct device *dev,
 	s->offset = offset;
 	INIT_LIST_HEAD(&s->list);
 	mutex_init(&s->lock);
-	list_add_tail(&priv->states, &s->list);
+	list_add_tail(&s->list, &priv->states);
 
 out:
 	mutex_unlock(&priv->lock);
