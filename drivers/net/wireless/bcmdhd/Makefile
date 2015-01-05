@@ -140,6 +140,10 @@ ifneq ($(CONFIG_BCM4354),)
   DHDCFLAGS += -DWL11U
   DHDCFLAGS += -DDHD_ENABLE_LPC
   DHDCFLAGS += -DCUSTOM_PSPRETEND_THR=30
+
+# Make same as proven good value from other platform
+  DHDCFLAGS += -DCUSTOM_DPC_PRIO_SETTING=45
+
 endif
 
 ifneq ($(CONFIG_BCM4339),)
