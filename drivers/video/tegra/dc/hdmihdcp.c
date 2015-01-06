@@ -1,7 +1,7 @@
 /*
  * drivers/video/tegra/dc/hdmihdcp.c
  *
- * Copyright (c) 2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -1595,10 +1595,15 @@ err:
 static int tegra_nvhdcp_on(struct tegra_nvhdcp *nvhdcp)
 {
 	u8 hdcp2version;
+	int e;
 	nvhdcp->state = STATE_UNAUTHENTICATED;
 	if (nvhdcp_is_plugged(nvhdcp)) {
 		nvhdcp->fail_count = 0;
-		nvhdcp_i2c_read8(nvhdcp, HDCP_HDCP2_VERSION, &hdcp2version);
+		e = nvhdcp_i2c_read8(nvhdcp, HDCP_HDCP2_VERSION, &hdcp2version);
+		if (e) {
+			nvhdcp_err("nvhdcp i2c HDCP22 version read failed\n");
+			return 1;
+		}
 		if (hdcp2version & HDCP_HDCP2_VERSION_HDCP22_YES) {
 			INIT_DELAYED_WORK(&nvhdcp->work,
 				nvhdcp2_downstream_worker);
