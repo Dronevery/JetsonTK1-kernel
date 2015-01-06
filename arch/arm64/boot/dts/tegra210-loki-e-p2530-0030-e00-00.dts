@@ -30,6 +30,7 @@
 	backlight {
 		compatible = "pwm-backlight";
 		status = "okay";
+		disable-on-kernel-charging;
 		panel-j-1440-810-5-8-bl {
 			pwms = <&tegra_pwm 0 29334>;
 		};
