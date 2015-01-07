@@ -57,6 +57,12 @@ static struct rc_map_table foster_table[] = {
 	{ 0x3100, KEY_POWER },
 	{ 0x3113, KEY_ENTER },
 	{ 0x3141, KEY_BACK },
+	{ 0x3118, KEY_MUTE },
+	{ 0x3160, KEY_PLAYCD },
+	{ 0x316c, KEY_PAUSECD },
+	{ 0x3163, KEY_STOP },
+	{ 0x3164, KEY_FASTFORWARD },
+	{ 0x3165, KEY_REWIND },
 };
 
 static struct rc_map_list nvidia_map = {
