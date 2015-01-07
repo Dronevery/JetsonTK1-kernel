@@ -1,6 +1,6 @@
 /* Keytable for NVIDIA Remote Controller
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -25,12 +25,15 @@ static struct rc_map_table foster_table[] = {
 	{ 0x807e0e, KEY_DOWN },
 	{ 0x807e0b, KEY_LEFT },
 	{ 0x807e0d, KEY_RIGHT },
-	{ 0x807e03, KEY_HOMEPAGE },
-	{ 0x807e07, KEY_POWER },
-	{ 0x807e11, KEY_ENTER },
-	{ 0x807e09, KEY_BACK },
+	{ 0x807e09, KEY_HOMEPAGE },
+	{ 0x807e06, KEY_POWER },
+	{ 0x807e03, KEY_ENTER },
+	{ 0x807e02, KEY_BACK },
 	{ 0x807e14, KEY_MUTE },
-	{ 0x807e08, KEY_PLAYPAUSE },
+	{ 0x807e20, KEY_PLAYPAUSE },
+	{ 0x807e11, KEY_PLAYCD },
+	{ 0x807e08, KEY_PAUSECD },
+	{ 0x807e07, KEY_STOP },
 	{ 0x807e0f, KEY_FASTFORWARD },
 	{ 0x807e0a, KEY_REWIND },
 
