@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010 Google, Inc.
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -313,7 +313,7 @@ int tegra_dc_program_mode(struct tegra_dc *dc, struct tegra_dc_mode *mode)
 	v_sync_width = mode->v_sync_width;
 	v_active = mode->v_active;
 
-	if (mode->vmode == FB_VMODE_INTERLACED) {
+	if (mode->vmode & FB_VMODE_INTERLACED) {
 		v_back_porch /= 2;
 		v_front_porch /= 2;
 		v_sync_width /= 2;
@@ -481,16 +481,28 @@ EXPORT_SYMBOL(tegra_dc_get_panel_sync_rate);
 static int _tegra_dc_set_mode(struct tegra_dc *dc,
 				const struct tegra_dc_mode *mode)
 {
-	if (memcmp(&dc->mode, mode, sizeof(dc->mode)) == 0) {
+	struct tegra_dc_mode new_mode = *mode;
+
+	if (dc->yuv_bypass &&
+		((new_mode.vmode & FB_VMODE_Y420) ||
+		 (new_mode.vmode & FB_VMODE_Y420_ONLY))) {
+		new_mode.h_back_porch /= 2;
+		new_mode.h_front_porch /= 2;
+		new_mode.h_sync_width /= 2;
+		new_mode.h_active /= 2;
+		new_mode.pclk /= 2;
+	}
+
+	if (memcmp(&dc->mode, &new_mode, sizeof(dc->mode)) == 0) {
 		/* mode is unchanged, just return */
 		return 0;
 	}
 
-	memcpy(&dc->mode, mode, sizeof(dc->mode));
+	memcpy(&dc->mode, &new_mode, sizeof(dc->mode));
 	dc->mode_dirty = true;
 
 	if (dc->out->type == TEGRA_DC_OUT_RGB)
-		panel_sync_rate = tegra_dc_calc_refresh(mode);
+		panel_sync_rate = tegra_dc_calc_refresh(&new_mode);
 	else if (dc->out->type == TEGRA_DC_OUT_DSI)
 		panel_sync_rate = dc->out->dsi->rated_refresh_rate * 1000;
 
@@ -500,8 +512,8 @@ static int _tegra_dc_set_mode(struct tegra_dc *dc,
 		tegra_dsi_init_clock_param(dc);
 	}
 
-	print_mode(dc, mode, __func__);
-	dc->frametime_ns = calc_frametime_ns(mode);
+	print_mode(dc, &new_mode, __func__);
+	dc->frametime_ns = calc_frametime_ns(&new_mode);
 	return 0;
 }
 

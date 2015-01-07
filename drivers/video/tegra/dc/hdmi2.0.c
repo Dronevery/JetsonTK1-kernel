@@ -1,7 +1,7 @@
 /*
  * drivers/video/tegra/dc/hdmi2.0.c
  *
- * Copyright (c) 2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION, All rights reserved.
  * Author: Animesh Kishore <ankishore@nvidia.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -1632,7 +1632,7 @@ static void tegra_hdmi_put(struct tegra_dc *dc)
 static inline u32 tegra_hdmi_get_bpp(struct tegra_hdmi *hdmi)
 {
 	if (hdmi->dc->yuv_bypass)
-		return 30;
+		return 24;
 	else
 		return 24;
 }
