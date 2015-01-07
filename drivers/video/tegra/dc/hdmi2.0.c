@@ -710,10 +710,8 @@ static int tegra_hdmi_controller_disable(struct tegra_hdmi *hdmi)
 
 static int tegra_hdmi_disable(struct tegra_hdmi *hdmi)
 {
-	if (!hdmi->enabled) {
-		tegra_hdmi_hotplug_notify(hdmi, false);
+	if (!hdmi->enabled)
 		return 0;
-	}
 
 	hdmi->enabled = false;
 	hdmi->eld_valid = false;
