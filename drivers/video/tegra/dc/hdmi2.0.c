@@ -1590,7 +1590,7 @@ static void tegra_hdmi_scdc_worker(struct work_struct *work)
 	mutex_lock(&hdmi->ddc_lock);
 
 	tegra_hdmi_scdc_read(hdmi, rd_tmds_config, ARRAY_SIZE(rd_tmds_config));
-	if (!rd_tmds_config[0][1])
+	if (!rd_tmds_config[0][1]  && (hdmi->dc->mode.pclk > 340000000))
 		_tegra_hdmi_v2_x_config(hdmi);
 
 	mutex_unlock(&hdmi->ddc_lock);
@@ -1924,6 +1924,15 @@ static void tegra_dc_hdmi_modeset_notifier(struct tegra_dc *dc)
 
 	tegra_hdmi_get(dc);
 	tegra_dc_io_start(dc);
+
+	/* disable hdmi2.x config on host and monitor */
+	if (dc->mode.pclk > 340000000) {
+		tegra_hdmi_v2_x_mon_config(hdmi, true);
+		tegra_hdmi_v2_x_host_config(hdmi, true);
+	} else {
+		tegra_hdmi_v2_x_mon_config(hdmi, false);
+		tegra_hdmi_v2_x_host_config(hdmi, false);
+	}
 
 	tegra_hdmi_gcp(hdmi);
 
