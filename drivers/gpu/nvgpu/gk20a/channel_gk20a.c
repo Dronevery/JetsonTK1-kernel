@@ -1,7 +1,7 @@
 /*
  * GK20A Graphics channel
  *
- * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -799,7 +799,6 @@ struct channel_gk20a *gk20a_open_new_channel(struct gk20a *g)
 
 		return NULL;
 	}
-	g->ops.fifo.bind_channel(ch);
 	ch->pid = current->pid;
 
 	/* By default, channel is regular (non-TSG) channel */
@@ -1246,6 +1245,8 @@ int gk20a_alloc_channel_gpfifo(struct channel_gk20a *c,
 	err = channel_gk20a_update_runlist(c, true);
 	if (err)
 		goto clean_up_unmap;
+
+	g->ops.fifo.bind_channel(c);
 
 	gk20a_free_sgtable(&sgt);
 
