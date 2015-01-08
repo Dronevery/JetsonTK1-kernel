@@ -4,7 +4,7 @@
  * Copyright (C) 2010 Google, Inc.
  * Author: Erik Gilling <konkers@android.com>
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -2719,6 +2719,11 @@ static void tegra_dc_vpulse2(struct work_struct *work)
 
 static void tegra_dc_process_vblank(struct tegra_dc *dc, ktime_t timestamp)
 {
+	/* pending user vblank, so wakeup */
+	if (dc->out->user_needs_vblank) {
+		dc->out->user_needs_vblank = false;
+		complete(&dc->out->user_vblank_comp);
+	}
 	if (test_bit(V_BLANK_USER, &dc->vblank_ref_count)) {
 #ifdef CONFIG_ADF_TEGRA
 		tegra_adf_process_vblank(dc->adf, timestamp);
@@ -2743,14 +2748,8 @@ int tegra_dc_config_frame_end_intr(struct tegra_dc *dc, bool enable)
 static void tegra_dc_one_shot_irq(struct tegra_dc *dc, unsigned long status,
 		ktime_t timestamp)
 {
-	/* pending user vblank, so wakeup */
-	if (status & (V_BLANK_INT | MSF_INT)) {
-		if (dc->out->user_needs_vblank) {
-			dc->out->user_needs_vblank = false;
-			complete(&dc->out->user_vblank_comp);
-		}
+	if (status & MSF_INT)
 		tegra_dc_process_vblank(dc, timestamp);
-	}
 
 	if (status & V_BLANK_INT) {
 		/* Sync up windows. */
@@ -2787,7 +2786,7 @@ static void tegra_dc_continuous_irq(struct tegra_dc *dc, unsigned long status,
 	if (status & V_BLANK_INT)
 		queue_work(system_freezable_wq, &dc->vblank_work);
 
-	if (status & (V_BLANK_INT | MSF_INT))
+	if (status & V_BLANK_INT)
 		tegra_dc_process_vblank(dc, timestamp);
 
 	if (status & FRAME_END_INT) {
