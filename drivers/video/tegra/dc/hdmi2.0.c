@@ -1631,7 +1631,7 @@ static void tegra_hdmi_scdc_worker(struct work_struct *work)
 	mutex_lock(&hdmi->ddc_lock);
 
 	tegra_hdmi_scdc_read(hdmi, rd_tmds_config, ARRAY_SIZE(rd_tmds_config));
-	if (!rd_tmds_config[0][1] && hdmi->dc->mode.pclk > 340000000)
+	if (!rd_tmds_config[0][1]  && (hdmi->dc->mode.pclk > 340000000))
 		_tegra_hdmi_v2_x_config(hdmi);
 
 	mutex_unlock(&hdmi->ddc_lock);
