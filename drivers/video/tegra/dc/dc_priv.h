@@ -4,7 +4,7 @@
  * Copyright (C) 2010 Google, Inc.
  * Author: Erik Gilling <konkers@android.com>
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -508,6 +508,7 @@ long tegra_dc_calc_min_bandwidth(struct tegra_dc *dc);
 /* defined in mode.c, used in dc.c and window.c */
 int tegra_dc_program_mode(struct tegra_dc *dc, struct tegra_dc_mode *mode);
 int tegra_dc_calc_refresh(const struct tegra_dc_mode *m);
+int tegra_dc_calc_fb_refresh(const struct fb_videomode *fbmode);
 int tegra_dc_update_mode(struct tegra_dc *dc);
 
 /* defined in clock.c, used in dc.c, rgb.c, dsi.c and hdmi.c */
