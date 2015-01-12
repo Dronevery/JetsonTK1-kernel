@@ -2293,6 +2293,7 @@ static int azx_pcm_hw_params(struct snd_pcm_substream *substream,
 	struct azx *chip = apcm->chip;
 	struct azx_dev *azx_dev = get_azx_dev(substream);
 	int ret;
+	printk("### %s : %d ###\n", __FUNCTION__, __LINE__);
 
 	dsp_lock(azx_dev);
 	if (dsp_is_locked(azx_dev)) {
@@ -2320,6 +2321,7 @@ static int azx_pcm_hw_free(struct snd_pcm_substream *substream)
 	struct azx_dev *azx_dev = get_azx_dev(substream);
 	struct azx *chip = apcm->chip;
 	struct hda_pcm_stream *hinfo = apcm->hinfo[substream->stream];
+	printk("### %s : %d ###\n", __FUNCTION__, __LINE__);
 
 	/* reset BDL address */
 	dsp_lock(azx_dev);
@@ -2424,6 +2426,9 @@ static int azx_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 	struct snd_pcm_substream *s;
 	int rstart = 0, start, nsync = 0, sbits = 0;
 	int nwait, timeout;
+
+	printk("### %s : cmd = %d DMA buffer : area = %08x addr = %08x size = %08x ###\n", __FUNCTION__, cmd,
+		substream->dma_buffer.area, substream->dma_buffer.addr, substream->dma_buffer.bytes);
 
 	azx_dev = get_azx_dev(substream);
 	trace_azx_pcm_trigger(chip, azx_dev, cmd);
