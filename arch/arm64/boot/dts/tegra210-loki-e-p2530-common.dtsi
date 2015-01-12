@@ -429,4 +429,9 @@
 	rollback-protection {
 		status = "okay";
 	};
+
+	usb_nvshield_led {
+                status = "okay";
+		disable-on-kernel-charging;
+        };
 };
