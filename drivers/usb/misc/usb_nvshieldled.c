@@ -1,7 +1,7 @@
 /*
  * USB LED Driver for NVIDIA Shield
  *
- * Copyright (c) 2013-2014, NVIDIA Corporation. All Rights Reserved.
+ * Copyright (c) 2013-2015, NVIDIA Corporation. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -79,6 +79,7 @@ enum led_state {
 struct nvshield_led {
 	struct usb_device	*udev;
 	bool			pwm_enabled;
+	bool			nvshieldled_state;
 	unsigned char		brightness[LED_NUM];
 	enum led_state		state[LED_NUM];
 };
@@ -351,10 +352,28 @@ static int nvshieldled_probe(struct usb_interface *interface,
 		dev_info(&interface->dev, "Disabling LED PWM\n");
 
 	dev->udev = usb_get_dev(udev);
-	dev->state[LED_NVBUTTON] = LED_NORMAL;
-	dev->brightness[LED_NVBUTTON] = 255;
-	dev->state[LED_TOUCH] = LED_NORMAL;
-	dev->brightness[LED_TOUCH] = 255;
+	np = of_find_node_by_name(NULL, "usb_nvshield_led");
+	if (np) {
+		dev->nvshieldled_state = of_device_is_available(np);
+		if (dev->nvshieldled_state) {
+			dev->state[LED_NVBUTTON] = LED_NORMAL;
+			dev->brightness[LED_NVBUTTON] = 255;
+			dev->state[LED_TOUCH] = LED_NORMAL;
+			dev->brightness[LED_TOUCH] = 255;
+		} else {
+			dev->state[LED_NVBUTTON] = LED_OFF;
+			dev->brightness[LED_NVBUTTON] = 255;
+			dev->state[LED_TOUCH] = LED_OFF;
+			dev->brightness[LED_TOUCH] = 255;
+			send_command(dev, LED_TOUCH);
+			send_command(dev, LED_NVBUTTON);
+		}
+	} else {
+		dev->state[LED_NVBUTTON] = LED_NORMAL;
+		dev->brightness[LED_NVBUTTON] = 255;
+		dev->state[LED_TOUCH] = LED_NORMAL;
+		dev->brightness[LED_TOUCH] = 255;
+	}
 
 	usb_set_intfdata(interface, dev);
 	g_dev = dev;
