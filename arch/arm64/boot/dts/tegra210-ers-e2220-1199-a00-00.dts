@@ -43,4 +43,17 @@
 	spi@7000da00 {
 		status = "disabled";
 	};
+	sdhci@700b0200 {
+		nvidia,is-ddr-tap-delay;
+		nvidia,ddr-tap-delay = <0>;
+		dqs-trim-delay = <17>;
+		max-clk-limit = <266000000>;
+		bus-width = <8>;
+		uhs-mask = <0x60>;
+		built-in;
+		vddio_sdmmc-supply = <&max77620_sd3>;
+		vddio_sd_slot-supply = <&vdd_3v3>;
+		nvidia,dll-calib-needed;
+		nvidia,is-emmc;
+	};
 };
