@@ -370,6 +370,7 @@ static int sysedp_probe(struct platform_device *pdev)
 
 static const struct of_device_id sysedp_of_match[] = {
 	{ .compatible = "nvidia,tegra124-sysedp", },
+	{ },
 };
 MODULE_DEVICE_TABLE(of, sysedp_of_match);
 
