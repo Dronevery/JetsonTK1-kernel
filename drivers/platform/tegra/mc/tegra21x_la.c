@@ -652,8 +652,8 @@ static int t21x_set_disp_la(enum tegra_la_id id,
 					LA_FP_FACTOR /
 					bw_mbps;
 	la_bw_upper_bound_nsec_fp = la_bw_upper_bound_nsec_fp *
-					(LA_FP_FACTOR /
-					LA_DISP_CATCHUP_FACTOR_FP);
+					LA_FP_FACTOR /
+					LA_DISP_CATCHUP_FACTOR_FP;
 	la_bw_upper_bound_nsec_fp =
 		la_bw_upper_bound_nsec_fp -
 		(LA_ST_LA_MINUS_SNAP_ARB_TO_ROW_SRT_EMCCLKS_FP +
