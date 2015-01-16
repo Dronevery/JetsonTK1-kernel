@@ -197,6 +197,8 @@ struct tegra_dc {
 	struct tegra_dc_cmu		cmu;
 	struct tegra_dc_cmu		cmu_shadow;
 	bool				cmu_dirty;
+	/* Is CMU set by bootloader */
+	bool				is_cmu_set_bl;
 	bool				cmu_shadow_dirty;
 	bool				cmu_shadow_force_update;
 	bool				cmu_enabled;
