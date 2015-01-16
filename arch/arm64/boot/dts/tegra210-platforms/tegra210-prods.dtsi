@@ -194,7 +194,6 @@
 		};
 	};
 
-
 	spi@7000d400 {
 		prod-settings {
 			prod {
@@ -272,6 +271,10 @@
 										// 				27:24=UTMIP_PCOUNT_UPDN_DIV	0x00
 					>;
 				};
+				prod_c_bias {
+					prod = <0x00000284 0xffffffc0 0x0000003a
+					>;
+				};
 		};
 	};
 
@@ -286,12 +289,21 @@
 										//				2:0=HSSQUELCH_LEVEL_NEW		0x02
 					>;
 				};
+				prod_c_bias {
+					prod = <0x00000284 0xffffffc0 0x0000003a
+					>;
+				};
 		};
 	};
 
 	xusb@70090000 {
 		prod-settings {
 			#prod-cells = <4>;
+			prod_c_bias {
+			    prod = <
+				0 0x00000284 0xffffffc0 0x0000003a
+			    >;
+			};
 			prod_c_utmi0 {
 			    prod = <
 				3 0x00000084 0xffffffbf 0x00000040
