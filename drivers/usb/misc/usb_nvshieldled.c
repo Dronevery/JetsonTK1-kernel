@@ -364,7 +364,7 @@ static int nvshieldled_probe(struct usb_interface *interface,
 			dev->state[LED_NVBUTTON] = LED_OFF;
 			dev->brightness[LED_NVBUTTON] = 255;
 			dev->state[LED_TOUCH] = LED_OFF;
-			dev->brightness[LED_TOUCH] = 255;
+			dev->brightness[LED_TOUCH] = 0;
 			send_command(dev, LED_TOUCH);
 			send_command(dev, LED_NVBUTTON);
 		}
