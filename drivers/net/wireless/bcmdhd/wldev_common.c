@@ -335,6 +335,33 @@ int wldev_set_band(
 	return error;
 }
 
+#define COUNTRY_CODE_LEN 2
+char *country_to_nv_country(char *country_code)
+{
+	char *nv_country;
+	const char EU_countries[] = "AT BE BG HR CZ DK FR DE GR HU IT NL NO PL PT RO SK ES SE CH GB";
+
+	nv_country = (char *)kmalloc(COUNTRY_CODE_LEN + 1, GFP_KERNEL);
+	if (nv_country == NULL) {
+		pr_err("%s: fail to allocate memory\n", __func__);
+		return ERR_PTR(-ENOMEM);
+	}
+
+	if (strncmp(country_code, "US", COUNTRY_CODE_LEN) == 0) {
+		strncpy(nv_country, "US", 2);	/* US is abbreviation for Q2/113 */
+	} else if (strncmp(country_code, "CA", COUNTRY_CODE_LEN) == 0) {
+		strncpy(nv_country, "US", 2);
+	} else if (strncmp(country_code, "EU", COUNTRY_CODE_LEN) == 0) {
+		strncpy(nv_country, "DE", 2);	/* DE is abbreviation  of E0/53 */
+	} else if (strstr(EU_countries, country_code)) {
+		strncpy(nv_country, "DE", 2);
+	} else {
+		strncpy(nv_country, "US", 2);
+	}
+	nv_country[2] = '\0';
+	return nv_country;
+}
+
 int wldev_set_country(
 	struct net_device *dev, char *country_code, bool notify, bool user_enforced)
 {
@@ -345,6 +372,8 @@ int wldev_set_country(
 
 	if (!country_code)
 		return error;
+
+	country_code = country_to_nv_country(country_code);
 
 	bzero(&scbval, sizeof(scb_val_t));
 	error = wldev_iovar_getbuf(dev, "country", NULL, 0, &cspec, sizeof(cspec), NULL);

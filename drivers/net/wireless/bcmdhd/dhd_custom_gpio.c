@@ -143,6 +143,11 @@ dhd_custom_get_mac_address(void *adapter, unsigned char *buf)
 /* Customized Locale table : OPTIONAL feature */
 const struct cntry_locales_custom translate_custom_table[] = {
 /* Table should be filled out based on custom platform regulatory requirement */
+#if defined(CUSTOM_COUNTRY_LOCALE)
+	{"DE", "E0", 53},
+	{"E0", "E0", 53},
+	{"US", "Q2", 113},
+#endif /* CUSTOM_COUNTRY_LOCALE */
 #ifdef EXAMPLE_TABLE
 	{"",   "XY", 4},  /* Universal if Country code is unknown or empty */
 	{"US", "US", 69}, /* input ISO "US" to : US regrev 69 */
@@ -258,7 +263,7 @@ const struct cntry_locales_custom translate_custom_table[] = {
 */
 void get_customized_country_code(void *adapter, char *country_iso_code, wl_country_t *cspec)
 {
-#if defined(CUSTOMER_HW2) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 39))
+#if !defined(CUSTOM_COUNTRY_LOCALE) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 39))
 
 	struct cntry_locales_custom *cloc_ptr;
 
@@ -273,7 +278,6 @@ void get_customized_country_code(void *adapter, char *country_iso_code, wl_count
 	return;
 #else
 	int size, i;
-
 	size = ARRAYSIZE(translate_custom_table);
 
 	if (cspec == 0)
