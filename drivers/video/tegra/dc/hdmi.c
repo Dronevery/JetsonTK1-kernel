@@ -4,7 +4,7 @@
  * Copyright (C) 2010 Google, Inc.
  * Author: Erik Gilling <konkers@android.com>
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -1843,8 +1843,10 @@ static void tegra_dc_hdmi_setup_avi_infoframe(struct tegra_dc *dc, bool dvi)
 	avi.vic = tegra_dc_find_cea_vic(&dc->mode);
 	avi.m = dc->mode.avi_m;
 	/*Enable YUV format for 4k support*/
-	if (dc->yuv_bypass)
+	if (dc->mode.vmode & FB_VMODE_Y420)
 		avi.y = 3;
+	else if (dc->mode.vmode & FB_VMODE_Y422)
+		avi.y = 1;
 	else
 		avi.y = 0;
 
