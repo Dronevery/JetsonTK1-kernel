@@ -4,7 +4,7 @@
  * Header file for Host Controller registers and I/O accessors.
  *
  *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
- *  Copyright (c) 2011-2014, NVIDIA CORPORATION. All Rights Reserved.
+ *  Copyright (c) 2011-2015, NVIDIA CORPORATION. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -385,7 +385,6 @@ struct sdhci_ops {
 	int	(*get_drive_strength)(struct sdhci_host *host,
 		unsigned int max_dtr, int host_drv, int card_drv);
 	void	(*post_init)(struct sdhci_host *host);
-	void	(*en_strobe)(struct sdhci_host *host);
 	void	(*dump_host_cust_regs)(struct sdhci_host *host);
 	int	(*get_max_tuning_loop_counter)(struct sdhci_host *sdhci);
 	void	(*config_tap_delay)(struct sdhci_host *host, u8 option);
