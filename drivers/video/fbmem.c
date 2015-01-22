@@ -32,6 +32,7 @@
 #include <linux/device.h>
 #include <linux/efi.h>
 #include <linux/fb.h>
+#include <linux/gpio.h>
 
 #include <asm/fb.h>
 
@@ -1105,7 +1106,10 @@ static long do_fb_ioctl(struct fb_info *info, unsigned int cmd,
 			return -ENODEV;
 		}
 		info->flags |= FBINFO_MISC_USEREVENT;
+		/* Complete hack for tegradc to disable hdmi hpd events during modeset */
+		disable_irq(gpio_to_irq(225));
 		ret = fb_set_var(info, &var);
+		enable_irq(gpio_to_irq(225));
 		info->flags &= ~FBINFO_MISC_USEREVENT;
 		unlock_fb_info(info);
 		console_unlock();
