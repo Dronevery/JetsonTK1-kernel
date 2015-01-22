@@ -39,7 +39,7 @@
 
 MODULE_LICENSE("GPL v2");
 
-#define snd_atvr_log(...) pr_info("snd_atvr: " __VA_ARGS__)
+#define snd_atvr_log(...) pr_debug("snd_atvr: " __VA_ARGS__)
 
 #define ADPCM_AUDIO_REPORT_ID 30
 
@@ -358,11 +358,11 @@ static int atvr_mic_ctrl(struct hid_device *hdev, bool enable)
 	int ret;
 
 	report[3] = enable ? 0x01 : 0x00;
-	hid_info(hdev, "%s remote mic\n", enable ? "enable" : "disable");
+	snd_atvr_log("%s remote mic\n", enable ? "enable" : "disable");
 	ret =  hdev->hid_output_raw_report(hdev, report, sizeof(report),
 					HID_OUTPUT_REPORT);
 	if (ret < 0)
-		hid_info(hdev, "failed to send mic ctrl report, err=%d\n", ret);
+		hid_err(hdev, "failed to send mic ctrl report, err=%d\n", ret);
 	else
 		ret = 0;
 
