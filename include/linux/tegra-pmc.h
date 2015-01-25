@@ -26,7 +26,6 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 
-extern void tegra_pmc_enable_wake_det(bool enable);
 extern void tegra_pmc_set_dpd_sample(void);
 extern void tegra_pmc_clear_dpd_sample(void);
 extern void tegra_pmc_remove_dpd_req(void);
