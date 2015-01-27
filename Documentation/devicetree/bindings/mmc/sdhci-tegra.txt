@@ -58,6 +58,7 @@ in HS400 mode.
 - nvidia,enable-hs533-mode: Set this Flag toenable HS533 mode.
 	---> eMMC card does not advertise HS533 mode support in device registers.
 	---> This flag has to be enabled only if the card supports HS533 mode, other wise the consequences are un-known.(Errors will be seen)
+- nvidia,enable-strobe-mode: Enable enhance strobe mode when eMMC device runs at HS400 mode.
 
 Example:
 
