@@ -24,4 +24,15 @@ extern unsigned int gk20a_debug_trace_cmdbuf;
 void gk20a_debug_dump(struct platform_device *pdev);
 void gk20a_debug_init(struct platform_device *pdev);
 
+struct gk20a_debug_output {
+	void (*fn)(void *ctx, const char *str, size_t len);
+	void *ctx;
+	char buf[256];
+};
+
+void gk20a_debug_output(struct gk20a_debug_output *o,
+	const char *fmt, ...);
+
+int gk20a_gr_debug_dump(struct platform_device *pdev);
+
 #endif
