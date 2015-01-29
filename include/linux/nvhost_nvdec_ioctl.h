@@ -3,7 +3,7 @@
  *
  * Tegra IOCTL Driver
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -44,5 +44,7 @@
 
 #define NVHOST_NVDEC_IOCTL_POWERON _IOW(NVHOST_NVDEC_IOCTL_MAGIC, 1, uint)
 #define NVHOST_NVDEC_IOCTL_POWEROFF _IOW(NVHOST_NVDEC_IOCTL_MAGIC, 2, uint)
+#define NVHOST_NVDEC_IOCTL_VPR_FLOOR_SIZE _IOW(NVHOST_NVDEC_IOCTL_MAGIC, 3, \
+						__u32)
 
 #endif
