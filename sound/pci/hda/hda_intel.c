@@ -8,7 +8,7 @@
  *  Copyright (c) 2004 Takashi Iwai <tiwai@suse.de>
  *                     PeiSen Hou <pshou@realtek.com.tw>
  *
- *   Copyright (C) 2013-2014 NVIDIA Corporation. All rights reserved.
+ *   Copyright (C) 2013-2015 NVIDIA Corporation. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the Free
@@ -2293,7 +2293,7 @@ static int azx_pcm_hw_params(struct snd_pcm_substream *substream,
 	struct azx *chip = apcm->chip;
 	struct azx_dev *azx_dev = get_azx_dev(substream);
 	int ret;
-	printk("### %s : %d ###\n", __FUNCTION__, __LINE__);
+	printk("### %s ###\n", __FUNCTION__);
 
 	dsp_lock(azx_dev);
 	if (dsp_is_locked(azx_dev)) {
@@ -2321,7 +2321,7 @@ static int azx_pcm_hw_free(struct snd_pcm_substream *substream)
 	struct azx_dev *azx_dev = get_azx_dev(substream);
 	struct azx *chip = apcm->chip;
 	struct hda_pcm_stream *hinfo = apcm->hinfo[substream->stream];
-	printk("### %s : %d ###\n", __FUNCTION__, __LINE__);
+	printk("### %s ###\n", __FUNCTION__);
 
 	/* reset BDL address */
 	dsp_lock(azx_dev);
@@ -2426,15 +2426,23 @@ static int azx_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 	struct snd_pcm_substream *s;
 	int rstart = 0, start, nsync = 0, sbits = 0;
 	int nwait, timeout;
-
-	printk("### %s : cmd = %d DMA buffer : area = %08x addr = %08x size = %08x ###\n", __FUNCTION__, cmd,
-		substream->dma_buffer.area, substream->dma_buffer.addr, substream->dma_buffer.bytes);
+	u32 *bdl;
 
 	azx_dev = get_azx_dev(substream);
 	trace_azx_pcm_trigger(chip, azx_dev, cmd);
 
 	if (dsp_is_locked(azx_dev) || !azx_dev->prepared)
 		return -EPIPE;
+
+	bdl = (u32 *)azx_dev->bdl.area;
+	if (cmd == SNDRV_PCM_TRIGGER_START)
+		printk("### %s : DMA area = %08x addr = %08x size = %08x "
+		" bdl[0] = %08x bdl[1] = %08x bdl[2] = %08x "
+		" bdl[3] = %08x SD_BDLPL = %08x SD_BDLPU = %08x ###\n",
+		__FUNCTION__, substream->dma_buffer.area,
+		substream->dma_buffer.addr, substream->dma_buffer.bytes,
+		bdl[0], bdl[1], bdl[2], bdl[3], azx_sd_readl(azx_dev, SD_BDLPL),
+		azx_sd_readl(azx_dev, SD_BDLPU));
 
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
