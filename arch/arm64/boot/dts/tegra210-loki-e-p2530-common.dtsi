@@ -432,7 +432,8 @@
 	};
 
 	usb_nvshield_led {
-                status = "okay";
+		status = "okay";
+		edp-consumer-name = "shieldled";
 		disable-on-kernel-charging;
         };
 };
