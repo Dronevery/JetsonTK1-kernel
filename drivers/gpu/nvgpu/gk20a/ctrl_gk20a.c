@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA Corporation.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -131,12 +131,8 @@ static int gk20a_ctrl_mark_compressible_write(
 {
 	int ret;
 
-	ret = gk20a_busy(g->dev);
-	if (ret)
-		return ret;
 	ret = gk20a_mark_compressible_write(g, args->handle,
 			args->valid_compbits, args->offset, args->zbc_color);
-	gk20a_idle(g->dev);
 
 	return ret;
 }
