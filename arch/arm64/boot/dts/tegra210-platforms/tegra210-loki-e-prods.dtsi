@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,11 +150,11 @@
 										//				12:09=TMDS_TERMADJ	0x9
 										//				23:20=LOADADJ		0x3
 					0x00000068 0xf0ffffff 0x08000000	// SOR_NV_PSIDP_SOR_PLL3_0	27:24=BG_VREF_LEVEL	0x8
-					0x00000138 0x00000000 0x33333333	// SOR_NV_PDISP_SOR_LANE_DRIVE_CURRENT0_0
-										//				31:24=LANE3_DP_LANE3	0x33
-										//				23:16=LANE2_DP_LANE0	0x33
-										//				15:08=LANE1_DP_LANE1	0x33
-										//				07:00=LANE0_DP_LANE2	0x33
+					0x00000138 0x00000000 0x35353535	// SOR_NV_PDISP_SOR_LANE_DRIVE_CURRENT0_0
+										//				31:24=LANE3_DP_LANE3	0x35
+										//				23:16=LANE2_DP_LANE0	0x35
+										//				15:08=LANE1_DP_LANE1	0x35
+										//				07:00=LANE0_DP_LANE2	0x35
 					0x00000148 0x00000000 0x01010101	// SOR_NV_PDISP_SOR_LANE_PREEMPHASIS0_0
 										//				31:24=LANE3_DP_LANE3	0x01
 										//				23:16=LANE2_DP_LANE0	0x01
