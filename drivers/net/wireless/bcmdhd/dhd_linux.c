@@ -5811,8 +5811,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 #ifdef RXCB
 	/* Enable bus rx callback */
 	bcm_mkiovar("bus:rxcb", (char *)&rxcb, 4, iovbuf, sizeof(iovbuf));
-	ret = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
-	if (ret < 0)
+	if ((ret =dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0)) < 0)
 		DHD_ERROR(("%s failed to set RXCB %d\n", __FUNCTION__, ret));
 #endif
 
