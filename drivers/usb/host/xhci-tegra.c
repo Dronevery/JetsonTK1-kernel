@@ -2482,7 +2482,7 @@ static int get_host_controlled_ports(struct tegra_xhci_hcd *tegra)
 	if ((padctl_readl(tegra, padregs->usb2_port_cap_0)
 			& USB2_PORT_CAP_MASK(0))
 			!= (USB2_PORT_CAP_HOST(0)))
-		enabled_ports &= ~(TEGRA_XUSB_USB2_P0 | TEGRA_XUSB_SS_P0);
+		enabled_ports &= ~(TEGRA_XUSB_USB2_P0);
 
 	return enabled_ports;
 }
