@@ -130,14 +130,19 @@ void migrate_irqs(void)
 	unsigned int i;
 	struct irq_desc *desc;
 	unsigned long flags;
+	struct cpumask offline_cpus, *affinity;
+
+	cpumask_complement(&offline_cpus, cpu_online_mask);
 
 	local_irq_save(flags);
 
 	for_each_irq_desc(i, desc) {
-		bool affinity_broken;
+		bool affinity_broken = false;
+		affinity = irq_desc_get_irq_data(desc)->affinity;
 
 		raw_spin_lock(&desc->lock);
-		affinity_broken = migrate_one_irq(desc);
+		if (cpumask_any_and(affinity, &offline_cpus) < nr_cpu_ids)
+			affinity_broken = migrate_one_irq(desc);
 		raw_spin_unlock(&desc->lock);
 
 		if (affinity_broken)
