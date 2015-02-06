@@ -607,6 +607,8 @@ static int __init tegra_gic_of_init(struct device_node *node,
 	cpumask |= cpumask << 16;
 	for (i = 0; i < (MAX_ICTLRS * ICTLR_IRQS_PER_LIC / 8); i++)
 		ictlr_target_cpu[i] = cpumask;
+	for (i = FIRST_LEGACY_IRQ; tegra_irq_range_valid(i); i++)
+		irq_set_affinity(i, cpumask_of(0));
 
 	gic_arch_extn.irq_ack = tegra_ack;
 	gic_arch_extn.irq_eoi = tegra_eoi;
