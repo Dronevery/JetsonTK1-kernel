@@ -1,7 +1,7 @@
 /*
  * Fundamental types and constants relating to WPA
  *
- * Copyright (C) 1999-2014, Broadcom Corporation
+ * Copyright (C) 1999-2015, Broadcom Corporation
  * 
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -169,6 +169,7 @@ typedef BWL_PRE_PACKED_STRUCT struct
 #define	WPA_CAP_WPA2_PREAUTH		RSN_CAP_PREAUTH
 
 #define WPA2_PMKID_COUNT_LEN	2
+#define RSN_GROUPMANAGE_CIPHER_LEN 4
 
 
 /* This marks the end of a packed structure section. */
