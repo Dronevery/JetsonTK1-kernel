@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -286,10 +286,6 @@ u64 tegra_smmu_fixup_swgids(struct device *dev, struct iommu_linear_map **map)
 	if (!dev)
 		return SWGIDS_ERROR_CODE;
 
-	if (!dev->of_node)
-		pr_info("No Device Node present for smmu client: %s !!\n",
-			dev_name(dev));
-
 	switch (tegra_get_chipid()) {
 	case TEGRA_CHIPID_TEGRA12:
 	case TEGRA_CHIPID_TEGRA13:
@@ -303,16 +299,23 @@ u64 tegra_smmu_fixup_swgids(struct device *dev, struct iommu_linear_map **map)
 	}
 
 	while ((s = table->name) != NULL) {
-		if (!strncmp(s, dev_name(dev), strlen(s))) {
-			if (map)
-				*map = table->linear_map;
-
-			return table->swgids;
+		if (strncmp(s, dev_name(dev), strlen(s))) {
+			table++;
+			continue;
 		}
-		table++;
+
+		if (map)
+			*map = table->linear_map;
+
+		if (dev->of_node)
+			break;
+
+		pr_info("No Device Node present for smmu client: %s !!\n",
+			dev_name(dev));
+		break;
 	}
 
-	return SWGIDS_ERROR_CODE;
+	return table->name ? table->swgids : SWGIDS_ERROR_CODE;
 }
 EXPORT_SYMBOL(tegra_smmu_fixup_swgids);
 
