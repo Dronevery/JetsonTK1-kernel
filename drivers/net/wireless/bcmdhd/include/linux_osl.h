@@ -372,7 +372,7 @@ extern int osl_error(int bcmerror);
 #define PKTSETID(skb, id)       ({BCM_REFERENCE(skb); BCM_REFERENCE(id);})
 #define PKTSHRINK(osh, m)		({BCM_REFERENCE(osh); m;})
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0)
-#define PKTORPHAN(skb)          skb_orphan(skb)
+#define PKTORPHAN(skb)          ({BCM_REFERENCE(skb); 0;})
 #else
 #define PKTORPHAN(skb)          ({BCM_REFERENCE(skb); 0;})
 #endif /* LINUX VERSION >= 3.6 */
