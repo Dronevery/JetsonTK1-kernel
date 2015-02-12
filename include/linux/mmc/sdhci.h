@@ -2,7 +2,7 @@
  *  linux/include/linux/mmc/sdhci.h - Secure Digital Host Controller Interface
  *
  *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
- *  Copyright (c) 2013-2014, NVIDIA CORPORATION. All Rights Reserved.
+ *  Copyright (c) 2013-2015, NVIDIA CORPORATION. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ struct sdhci_host {
 /* Turn off/on card clock before sending/after tuning command*/
 #define SDHCI_QUIRK2_NON_STD_TUN_CARD_CLOCK		(1<<13)
 #define SDHCI_QUIRK2_NON_STD_TUNING_LOOP_CNTR		(1<<14)
+#define SDHCI_QUIRK2_PERIODIC_CALIBRATION		(1<<15)
 
 	unsigned int  acmd12_ctrl;
 	unsigned int  ier;
@@ -250,6 +251,8 @@ struct sdhci_host {
 	bool			enable_sdhci_perf_stats;
 #endif
 	int			clk_gate_tmout_ticks;
+	ktime_t timestamp;
+	bool is_calibration_done;
 
 	struct task_struct *suspend_task;
 

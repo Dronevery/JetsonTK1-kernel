@@ -87,6 +87,7 @@ struct tegra_sdhci_platform_data {
 	bool enable_hs533_mode;
 	bool is_sd_device;
 	bool en_strobe; /* Enable enhance strobe mode for eMMC */
+	bool en_periodic_calib;
 };
 
 #endif
