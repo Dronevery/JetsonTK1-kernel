@@ -386,12 +386,6 @@ static int cy8c_led_probe(struct i2c_client *client,
 	/* enable print in show/get */
 	data->client = client;
 
-	/* create debugfs for f/w loading purpose */
-	d = debugfs_create_file("cy8c_led", S_IRUGO, NULL, data,
-							&cy8c_debug_fops);
-	if (!d)
-		pr_err("Failed to create suspend_mode debug file\n");
-
 	of_led_parse_pdata(client, data);
 
 	data->led.brightness_set = set_led_brightness;
@@ -445,6 +439,12 @@ static int cy8c_led_probe(struct i2c_client *client,
 	ret = device_create_file(data->led.dev, &dev_attr_params);
 	if (ret)
 		dev_err(&client->dev, "Failed to register params sys node\n");
+
+	/* create debugfs for f/w loading purpose */
+	d = debugfs_create_file("cy8c_led", S_IRUGO, NULL, data,
+							&cy8c_debug_fops);
+	if (!d)
+		pr_err("Failed to create suspend_mode debug file\n");
 
 	return ret;
 }
