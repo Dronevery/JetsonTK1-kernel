@@ -75,7 +75,7 @@ struct tegra_sdhci_platform_data {
 	bool enable_pm_domain; /* enable pm domain when true */
 	bool update_pinctrl_settings;
 	u32 cpu_speedo;
-	unsigned char default_drv_type;
+	unsigned int default_drv_type;
 	bool dll_calib_needed;
 	bool pwr_off_during_lp0;
 	bool disable_auto_cal;
