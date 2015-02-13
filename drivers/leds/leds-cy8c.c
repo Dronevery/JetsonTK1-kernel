@@ -1,7 +1,7 @@
 /*
  * CY8C4014 LED chip driver
  *
- * Copyright (C) 2014 NVIDIA Corporation. All rights reserved.
+ * Copyright (C) 2014-2015 NVIDIA Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -383,6 +383,9 @@ static int cy8c_led_probe(struct i2c_client *client,
 	if (!data)
 		return -ENOMEM;
 
+	/* enable print in show/get */
+	data->client = client;
+
 	/* create debugfs for f/w loading purpose */
 	d = debugfs_create_file("cy8c_led", S_IRUGO, NULL, data,
 							&cy8c_debug_fops);
@@ -425,12 +428,10 @@ static int cy8c_led_probe(struct i2c_client *client,
 
 	dev_dbg(&client->dev, "0x%02x\n", reg);
 
-	cy8c_apply_default_settings(data);
 
 	mutex_init(&data->lock);
 
-	/* enable print in show/get */
-	data->client = client;
+	cy8c_apply_default_settings(data);
 
 	ret = led_classdev_register(&client->dev, &data->led);
 	if (ret < 0)
