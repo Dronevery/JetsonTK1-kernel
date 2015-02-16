@@ -27,7 +27,7 @@ static struct rc_map_table foster_table[] = {
 	{ 0x807e0d, KEY_RIGHT },
 	{ 0x807e09, KEY_HOMEPAGE },
 	{ 0x807e06, KEY_POWER },
-	{ 0x807e03, KEY_ENTER },
+	{ 0x807e03, KEY_SELECT },
 	{ 0x807e02, KEY_BACK },
 	{ 0x807e14, KEY_MUTE },
 	{ 0x807e20, KEY_PLAYPAUSE },
