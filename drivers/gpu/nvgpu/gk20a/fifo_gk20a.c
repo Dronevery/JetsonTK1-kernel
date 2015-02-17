@@ -1023,6 +1023,7 @@ static bool gk20a_fifo_handle_mmu_fault(struct gk20a *g)
 
 		if (ctxsw) {
 			gk20a_fecs_dump_falcon_stats(g);
+			gk20a_gr_debug_dump(g->dev);
 			gk20a_err(dev_from_gk20a(g), "gr_status_r : 0x%x",
 					gk20a_readl(g, gr_status_r()));
 		}
@@ -1384,6 +1385,7 @@ static bool gk20a_fifo_handle_sched_error(struct gk20a *g)
 			gk20a_err(dev_from_gk20a(g),
 				"fifo sched ctxsw timeout error:"
 				"engine = %u, ch = %d", engine_id, id);
+			gk20a_gr_debug_dump(g->dev);
 			gk20a_fifo_recover(g, BIT(engine_id),
 				ch->timeout_debug_dump);
 		} else {
