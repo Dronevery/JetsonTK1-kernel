@@ -124,6 +124,7 @@ struct tegra_dc_out_ops {
 	int (*ddc_enable)(struct tegra_dc *dc);
 	/* refcounted disable of pads and clocks after performing DDC/I2C. */
 	int (*ddc_disable)(struct tegra_dc *dc);
+	int (*hotplug_notify)(struct tegra_dc *dc);
 };
 
 struct tegra_dc_shift_clk_div {
@@ -171,6 +172,7 @@ struct tegra_dc {
 	bool				enabled;
 	bool				suspended;
 	bool				blanked;
+	bool				hotplug_pending;
 
 	/* Some of the setup code could reset display even if
 	 * DC is already by bootloader.  This one-time mark is

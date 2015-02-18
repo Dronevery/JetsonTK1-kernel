@@ -627,6 +627,16 @@ static void tegra_hdmi_hotplug_notify(struct tegra_hdmi *hdmi,
 #endif
 }
 
+static int tegra_dc_hdmi_notify(struct tegra_dc *dc)
+{
+	struct tegra_hdmi *hdmi = tegra_dc_get_outdata(dc);
+	dc->connected = false;
+	tegra_dc_ext_process_hotplug(dc->ndev->id);
+	switch_set_state(&hdmi->hpd_switch, 0);
+
+	return 0;
+}
+
 static int tegra_hdmi_edid_eld_setup(struct tegra_hdmi *hdmi)
 {
 	int err;
@@ -711,7 +721,7 @@ static int tegra_hdmi_controller_disable(struct tegra_hdmi *hdmi)
 static int tegra_hdmi_disable(struct tegra_hdmi *hdmi)
 {
 	if (!hdmi->enabled) {
-		tegra_hdmi_hotplug_notify(hdmi, false);
+		hdmi->dc->hotplug_pending = true;
 		return 0;
 	}
 
@@ -1621,7 +1631,7 @@ static void tegra_hdmi_scdc_worker(struct work_struct *work)
 	mutex_lock(&hdmi->ddc_lock);
 
 	tegra_hdmi_scdc_read(hdmi, rd_tmds_config, ARRAY_SIZE(rd_tmds_config));
-	if (!rd_tmds_config[0][1] && hdmi->dc->mode.pclk > 340000000)
+	if (!rd_tmds_config[0][1]  && (hdmi->dc->mode.pclk > 340000000))
 		_tegra_hdmi_v2_x_config(hdmi);
 
 	mutex_unlock(&hdmi->ddc_lock);
@@ -2101,4 +2111,5 @@ struct tegra_dc_out_ops tegra_dc_hdmi2_0_ops = {
 	.ddc_enable = tegra_dc_hdmi_ddc_enable,
 	.ddc_disable = tegra_dc_hdmi_ddc_disable,
 	.modeset_notifier = tegra_dc_hdmi_modeset_notifier,
+	.hotplug_notify = tegra_dc_hdmi_notify,
 };

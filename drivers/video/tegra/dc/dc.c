@@ -3365,8 +3365,13 @@ static bool _tegra_dc_enable(struct tegra_dc *dc)
 
 	pm_runtime_get_sync(&dc->ndev->dev);
 
-	if (dc->out->type == TEGRA_DC_OUT_HDMI && !tegra_dc_hpd(dc))
+	if (dc->out->type == TEGRA_DC_OUT_HDMI && !tegra_dc_hpd(dc)) {
+		if (dc->hotplug_pending) {
+			dc->hotplug_pending = false;
+			dc->out_ops->hotplug_notify(dc);
+		}
 		return false;
+	}
 
 #ifdef CONFIG_TEGRA_NVDISPLAY
 	if (tegra_nvdisp_head_enable(dc)) {
@@ -4173,6 +4178,7 @@ static int tegra_dc_probe(struct platform_device *ndev)
 	dc->cmu_enabled = dc->pdata->cmu_enable;
 #endif
 
+	dc->hotplug_pending = false;
 	if (dc->pdata->flags & TEGRA_DC_FLAG_ENABLED) {
 		/* WAR: BL is putting DC in bad state for EDP configuration */
 		if (dc->out->type == TEGRA_DC_OUT_DP ||
