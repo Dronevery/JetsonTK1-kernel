@@ -59,6 +59,7 @@ in HS400 mode.
 	---> eMMC card does not advertise HS533 mode support in device registers.
 	---> This flag has to be enabled only if the card supports HS533 mode, other wise the consequences are un-known.(Errors will be seen)
 - nvidia,enable-strobe-mode: Enable enhance strobe mode when eMMC device runs at HS400 mode.
+- nvidia,en-periodic-calib: Enable periodic calibration support for sdmmc1/sdmmc3. Auto calibration sequence will be run at interval of 100ms during sdmmc1/sdmmc3 interfaces are active.
 
 Example:
 
