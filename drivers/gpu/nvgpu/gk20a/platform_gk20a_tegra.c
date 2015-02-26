@@ -486,7 +486,7 @@ static struct gk20a_platform t132_gk20a_tegra_platform = {
 	.enable_elpg            = true,
 	.enable_aelpg           = true,
 
-	.force_reset_in_do_idle = true,
+	.force_reset_in_do_idle = false,
 
 	.default_big_page_size	= SZ_128K,
 
@@ -529,7 +529,7 @@ struct gk20a_platform gk20a_tegra_platform = {
 	.enable_elpg            = true,
 	.enable_aelpg           = true,
 
-	.force_reset_in_do_idle = true,
+	.force_reset_in_do_idle = false,
 
 	.default_big_page_size	= SZ_128K,
 
@@ -573,7 +573,7 @@ struct gk20a_platform gm20b_tegra_platform = {
 	.enable_elpg            = true,
 	.enable_aelpg           = true,
 
-	.force_reset_in_do_idle = true,
+	.force_reset_in_do_idle = false,
 
 	.default_big_page_size	= SZ_128K,
 
