@@ -5000,14 +5000,14 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	if (plat == NULL) {
 		pr_err("%s Parsing DT data\n", mmc_hostname(host->mmc));
 		plat = sdhci_tegra_dt_parse_pdata(pdev);
+		if (plat == NULL) {
+			dev_err(mmc_dev(host->mmc), "missing platform data\n");
+			rc = -ENXIO;
+			goto err_no_plat;
+		}
 	} else {
 		pr_err("%s using board files instead of DT\n",
 			mmc_hostname(host->mmc));
-	}
-	if (plat == NULL) {
-		dev_err(mmc_dev(host->mmc), "missing platform data\n");
-		rc = -ENXIO;
-		goto err_no_plat;
 	}
 
 	if (sdhci_tegra_check_bondout(plat->id)) {
