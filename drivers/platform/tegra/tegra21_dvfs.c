@@ -27,8 +27,9 @@
 
 #include <linux/platform/tegra/clock.h>
 #include <linux/platform/tegra/dvfs.h>
-#include "board.h"
 #include <linux/platform/tegra/tegra_cl_dvfs.h>
+#include <linux/platform/tegra/cpu-tegra.h>
+#include "board.h"
 #include "tegra_core_sysfs_limits.h"
 
 static bool tegra_dvfs_cpu_disabled;
@@ -52,6 +53,13 @@ static int vdd_cpu_therm_floors_table[MAX_THERMAL_LIMITS];
 static struct tegra_cooling_device cpu_vmin_cdev = {
 	.compatible = "nvidia,tegra210-rail-vmin-cdev",
 };
+static int vdd_cpu_vmax_trips_table[MAX_THERMAL_LIMITS];
+static int vdd_cpu_therm_caps_table[MAX_THERMAL_LIMITS];
+#ifndef CONFIG_TEGRA_CPU_VOLT_CAP
+static struct tegra_cooling_device cpu_vmax_cdev = {
+	.compatible = "nvidia,tegra210-rail-vmax-cdev",
+};
+#endif
 
 static struct tegra_cooling_device gpu_vts_cdev = {
 	.compatible = "nvidia,tegra210-rail-scaling-cdev",
@@ -63,6 +71,9 @@ static struct dvfs_rail tegra21_dvfs_rail_vdd_cpu = {
 	.step = VDD_SAFE_STEP,
 	.jmp_to_zero = true,
 	.vmin_cdev = &cpu_vmin_cdev,
+#ifndef CONFIG_TEGRA_CPU_VOLT_CAP
+	.vmax_cdev = &cpu_vmax_cdev,
+#endif
 	.alignment = {
 		.step_uv = 6250, /* 6.25mV */
 	},
@@ -977,6 +988,13 @@ static int __init init_cpu_rail_thermal_profile(struct dvfs *cpu_dvfs)
 			vdd_cpu_vmin_trips_table, vdd_cpu_therm_floors_table,
 			rail, &cpu_dvfs->dfll_data))
 			rail->vmin_cdev = NULL;
+	}
+
+	if (rail->vmax_cdev) {
+		if (tegra_dvfs_rail_of_init_vmax_thermal_profile(
+			vdd_cpu_vmax_trips_table, vdd_cpu_therm_caps_table,
+			rail, &cpu_dvfs->dfll_data))
+			rail->vmax_cdev = NULL;
 	}
 
 	return 0;
