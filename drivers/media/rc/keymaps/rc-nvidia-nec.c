@@ -38,6 +38,14 @@ static struct rc_map_table foster_table[] = {
 	{ 0x807e0a, KEY_REWIND },
 	{ 0x807e41, KEY_SLEEP },
 	{ 0x807e45, KEY_WAKEUP },
+	{ 0x807e22, BTN_A },
+	{ 0x807e23, BTN_B },
+	{ 0x807e24, BTN_X },
+	{ 0x807e25, BTN_Y },
+	{ 0x807e26, BTN_TL },
+	{ 0x807e27, BTN_TR },
+	{ 0x807e28, BTN_TL2 },
+	{ 0x807e29, BTN_TR2 },
 
 	/* Following keymaps are for internal Testing */
 	{ 0x310c, KEY_0 },
