@@ -125,10 +125,6 @@ static void set_led_brightness(struct led_classdev *led_cdev,
 
 	ret = regmap_write(data->regmap,
 		P1961_REG_NOM_BRIGHT, value & 0xff);
-	ret |= regmap_write(data->regmap,
-		P1961_REG_CMD_DAT, P1961_REG_NOM_BRIGHT);
-	ret |= regmap_write(data->regmap,
-		P1961_REG_CMD, P1961_CMD_WRITE_EEPROM);
 	if (ret)
 		dev_err(&data->client->dev, "cannot write %d\n", value);
 }
