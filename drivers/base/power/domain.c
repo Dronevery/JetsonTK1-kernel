@@ -2,7 +2,7 @@
  * drivers/base/power/domain.c - Common code related to device power domains.
  *
  * Copyright (C) 2011 Rafael J. Wysocki <rjw@sisk.pl>, Renesas Electronics Corp.
- * Copyright (c) 2014, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
  *
  * This file is released under the GPLv2.
  */
@@ -349,7 +349,7 @@ static int __pm_genpd_poweron(struct generic_pm_domain *genpd)
 	 */
 	list_for_each_entry(link, &genpd->slave_links, slave_node) {
 		genpd_sd_counter_inc(link->master);
-		genpd->status = GPD_STATE_WAIT_MASTER;
+		__update_genpd_status(genpd, GPD_STATE_WAIT_MASTER);
 
 		mutex_unlock(&genpd->lock);
 
