@@ -172,6 +172,12 @@
 	pinmux@700008d4 {
 		prod-settings {
 			#prod-cells = <4>;
+			prod {
+				status = "okay";
+				nvidia,prod-boot-init;
+				prod = <1 0x160 0xFFFFEFFF 0x00001000>;
+			};
+
 			aud_mlk_prod {
 				status = "okay";
 				nvidia,prod-boot-init;
