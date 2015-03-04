@@ -1,7 +1,7 @@
 /*
  * GK20A memory management
  *
- * Copyright (c) 2011-2015, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -537,9 +537,6 @@ int gk20a_vm_map_buffer(struct gk20a_as_share *as_share,
 int gk20a_vm_unmap_buffer(struct gk20a_as_share *, u64 offset);
 void gk20a_get_comptags(struct device *dev, struct dma_buf *dmabuf,
 			struct gk20a_comptags *comptags);
-u64 gk20a_vm_cde_mapped(struct vm_gk20a *vm, struct dma_buf *dmabuf);
-void gk20a_vm_mark_cde_mapped(struct vm_gk20a *vm, struct dma_buf *dmabuf,
-		u64 map_vaddr);
 dma_addr_t gk20a_mm_gpuva_to_iova_base(struct vm_gk20a *vm, u64 gpu_vaddr);
 
 int gk20a_dmabuf_alloc_drvdata(struct dma_buf *dmabuf, struct device *dev);
