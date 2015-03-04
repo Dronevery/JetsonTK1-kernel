@@ -1338,7 +1338,8 @@ const char __user *addr, size_t len, loff_t *pos)
 
 	if (len < 128) { /* not a valid edid */
 		dc->vedid = false;
-		return -EINVAL;
+		tegra_edid_get_monspecs(dc->edid, &mon_spec, NULL);
+		return 1;
 	}
 
 	/* store write data */
@@ -1349,6 +1350,7 @@ const char __user *addr, size_t len, loff_t *pos)
 
 	tegra_edid_get_monspecs(dc->edid, &mon_spec, vedid);
 	kfree(vedid);
+	kfree(mon_spec.modedb);
 	dc->vedid = true;
 	return len;
 }
@@ -1358,6 +1360,7 @@ static const struct file_operations edid_fops = {
 	.read		= seq_read,
 	.llseek		= seq_lseek,
 	.write		= dbg_edid_write,
+	.release	= single_release,
 };
 
 static int dbg_hotplug_show(struct seq_file *s, void *unused)
