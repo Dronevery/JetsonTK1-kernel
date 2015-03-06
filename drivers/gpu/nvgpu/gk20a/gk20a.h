@@ -480,6 +480,15 @@ struct gk20a {
 
 	struct generic_pm_domain pd;
 
+	atomic_t hw_irq_stall_count;
+	atomic_t hw_irq_nonstall_count;
+
+	atomic_t sw_irq_stall_last_handled;
+	wait_queue_head_t sw_irq_stall_last_handled_wq;
+
+	atomic_t sw_irq_nonstall_last_handled;
+	wait_queue_head_t sw_irq_nonstall_last_handled_wq;
+
 	struct devfreq *devfreq;
 
 	struct gk20a_scale_profile *scale_profile;

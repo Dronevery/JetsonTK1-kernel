@@ -1330,6 +1330,9 @@ static int gk20a_probe(struct platform_device *dev)
 		return -ENOMEM;
 	}
 
+	init_waitqueue_head(&gk20a->sw_irq_stall_last_handled_wq);
+	init_waitqueue_head(&gk20a->sw_irq_nonstall_last_handled_wq);
+
 	set_gk20a(dev, gk20a);
 	gk20a->dev = dev;
 
