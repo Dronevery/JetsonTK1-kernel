@@ -354,6 +354,15 @@
 		};
 	};
 
+	pmc@7000e400 {
+		prod-settings {
+			prod_c_platform_pad_rail {
+				prod = <0 0x48 0xFF5BFFFF 0x00A40000
+					0 0xE4 0xFF5BFFFF 0x00200000>;
+			};
+		};
+	};
+
 	sdhci@700b0000 {
 		default-drv-type = <1>;
 	};
