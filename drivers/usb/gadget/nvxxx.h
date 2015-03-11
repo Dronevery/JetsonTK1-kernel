@@ -646,6 +646,7 @@ struct nv_udc_s {
 	struct delayed_work non_std_charger_work;
 	u32 current_ma;
 
+	struct tegra_prod_list *prod_list;
 	/* otg work, will be moved to OTG driver */
 	struct work_struct work;
 };

@@ -2608,7 +2608,7 @@ static int tegra_xhci_host_elpg_entry(struct tegra_xhci_hcd *tegra)
 	tegra_xhci_release_port_ownership(tegra, true);
 
 #ifdef CONFIG_ARCH_TEGRA_21x_SOC
-	utmi_phy_pad_disable();
+	utmi_phy_pad_disable(tegra->prod_list);
 	utmi_phy_iddq_override(true);
 #endif
 
@@ -2883,7 +2883,7 @@ tegra_xhci_host_partition_elpg_exit(struct tegra_xhci_hcd *tegra)
 		return 0;
 
 #ifdef CONFIG_ARCH_TEGRA_21x_SOC
-	utmi_phy_pad_enable();
+	utmi_phy_pad_enable(tegra->prod_list);
 	utmi_phy_iddq_override(false);
 #endif
 
@@ -4784,7 +4784,11 @@ static int tegra_xhci_probe(struct platform_device *pdev)
 	tegra_xhci_ss_vcore(tegra->bdata->portmap, false);
 
 	/* Perform USB2.0 pad tracking */
+#ifdef CONFIG_ARCH_TEGRA_21x_SOC
+	utmi_phy_pad_enable(tegra->prod_list);
+#else
 	utmi_phy_pad_enable();
+#endif
 	utmi_phy_iddq_override(false);
 
 	platform_set_drvdata(pdev, tegra);
@@ -5012,7 +5016,11 @@ static int tegra_xhci_remove(struct platform_device *pdev)
 		struct xhci_hcd	*xhci = NULL;
 		struct usb_hcd *hcd = NULL;
 
+#ifdef CONFIG_ARCH_TEGRA_21x_SOC
+		utmi_phy_pad_disable(tegra->prod_list);
+#else
 		utmi_phy_pad_disable();
+#endif
 		utmi_phy_iddq_override(true);
 
 		xhci = tegra->xhci;
