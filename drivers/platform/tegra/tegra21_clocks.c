@@ -9793,6 +9793,7 @@ static void tegra21_pllp_init_dependencies(unsigned long pllp_rate)
 {
 	u32 div;
 	unsigned long backup_rate;
+	unsigned long adsp_backup_rate;
 
 	switch (pllp_rate) {
 	case 216000000:
@@ -9801,7 +9802,7 @@ static void tegra21_pllp_init_dependencies(unsigned long pllp_rate)
 		tegra_pll_p_out5.u.pll_div.default_rate = 108000000;
 		tegra_clk_sbus_cmplx.u.system.threshold = 108000000;
 		tegra_clk_host1x.u.periph.threshold = 108000000;
-		tegra_clk_aclk_adsp.u.cclk.div71 = 2; /* reg settings */
+		adsp_backup_rate = 108000000;
 		break;
 	case 408000000:
 		tegra_pll_p_out3.u.pll_div.default_rate = 102000000;
@@ -9809,7 +9810,7 @@ static void tegra21_pllp_init_dependencies(unsigned long pllp_rate)
 		tegra_pll_p_out5.u.pll_div.default_rate = 204000000;
 		tegra_clk_sbus_cmplx.u.system.threshold = 204000000;
 		tegra_clk_host1x.u.periph.threshold = 204000000;
-		tegra_clk_aclk_adsp.u.cclk.div71 = 2; /* reg settings */
+		adsp_backup_rate = 136000000;
 		break;
 	case 204000000:
 		tegra_pll_p_out3.u.pll_div.default_rate = 102000000;
@@ -9817,7 +9818,7 @@ static void tegra21_pllp_init_dependencies(unsigned long pllp_rate)
 		tegra_pll_p_out5.u.pll_div.default_rate = 204000000;
 		tegra_clk_sbus_cmplx.u.system.threshold = 204000000;
 		tegra_clk_host1x.u.periph.threshold = 204000000;
-		tegra_clk_aclk_adsp.u.cclk.div71 = 0; /* reg settings */
+		adsp_backup_rate = 102000000;
 		break;
 	default:
 		pr_err("tegra: PLLP rate: %lu is not supported\n", pllp_rate);
@@ -9832,6 +9833,11 @@ static void tegra21_pllp_init_dependencies(unsigned long pllp_rate)
 	div = pllp_rate / CPU_LP_BACKUP_RATE_TARGET;
 	backup_rate = pllp_rate / div;
 	tegra_clk_virtual_cpu_lp.u.cpu.backup_rate = backup_rate;
+
+	div = pllp_rate / adsp_backup_rate;
+	tegra_clk_aclk_adsp.u.cclk.div71 = 2 * div - 2; /* reg settings */
+	backup_rate = pllp_rate / div;
+	tegra_clk_virtual_adsp_cpu.u.cpu.backup_rate = adsp_backup_rate;
 }
 
 static void tegra21_init_one_clock(struct clk *c)
