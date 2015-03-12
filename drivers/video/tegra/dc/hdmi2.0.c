@@ -55,6 +55,8 @@
 #define TMDS_NODE	"/host1x/sor1"
 #endif
 
+extern bool G_RECOVERY_HACK;
+
 static ssize_t hdmi_ddc_power_toggle(struct kobject *kobj,
 	struct kobj_attribute *attr, const char *buf, size_t count);
 
@@ -809,6 +811,9 @@ static irqreturn_t tegra_hdmi_hpd_irq_handler(int irq, void *ptr)
 {
 	struct tegra_dc *dc = ptr;
 	struct tegra_hdmi *hdmi = tegra_dc_get_outdata(dc);
+
+	if (G_RECOVERY_HACK == true)
+		return IRQ_HANDLED;
 
 	cancel_delayed_work(&hdmi->hpd_worker);
 	schedule_delayed_work(&hdmi->hpd_worker,
