@@ -139,6 +139,10 @@
 		status = "okay";
 	};
 
+	chosen {
+		nvidia,tegra-shield-sku;
+        };
+
 	gpio-ir-receiver {
 		compatible = "gpio-ir-receiver";
 		status = "okay";
