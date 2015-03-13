@@ -3318,7 +3318,7 @@ static int tegra_ahci_init_one(struct platform_device *pdev)
 		if (!(hpriv->port_map & (1 << i)))
 			ap->ops = &ata_dummy_port_ops;
 		else
-			ap->target_lpm_policy = ATA_LPM_MIN_POWER;
+			ap->target_lpm_policy = ATA_LPM_MAX_POWER;
 	}
 
 	rc = ahci_reset_controller(host);
