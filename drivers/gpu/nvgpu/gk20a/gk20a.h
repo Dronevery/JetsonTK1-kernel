@@ -153,6 +153,7 @@ struct gpu_ops {
 				void *ctx_ptr);
 		int (*dump_gr_regs)(struct gk20a *g,
 				struct gk20a_debug_output *o);
+		void (*init_sm_dsm_reg_info)(void);
 	} gr;
 	const char *name;
 	struct {
