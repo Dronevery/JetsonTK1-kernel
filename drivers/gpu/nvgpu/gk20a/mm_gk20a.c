@@ -1795,7 +1795,7 @@ static int update_gmmu_ptes_locked(struct vm_gk20a *vm,
 					   " ctag=%d vol=%d refs=%d"
 					   " [0x%08x,0x%08x]",
 					   pte_cur, hi32(addr), lo32(addr),
-					   kind_v, ctag, !cacheable,
+					   kind_v, ctag / SZ_128K, !cacheable,
 					   pte->ref_cnt, pte_w[1], pte_w[0]);
 				ctag += ctag_incr;
 				cur_offset += page_size;
