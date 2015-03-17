@@ -1118,12 +1118,20 @@ __maybe_unused
 static int tegra_hdmi_find_cea_vic(struct tegra_hdmi *hdmi)
 {
 	struct fb_videomode m;
+	struct tegra_dc *dc = hdmi->dc;
 	unsigned i;
 	unsigned best = 0;
 	u32 modedb_size = tegra_hdmi_get_cea_modedb_size(hdmi);
-	const struct tegra_dc_mode *mode = &hdmi->dc->mode;
 
-	tegra_dc_to_fb_videomode(&m, mode);
+	if (dc->initialized) {
+		u32 vic = tegra_dc_readl(dc,
+			NV_SOR_HDMI_AVI_INFOFRAME_SUBPACK0_HIGH) & 0xff;
+		if (!vic)
+			dev_WARN(&dc->ndev->dev, "hdmi: BL set VIC 0\n");
+		return vic;
+	}
+
+	fb_var_to_videomode(&m, tegra_fb_get_var(hdmi->dc->fb));
 
 	/* only interlaced required for VIC identification */
 	m.vmode &= FB_VMODE_INTERLACED;

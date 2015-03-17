@@ -6,7 +6,7 @@
  *         Colin Cross <ccross@android.com>
  *         Travis Geiselbrecht <travis@palm.com>
  *
- * Copyright (c) 2010-2014, NVIDIA CORPORATION, All rights reserved.
+ * Copyright (c) 2010-2015, NVIDIA CORPORATION, All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -697,6 +697,16 @@ void tegra_fb_update_fix(struct tegra_fb_info *fb_info,
 	fix->max_clk_rate = tegra_edid_get_max_clk_rate(dc_edid);
 
 	mutex_unlock(&fb_info->info->lock);
+}
+
+struct fb_var_screeninfo *tegra_fb_get_var(struct tegra_fb_info *fb_info)
+{
+	if (!fb_info) {
+		dev_WARN(&fb_info->ndev->dev, "NULL tegra fb\n");
+		return NULL;
+	}
+
+	return &fb_info->info->var;
 }
 
 static ssize_t nvdps_show(struct device *device,
