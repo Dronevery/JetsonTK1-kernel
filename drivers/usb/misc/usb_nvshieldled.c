@@ -25,6 +25,7 @@
 #include <linux/notifier.h>
 #include <linux/of.h>
 #include <linux/sysedp.h>
+#include <linux/kobject.h>
 
 #define DRIVER_AUTHOR "Jun Yan, juyan@nvidia.com"
 #define DRIVER_DESC "NVIDIA Shield USB LED Driver"
@@ -62,7 +63,7 @@
 #define NUM_EDP_STATES		11
 
 struct nvshield_led *g_dev;
-struct compat_class *nvshieldled_compat_class = NULL;
+struct class_compat *nvshieldled_compat_class = NULL;
 
 static const struct usb_device_id nvshield_table[] = {
 	{ USB_DEVICE_AND_INTERFACE_INFO(VID, PID,
@@ -392,7 +393,7 @@ static int nvshieldled_probe(struct usb_interface *interface,
 			dev->state[LED_NVBUTTON] = LED_NORMAL;
 			dev->brightness[LED_NVBUTTON] = 255;
 			dev->state[LED_TOUCH] = LED_NORMAL;
-			dev->brightness[LED_TOUCH] = 255;
+			dev->brightness[LED_TOUCH] = 0;
 		} else {
 			dev->state[LED_NVBUTTON] = LED_OFF;
 			dev->brightness[LED_NVBUTTON] = 255;
@@ -440,6 +441,12 @@ static int nvshieldled_probe(struct usb_interface *interface,
 		goto error4;
 	dev_info(&interface->dev, "Nvidia Shield LED attached\n");
 
+	retval = kobject_uevent(&interface->dev.kobj, KOBJ_CHANGE);
+	if (retval)
+		dev_info(&interface->dev, "sent uevent successfully\n");
+	else
+		dev_info(&interface->dev, "failed to send uevent\n");
+
 	retval = register_reboot_notifier(&nvshieldled_notifier);
 	if (retval)
 		goto error5;
@@ -452,6 +459,14 @@ static int nvshieldled_probe(struct usb_interface *interface,
 					&interface->dev, NULL);
 	if (retval)
 		goto error7;
+
+	retval = kobject_uevent(
+			(*(struct kobject**)nvshieldled_compat_class),
+								KOBJ_CHANGE);
+	if (retval)
+		dev_info(&interface->dev, "sent uevent successfully\n");
+	else
+		dev_info(&interface->dev, "failed to send uevent\n");
 
 	return 0;
 
@@ -512,6 +527,7 @@ static int nvshieldled_resume(struct usb_interface *interface)
 static int nvshieldled_reset_resume(struct usb_interface *interface)
 {
 	dev_info(&interface->dev, "Nvidia Shield USB reset resume");
+	return 0;
 }
 
 static struct usb_driver shieldled_driver = {
