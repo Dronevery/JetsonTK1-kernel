@@ -1,7 +1,7 @@
 /*
  * GK20A Graphics
  *
- * Copyright (c) 2011-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -4330,10 +4330,6 @@ static int gk20a_init_gr_setup_hw(struct gk20a *g)
 	gk20a_writel(g, gr_exception1_en_r(), 0xFFFFFFFF);
 	gk20a_writel(g, gr_exception2_r(), 0xFFFFFFFF);
 	gk20a_writel(g, gr_exception2_en_r(), 0xFFFFFFFF);
-
-	/* ignore status from some units */
-	data = gk20a_readl(g, gr_status_mask_r());
-	gk20a_writel(g, gr_status_mask_r(), data & gr->status_disable_mask);
 
 	gr_gk20a_load_zbc_table(g, gr);
 
