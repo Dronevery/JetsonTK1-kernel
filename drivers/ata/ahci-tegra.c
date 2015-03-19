@@ -462,6 +462,7 @@ static int tegra_ahci_init_one(struct platform_device *pdev);
 static int tegra_ahci_controller_init(void *hpriv, int lp0);
 static int tegra_ahci_t210_controller_init(void *hpriv, int lp0);
 static int tegra_ahci_remove_one(struct platform_device *pdev);
+static void tegra_ahci_shutdown(struct platform_device *pdev);
 static void tegra_ahci_set_clk_rst_cnt_rst_dev(void);
 static void tegra_ahci_clr_clk_rst_cnt_rst_dev(void);
 static void tegra_ahci_pad_config(void);
@@ -566,6 +567,7 @@ MODULE_DEVICE_TABLE(of, of_ahci_tegra_match);
 static struct platform_driver tegra_platform_ahci_driver = {
 	.probe		= tegra_ahci_init_one,
 	.remove		= tegra_ahci_remove_one,
+	.shutdown	= tegra_ahci_shutdown,
 #ifdef CONFIG_PM
 #ifndef CONFIG_TEGRA_SATA_IDLE_POWERGATE
 	.suspend	= tegra_ahci_suspend,
@@ -3418,6 +3420,30 @@ fail:
 	return rc;
 }
 
+static void tegra_ahci_shutdown(struct platform_device *pdev)
+{
+	struct ata_host *host = dev_get_drvdata(&pdev->dev);
+	int i = 0;
+
+	do {
+		/* make sure all ports have no outstanding commands and are idle. */
+		if (!tegra_ahci_are_all_ports_idle(host)) {
+			mdelay(10);
+		} else
+			break;
+
+	} while( ++i < 50);
+
+	if (i >= 50 )
+		printk("%s(%d) there are still outstanding commands but still going \
+				ahead with shutdown process\n", __func__, __LINE__);
+
+	for (i = 0; i < host->n_ports; i++) {
+		struct ata_port *ap = host->ports[i];
+		ahci_ops.port_stop(ap);
+	}
+
+}
 static int __init ahci_init(void)
 {
 	int ret = 0;
