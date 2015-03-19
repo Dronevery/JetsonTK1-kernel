@@ -3410,12 +3410,26 @@ static void tegra_ahci_shutdown(struct platform_device *pdev)
 {
 	struct ata_host *host = dev_get_drvdata(&pdev->dev);
 	int i = 0;
+
 	dev_err(&pdev->dev, "tegra_ahci_shutdown-start\n");
+
+	do {
+		/* make sure all ports have no outstanding commands and are idle. */
+		if (!tegra_ahci_are_all_ports_idle(host)) {
+			mdelay(10);
+		} else
+			break;
+
+	} while( ++i < 50);
+
+	if (i >= 50 )
+		printk("%s(%d) there are still outstanding commands but still going ahead with shutdown process\n", __func__, __LINE__);
 
 	for (i = 0; i < host->n_ports; i++) {
 		struct ata_port *ap = host->ports[i];
 		ahci_ops.port_stop(ap);
 	}
+
 	dev_err(&pdev->dev, "tegra_ahci_shutdown-end\n");
 
 }
