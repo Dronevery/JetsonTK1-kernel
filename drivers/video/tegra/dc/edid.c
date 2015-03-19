@@ -771,8 +771,6 @@ struct tegra_edid *tegra_edid_create(struct tegra_dc *dc,
 	mutex_init(&edid->lock);
 	edid->i2c_ops.i2c_transfer = i2c_func;
 	edid->dc = dc;
-	edid->quirks = TEGRA_EDID_QUIRK_NONE;
-
 	return edid;
 }
 
