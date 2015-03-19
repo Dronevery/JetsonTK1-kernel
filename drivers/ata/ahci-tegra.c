@@ -1,7 +1,7 @@
 /*
  * ahci-tegra.c - AHCI SATA support for TEGRA AHCI device
  *
- * Copyright (c) 2011-2014, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2011-2015, NVIDIA Corporation.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -461,6 +461,7 @@ static int tegra_ahci_init_one(struct platform_device *pdev);
 static int tegra_ahci_controller_init(void *hpriv, int lp0);
 static int tegra_ahci_t210_controller_init(void *hpriv, int lp0);
 static int tegra_ahci_remove_one(struct platform_device *pdev);
+static void tegra_ahci_shutdown(struct platform_device *pdev);
 static void tegra_ahci_set_clk_rst_cnt_rst_dev(void);
 static void tegra_ahci_clr_clk_rst_cnt_rst_dev(void);
 static void tegra_ahci_pad_config(void);
@@ -565,6 +566,7 @@ MODULE_DEVICE_TABLE(of, of_ahci_tegra_match);
 static struct platform_driver tegra_platform_ahci_driver = {
 	.probe		= tegra_ahci_init_one,
 	.remove		= tegra_ahci_remove_one,
+	.shutdown	= tegra_ahci_shutdown,
 #ifdef CONFIG_PM
 #ifndef CONFIG_TEGRA_SATA_IDLE_POWERGATE
 	.suspend	= tegra_ahci_suspend,
@@ -3404,6 +3406,19 @@ fail:
 	return rc;
 }
 
+static void tegra_ahci_shutdown(struct platform_device *pdev)
+{
+	struct ata_host *host = dev_get_drvdata(&pdev->dev);
+	int i = 0;
+	dev_err(&pdev->dev, "tegra_ahci_shutdown-start\n");
+
+	for (i = 0; i < host->n_ports; i++) {
+		struct ata_port *ap = host->ports[i];
+		ahci_ops.port_stop(ap);
+	}
+	dev_err(&pdev->dev, "tegra_ahci_shutdown-end\n");
+
+}
 static int __init ahci_init(void)
 {
 	int ret = 0;
