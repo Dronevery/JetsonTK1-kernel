@@ -31,7 +31,6 @@
 #include <linux/of_platform.h>
 #include <linux/dma-mapping.h>
 #include <linux/tegra-soc.h>
-#include <linux/uaccess.h>
 
 #include <linux/tegra_pm_domains.h>
 #include <linux/nvhost_nvdec_ioctl.h>
@@ -660,13 +659,11 @@ static int nvdec_open(struct inode *inode, struct file *file)
 	return 0;
 }
 
-extern struct device tegra_vpr_dev;
 static long nvdec_ioctl(struct file *file,
 	unsigned int cmd, unsigned long arg)
 {
 	struct nvdec_private *priv = file->private_data;
 	struct platform_device *pdev = priv->pdev;
-	u32 floor_size;
 	int err;
 
 	if (WARN_ONCE(pdev == NULL, "pdata not found, %s failed\n", __func__))
@@ -687,13 +684,6 @@ static long nvdec_ioctl(struct file *file,
 		if (atomic_dec_if_positive(&priv->refcnt) >= 0)
 			nvhost_module_idle(pdev);
 	break;
-	case NVHOST_NVDEC_IOCTL_VPR_FLOOR_SIZE:
-		if (copy_from_user(&floor_size, (void __user *)arg,
-			sizeof(floor_size)))
-			return -EFAULT;
-
-		return dma_set_resizable_heap_floor_size(&tegra_vpr_dev,
-				floor_size);
 	default:
 		dev_err(&pdev->dev,
 			"%s: Unknown nvdec ioctl.\n", __func__);
