@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 NVIDIA Corporation. All rights reserved.
+ * Copyright (c) 2013-2015 NVIDIA Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,6 +248,6 @@ enum ta_event_id {
 int te_handle_ss_ioctl(struct file *file, unsigned int ioctl_num,
 		unsigned long ioctl_param);
 void ote_print_logs(void);
-void tlk_ss_op(void);
+int tlk_ss_op(void);
 
 #endif
