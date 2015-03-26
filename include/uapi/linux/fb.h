@@ -187,7 +187,6 @@ struct fb_fix_screeninfo {
 	__u16 capabilities;		/* see FB_CAP_*			*/
 	__u16 max_clk_rate;	/* max supported clock rate on link in Mhz */
 	__u16 colorimetry;		/* see FB_COL_* */
-	__u16 reserved[1];              /* Reserved for future compatibility */
 };
 
 /* Interpretation of offset for color fields: All offsets are from the right,
