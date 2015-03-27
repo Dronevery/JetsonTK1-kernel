@@ -678,8 +678,6 @@ static void tegra_dc_ext_flip_worker(struct work_struct *work)
 	/* unpin and deref previous front buffers */
 	tegra_dc_ext_unpin_handles(unpin_handles, nr_unpin);
 
-	/* now DC has submitted buffer for display, try to release fbmem */
-	tegra_fb_release_fbmem(ext->dc->fb);
 	kfree(data);
 }
 
