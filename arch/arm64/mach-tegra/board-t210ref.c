@@ -387,6 +387,7 @@ static void __init tegra_t210ref_late_init(void)
 
 	tegra21_emc_init();
 	isomgr_init();
+	tegra_fb_copy_or_clear();
 
 #if defined(CONFIG_TEGRA_FIQ_DEBUGGER) && defined(CONFIG_FIQ)
 	tegra_serial_debug_init(TEGRA_UARTA_BASE, INT_WDT_CPU, NULL, -1, -1);
@@ -473,17 +474,32 @@ static void __init tegra_t210ref_reserve(void)
 #if defined(CONFIG_NVMAP_CONVERT_CARVEOUT_TO_IOVMM) || \
 		defined(CONFIG_TEGRA_NO_CARVEOUT)
 	ulong carveout_size = 0;
+	ulong fb2_size = SZ_64M + SZ_8M;
 #else
 	ulong carveout_size = SZ_1G;
+	ulong fb2_size = SZ_4M;
 #endif
-	ulong vpr_size = 186 * SZ_1M;
+	ulong fb1_size = SZ_64M + SZ_8M;
+	ulong vpr_size = 672 * SZ_1M;
 
 #if defined(CONFIG_TEGRA_NVADSP) && \
 		!defined(CONFIG_TEGRA_NVADSP_ON_SMMU)
 	nvadsp_plat_data.co_pa = tegra_reserve_adsp(SZ_32M);
 	nvadsp_plat_data.co_size = SZ_32M;
 #endif
-	tegra_reserve4(carveout_size, 0, 0, vpr_size);
+
+#ifdef CONFIG_FRAMEBUFFER_CONSOLE
+	/* support FBcon on 4K monitors */
+	fb2_size = SZ_64M + SZ_8M;	/* 4096*2160*4*2 = 70778880 bytes */
+#endif /* CONFIG_FRAMEBUFFER_CONSOLE */
+
+#ifdef CONFIG_TEGRA_HDMI_PRIMARY
+	tmp = fb1_size;
+	fb1_size = fb2_size;
+	fb2_size = tmp;
+#endif /* CONFIG_TEGRA_HDMI_PRIMARY */
+
+	tegra_reserve4(carveout_size, fb1_size, fb2_size, vpr_size);
 }
 
 static const char * const t210ref_dt_board_compat[] = {
