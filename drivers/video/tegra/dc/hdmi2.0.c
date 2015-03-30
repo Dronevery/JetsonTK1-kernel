@@ -1122,9 +1122,8 @@ static int tegra_hdmi_find_cea_vic(struct tegra_hdmi *hdmi)
 	unsigned i;
 	unsigned best = 0;
 	u32 modedb_size = tegra_hdmi_get_cea_modedb_size(hdmi);
-
 	if (dc->initialized) {
-		u32 vic = tegra_dc_readl(dc,
+		u32 vic = tegra_sor_readl(hdmi->sor,
 			NV_SOR_HDMI_AVI_INFOFRAME_SUBPACK0_HIGH) & 0xff;
 		if (!vic)
 			dev_WARN(&dc->ndev->dev, "hdmi: BL set VIC 0\n");
