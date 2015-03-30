@@ -206,7 +206,7 @@
 		gpu_scaling_cdev: vdd-gpu-scaling-cdev@7 {
 			reg = <7>;
 			cooling-min-state = <0>;
-			cooling-max-state = <1>;
+			cooling-max-state = <4>;
 			#cooling-cells = <2>;
 			compatible = "nvidia,tegra210-rail-scaling-cdev";
 			cdev-type = "gpu_scaling";
@@ -224,7 +224,7 @@
 			compatible = "nvidia,tegra210-rail-vmax-cdev";
 			cdev-type = "cpu_hot";
 			nvidia,constraint;
-			nvidia,trips = <&cpu_vmax1 1170 &cpu_vmax2 1130>;
+			nvidia,trips = <&cpu_vmax1 1170 &cpu_vmax2 1132>;
 		};
 	};
 
@@ -247,7 +247,7 @@
 			SET_MAP_TRIP(gpu, gpu, scaling, 4, 70000);
 		};
 		Tdiode_tegra {
-			SET_MAP_TRIP(core, core, vmin, 1, 20000);
+			SET_MAP_TRIP(core, core, vmin, 1, 15000);
 		};
 		CPU-therm {
 			SET_MAP_TRIP(cpu, cpu, vmax, 1, 66000);
