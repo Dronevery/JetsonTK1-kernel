@@ -187,7 +187,9 @@ static void smmu_client_ordered(struct smmu_device *smmu)
 
 #define FLUSH_CPU_DCACHE(va, page, size)	\
 	do {	\
-		wmb(); \
+		unsigned long _pa_ = VA_PAGE_TO_PA(va, page);		\
+		FLUSH_DCACHE_AREA((void *)(va), (size_t)(size));	\
+		outer_flush_range(_pa_, _pa_+(size_t)(size));		\
 	} while (0)
 
 /*
@@ -582,17 +584,12 @@ static void free_ptbl(struct smmu_as *as, dma_addr_t iova, bool flush)
 {
 	int pdn = SMMU_ADDR_TO_PDN(iova);
 	u32 *pdir = (u32 *)page_address(as->pdir_page);
-	struct page *page;
 
 	if (pdir[pdn] != _PDE_VACANT(pdn)) {
 		dev_dbg(as->smmu->dev, "pdn: %x\n", pdn);
 
-		if (pdir[pdn] & _PDE_NEXT) {
-			page = SMMU_EX_PTBL_PAGE(pdir[pdn]);
-			dma_free_coherent(NULL, PAGE_SIZE,
-				page_address(page),
-				pfn_to_dma(NULL, page_to_pfn(page)));
-		}
+		if (pdir[pdn] & _PDE_NEXT)
+			__free_page(SMMU_EX_PTBL_PAGE(pdir[pdn]));
 		pdir[pdn] = _PDE_VACANT(pdn);
 		FLUSH_CPU_DCACHE(&pdir[pdn], as->pdir_page, sizeof pdir[pdn]);
 		if (!flush)
@@ -671,7 +668,6 @@ static void free_pdir(struct smmu_as *as)
 	unsigned long addr;
 	int count;
 	struct device *dev = as->smmu->dev;
-	struct page *page;
 
 	if (!as->pdir_page)
 		return;
@@ -682,11 +678,7 @@ static void free_pdir(struct smmu_as *as)
 		free_ptbl(as, addr, 1);
 		addr += SMMU_PAGE_SIZE * SMMU_PTBL_COUNT;
 	}
-
-	page = as->pdir_page;
-	dma_free_coherent(NULL, PAGE_SIZE,
-		page_address(page),
-		pfn_to_dma(NULL, page_to_pfn(page)));
+	__free_page(as->pdir_page);
 	as->pdir_page = NULL;
 	devm_kfree(dev, as->pte_count);
 	as->pte_count = NULL;
@@ -698,11 +690,9 @@ static struct page *alloc_ptbl(struct smmu_as *as, dma_addr_t iova, bool flush)
 	u32 *pdir = page_address(as->pdir_page);
 	int pdn = SMMU_ADDR_TO_PDN(iova);
 	unsigned long addr = SMMU_PDN_TO_ADDR(pdn);
-	struct page *page = NULL;
+	struct page *page;
 	u32 *ptbl;
 	gfp_t gfp = GFP_ATOMIC;
-	dma_addr_t dma_addr;
-	void *cpu_va;
 
 	if (IS_ENABLED(CONFIG_PREEMPT) && !in_atomic())
 		gfp = GFP_KERNEL;
@@ -713,14 +703,10 @@ static struct page *alloc_ptbl(struct smmu_as *as, dma_addr_t iova, bool flush)
 	/* Vacant - allocate a new page table */
 	dev_dbg(as->smmu->dev, "New PTBL pdn: %x\n", pdn);
 
-	cpu_va = dma_alloc_coherent(NULL, PAGE_SIZE, &dma_addr, 0);
-	if (cpu_va) {
-		memset(cpu_va, 0x0, PAGE_SIZE);
-		page = pfn_to_page(dma_to_pfn(NULL, dma_addr));
-	}
-
+	page = alloc_page(gfp);
 	if (!page)
 		return NULL;
+
 	ptbl = (u32 *)page_address(page);
 	if (IS_ENABLED(CONFIG_TEGRA_IOMMU_SMMU_LINEAR)) {
 		for (i = 0; i < SMMU_PTBL_COUNT; i++) {
@@ -808,10 +794,8 @@ static int alloc_pdir(struct smmu_as *as)
 	int pdn, err = 0;
 	u32 val;
 	struct smmu_device *smmu = as->smmu;
-	struct page *page = NULL;
+	struct page *page;
 	unsigned int *cnt;
-	dma_addr_t dma_addr;
-	void *cpu_va;
 
 	/*
 	 * do the allocation, then grab as->lock
@@ -819,11 +803,7 @@ static int alloc_pdir(struct smmu_as *as)
 	cnt = devm_kzalloc(smmu->dev,
 			   sizeof(cnt[0]) * SMMU_PDIR_COUNT,
 			   GFP_KERNEL);
-	cpu_va = dma_alloc_coherent(NULL, PAGE_SIZE, &dma_addr, 0);
-	if (cpu_va) {
-		memset(cpu_va, 0x0, PAGE_SIZE);
-		page = pfn_to_page(dma_to_pfn(NULL, dma_addr));
-	}
+	page = alloc_page(GFP_KERNEL | __GFP_DMA);
 
 	spin_lock_irqsave(&as->lock, flags);
 
@@ -862,9 +842,7 @@ err_out:
 	spin_unlock_irqrestore(&as->lock, flags);
 
 	if (page)
-		dma_free_coherent(NULL, PAGE_SIZE,
-			page_address(page),
-			pfn_to_dma(NULL, page_to_pfn(page)));
+		__free_page(page);
 	if (cnt)
 		devm_kfree(smmu->dev, cnt);
 	return err;
@@ -1153,10 +1131,8 @@ static int __smmu_iommu_remap_largepage(struct smmu_as *as, dma_addr_t iova)
 	unsigned int *rest = &as->pte_count[pdn];
 	gfp_t gfp = GFP_ATOMIC;
 	u32 *pte;
-	struct page *page = NULL;
+	struct page *page;
 	int i;
-	dma_addr_t dma_addr;
-	void *cpu_va;
 
 	BUG_ON(!IS_ALIGNED(iova, SZ_4M));
 	BUG_ON(pdir[pdn] & _PDE_NEXT);
@@ -1166,11 +1142,7 @@ static int __smmu_iommu_remap_largepage(struct smmu_as *as, dma_addr_t iova)
 	/* Prepare L2 page table in advance */
 	if (IS_ENABLED(CONFIG_PREEMPT) && !in_atomic())
 		gfp = GFP_KERNEL;
-	cpu_va = dma_alloc_coherent(NULL, PAGE_SIZE, &dma_addr, 0);
-	if (cpu_va) {
-		memset(cpu_va, 0x0, PAGE_SIZE);
-		page = pfn_to_page(dma_to_pfn(NULL, dma_addr));
-	}
+	page = alloc_page(gfp);
 	if (!page)
 		return -ENOMEM;
 	pte = (u32 *)page_address(page);
