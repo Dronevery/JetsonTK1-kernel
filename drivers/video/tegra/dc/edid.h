@@ -82,12 +82,22 @@ struct tegra_dc_i2c_ops {
 	i2c_transfer_func_t i2c_transfer;
 };
 
+/* EDID quirks */
+#define TEGRA_EDID_QUIRK_NONE           (0)
+
+/*
+ * Some Samsung TVs fail hot plug at 594 MHz. This WAR bumps up the pclk
+ * for these TVs
+ */
+#define TEGRA_EDID_QUIRK_BUMPUP_594PCLK (0x1 << 0)
+
 struct tegra_edid {
 	struct tegra_edid_pvt	*data;
 
 	struct mutex		lock;
 	struct tegra_dc_i2c_ops i2c_ops;
 	struct tegra_dc		*dc;
+	u32 quirks;
 };
 
 /*
@@ -125,6 +135,7 @@ bool tegra_edid_is_420db_present(struct tegra_edid *edid);
 bool tegra_edid_is_hfvsdb_present(struct tegra_edid *edid);
 u16 tegra_edid_get_ex_colorimetry(struct tegra_edid *edid);
 int tegra_edid_get_eld(struct tegra_edid *edid, struct tegra_edid_hdmi_eld *elddata);
+u32 tegra_edid_lookup_quirks(const char *manufacturer, u32 model);
 
 struct tegra_dc_edid *tegra_edid_get_data(struct tegra_edid *edid);
 void tegra_edid_put_data(struct tegra_dc_edid *data);
