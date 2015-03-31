@@ -594,8 +594,8 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 		kref_put(&old_data->refcnt, data_release);
 
 	tegra_edid_dump(edid);
+	edid->quirks = tegra_edid_lookup_quirks(specs->manufacturer, specs->model);
 	return 0;
-
 fail:
 	vfree(new_data);
 	return ret;
@@ -639,6 +639,7 @@ struct tegra_edid *tegra_edid_create(struct tegra_dc *dc,
 	mutex_init(&edid->lock);
 	edid->i2c_ops.i2c_transfer = i2c_func;
 	edid->dc = dc;
+	edid->quirks = TEGRA_EDID_QUIRK_NONE;
 
 	return edid;
 }

@@ -1905,9 +1905,16 @@ static long tegra_hdmi_get_pclk(struct tegra_dc_mode *mode)
 
 static long tegra_dc_hdmi_setup_clk(struct tegra_dc *dc, struct clk *clk)
 {
+	struct tegra_hdmi *hdmi = tegra_dc_get_outdata(dc);
 	struct clk *parent_clk = clk_get_sys(NULL,
 				dc->out->parent_clk ? : "pll_d2");
 	dc->mode.pclk = tegra_hdmi_get_pclk(&dc->mode);
+
+	if (hdmi->edid->quirks & TEGRA_EDID_QUIRK_BUMPUP_540PCLK)
+		if (dc->mode.pclk == 594000000) {
+			dev_info(&dc->ndev->dev, "hdmi: bumpup 540 MHz pclk WAR. Setting pclk to 594.02 MHz");
+			dc->mode.pclk += 28125;
+		}
 
 	if (IS_ERR_OR_NULL(parent_clk)) {
 		dev_err(&dc->ndev->dev, "hdmi: parent clk get failed\n");

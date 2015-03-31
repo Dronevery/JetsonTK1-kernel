@@ -16,6 +16,7 @@ obj-$(CONFIG_TEGRA_MIPI_CAL) += mipi_cal.o
 obj-$(CONFIG_TEGRA_NVHDCP) += nvhdcp.o
 obj-$(CONFIG_TEGRA_HDMIHDCP) += hdmihdcp.o
 obj-$(CONFIG_TEGRA_HDMIHDCP) += nvhdcp_hdcp22_methods.o
+obj-y += edid_quirks.o
 obj-y += edid.o
 obj-$(CONFIG_TEGRA_NVSD) += nvsd.o
 obj-y += dsi.o
