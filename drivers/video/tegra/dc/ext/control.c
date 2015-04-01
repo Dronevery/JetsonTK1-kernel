@@ -276,10 +276,13 @@ static int tegra_dc_ext_control_open(struct inode *inode, struct file *filp)
 {
 	struct tegra_dc_ext_control_user *user;
 	struct tegra_dc_ext_control *control;
+	struct tegra_hdmi *hdmi = tegra_dc_get_hdmi_struct();
 
 	user = kzalloc(sizeof(*user), GFP_KERNEL);
 	if (!user)
 		return -ENOMEM;
+
+	tegra_hdmi_hpd_enable(hdmi);
 
 	control = container_of(inode->i_cdev, struct tegra_dc_ext_control,
 		cdev);
@@ -301,7 +304,9 @@ static int tegra_dc_ext_control_release(struct inode *inode, struct file *filp)
 {
 	struct tegra_dc_ext_control_user *user = filp->private_data;
 	struct tegra_dc_ext_control *control = user->control;
+	struct tegra_hdmi *hdmi = tegra_dc_get_hdmi_struct();
 
+	tegra_hdmi_hpd_disable(hdmi);
 	/* This will free any pending events for this user */
 	set_event_mask(user, 0);
 

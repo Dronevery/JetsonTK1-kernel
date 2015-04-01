@@ -162,4 +162,8 @@ extern unsigned int tegra_dc_ext_event_poll(struct file *, poll_table *);
 
 extern int tegra_dc_ext_get_num_outputs(void);
 
+extern struct tegra_hdmi *tegra_dc_get_hdmi_struct(void);
+extern void tegra_hdmi_hpd_enable(struct tegra_hdmi *hdmi);
+extern void tegra_hdmi_hpd_disable(struct tegra_hdmi *hdmi);
+
 #endif /* __TEGRA_DC_EXT_PRIV_H */
