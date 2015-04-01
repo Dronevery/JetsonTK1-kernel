@@ -18,6 +18,7 @@
 #include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/interrupt.h>
+#include <linux/irq.h>
 #include <linux/kernel.h>
 #include <linux/mutex.h>
 #include <linux/device.h>
@@ -114,6 +115,7 @@ static void tegra_hdmi_get(struct tegra_dc *dc);
 static void tegra_hdmi_put(struct tegra_dc *dc);
 static void tegra_hdmi_scdc_worker(struct work_struct *work);
 static void tegra_hdmi_debugfs_init(struct tegra_hdmi *hdmi);
+static bool tegra_dc_hdmi_detect(struct tegra_dc *dc);
 
 static inline bool tegra_hdmi_is_connected(struct tegra_hdmi *hdmi)
 {
@@ -803,6 +805,29 @@ static irqreturn_t tegra_hdmi_hpd_irq_handler(int irq, void *ptr)
 	return IRQ_HANDLED;
 }
 
+void tegra_hdmi_hpd_enable(struct tegra_hdmi *hdmi)
+{
+	if (!hdmi)
+		return;
+
+	/* check if hpd already low */
+	tegra_dc_hdmi_detect(hdmi->dc);
+
+	if (atomic_xchg(&hdmi->hpd_enabled, 1))
+		return;
+	tegra_hdmi_irq_enable(hdmi);
+}
+
+void tegra_hdmi_hpd_disable(struct tegra_hdmi *hdmi)
+{
+	if (!hdmi)
+		return;
+
+	if (!atomic_xchg(&hdmi->hpd_enabled, 0))
+		return;
+	tegra_hdmi_irq_disable(hdmi);
+}
+
 static int tegra_hdmi_hpd_init(struct tegra_hdmi *hdmi)
 {
 	struct tegra_dc *dc = hdmi->dc;
@@ -827,6 +852,9 @@ static int tegra_hdmi_hpd_init(struct tegra_hdmi *hdmi)
 		dev_err(&dc->ndev->dev,
 			"hdmi: hpd gpio_request failed %d\n", err);
 	gpio_direction_input(hotplug_gpio);
+
+	/* do not enable IRQ now */
+	irq_set_status_flags(hotplug_irq, IRQ_NOAUTOEN);
 
 	err = request_threaded_irq(hotplug_irq,
 				NULL, tegra_hdmi_hpd_irq_handler,
@@ -897,6 +925,11 @@ static int tegra_hdmi_config_tmds(struct tegra_hdmi *hdmi)
 	}
 
 	return 0;
+}
+
+struct tegra_hdmi *tegra_dc_get_hdmi_struct(void)
+{
+	return dc_hdmi;
 }
 
 static int tegra_dc_hdmi_init(struct tegra_dc *dc)
