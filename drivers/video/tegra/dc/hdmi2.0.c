@@ -812,11 +812,13 @@ void tegra_hdmi_hpd_enable(struct tegra_hdmi *hdmi)
 	if (!hdmi)
 		return;
 
+	atomic_inc(&hdmi->hpd_enabled);
+	if (atomic_read(&hdmi->hpd_enabled) > 1)
+		return;
+
 	/* check if hpd already low */
 	tegra_dc_hdmi_detect(hdmi->dc);
 
-	if (atomic_xchg(&hdmi->hpd_enabled, 1))
-		return;
 	tegra_hdmi_irq_enable(hdmi);
 }
 
@@ -825,8 +827,10 @@ void tegra_hdmi_hpd_disable(struct tegra_hdmi *hdmi)
 	if (!hdmi)
 		return;
 
-	if (!atomic_xchg(&hdmi->hpd_enabled, 0))
+	atomic_dec(&hdmi->hpd_enabled);
+	if (atomic_read(&hdmi->hpd_enabled) >= 1)
 		return;
+
 	tegra_hdmi_irq_disable(hdmi);
 }
 
