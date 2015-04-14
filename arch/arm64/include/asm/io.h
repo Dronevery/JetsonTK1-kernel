@@ -59,7 +59,7 @@ static inline u8 __raw_readb(const volatile void __iomem *addr)
 {
 	u8 val;
 	pstore_rtrace_call(RTRACE_READ, (void __force *)addr, 0);
-	asm volatile("ldrb %w0, [%1]" : "=r" (val) : "r" (addr));
+	asm volatile("ldarb %w0, [%1]" : "=r" (val) : "r" (addr));
 	pstore_rtrace_call(RTRACE_READ, (void __force *)addr, (long)val);
 	return val;
 }
@@ -68,7 +68,7 @@ static inline u16 __raw_readw(const volatile void __iomem *addr)
 {
 	u16 val;
 	pstore_rtrace_call(RTRACE_READ, (void __force *)addr, 0);
-	asm volatile("ldrh %w0, [%1]" : "=r" (val) : "r" (addr));
+	asm volatile("ldarh %w0, [%1]" : "=r" (val) : "r" (addr));
 	return val;
 }
 
@@ -76,7 +76,7 @@ static inline u32 __raw_readl(const volatile void __iomem *addr)
 {
 	u32 val;
 	pstore_rtrace_call(RTRACE_READ, (void __force *)addr, 0);
-	asm volatile("ldr %w0, [%1]" : "=r" (val) : "r" (addr));
+	asm volatile("ldar %w0, [%1]" : "=r" (val) : "r" (addr));
 	return val;
 }
 
@@ -84,7 +84,7 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
 {
 	u64 val;
 	pstore_rtrace_call(RTRACE_READ, (void __force *)addr, 0);
-	asm volatile("ldr %0, [%1]" : "=r" (val) : "r" (addr));
+	asm volatile("ldar %0, [%1]" : "=r" (val) : "r" (addr));
 	return val;
 }
 
