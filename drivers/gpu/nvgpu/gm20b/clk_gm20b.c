@@ -1,7 +1,7 @@
 /*
  * GM20B Clocks
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -1098,13 +1098,13 @@ static int gm20b_init_clk_setup_sw(struct gk20a *g)
 	}
 
 	/*
-	 * Locking time in both legacy and DVFS mode is 40us. However, in legacy
+	 * Locking time in both legacy and DVFS mode is 300us. However, in legacy
 	 * mode we rely on lock detection signal, and delay is just timeout
 	 * limit, so we can afford set it longer. In DVFS mode each lock inserts
 	 * specified delay, so it should be set as short as h/w allows.
 	 */
 	clk->pll_delay = 300; /* usec */
-	clk->na_pll_delay = 40; /* usec*/
+	clk->na_pll_delay = 300; /* usec*/
 
 	clk->gpc_pll.id = GK20A_GPC_PLL;
 	clk->gpc_pll.clk_in = clk_get_rate(ref) / KHZ;
