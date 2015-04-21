@@ -816,8 +816,17 @@ void tegra_hdmi_hpd_enable(struct tegra_hdmi *hdmi)
 	if (atomic_read(&hdmi->hpd_enabled) > 1)
 		return;
 
-	/* check if hpd already low */
-	tegra_dc_hdmi_detect(hdmi->dc);
+	/* check if hpd already asserted */
+	mutex_lock(&hdmi->hpd_lock);
+	if (tegra_dc_hpd(hdmi->dc)) {
+		int level = tegra_hdmi_plugged(hdmi, TEGRA_EDID_ELD_SETUP);
+		if (level >= TEGRA_HDMI_MONITOR_ENABLE)
+			dev_info(&hdmi->dc->ndev->dev, "hdmi: plugged\n");
+		else
+			dev_info(&hdmi->dc->ndev->dev,
+				"hdmi state %d failed during plug\n", level);
+	}
+	mutex_unlock(&hdmi->hpd_lock);
 
 	tegra_hdmi_irq_enable(hdmi);
 }
