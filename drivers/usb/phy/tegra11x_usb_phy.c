@@ -180,6 +180,7 @@
 #define   UHSIC_ELASTIC_UNDERRUN_LIMIT(x)	(((x) & 0x1f) << 2)
 #define   UHSIC_ELASTIC_OVERRUN_LIMIT(x)	(((x) & 0x1f) << 8)
 #define   UHSIC_IDLE_WAIT(x)			(((x) & 0x1f) << 13)
+#define   UTMIP_PCOUNT_UPDN_DIV(x)		(((x) & 0xf) << 24)
 
 #define UHSIC_HSRX_CFG1				0xc0c
 #define   UHSIC_HS_SYNC_START_DLY(x)		(((x) & 0x1f) << 1)
@@ -1100,6 +1101,10 @@ static int utmi_phy_power_on(struct tegra_usb_phy *phy)
 
 	val = readl(base + UTMIP_HSRX_CFG0);
 	val &= ~(UTMIP_IDLE_WAIT(~0) | UTMIP_ELASTIC_LIMIT(~0));
+#ifdef CONFIG_ARCH_TEGRA_21x_SOC
+	/* To handle hosts with bad jitter */
+	val &= ~UTMIP_PCOUNT_UPDN_DIV(~0);
+#endif
 	val |= UTMIP_IDLE_WAIT(config->idle_wait_delay);
 	val |= UTMIP_ELASTIC_LIMIT(config->elastic_limit);
 	writel(val, base + UTMIP_HSRX_CFG0);
