@@ -27,6 +27,7 @@
 #include <linux/gpio.h>
 #include <linux/interrupt.h>
 #include <linux/debugfs.h>
+#include <linux/unistd.h>
 #ifdef CONFIG_SWITCH
 #include <linux/switch.h>
 #endif
@@ -563,8 +564,7 @@ static int tegra_hdmi_get_mon_spec(struct tegra_hdmi *hdmi)
 	memset(&hdmi->mon_spec, 0, sizeof(hdmi->mon_spec));
 
 	do {
-		err = tegra_edid_get_monspecs(hdmi->edid,
-						&hdmi->mon_spec, NULL);
+		err = tegra_edid_get_monspecs(hdmi->edid, &hdmi->mon_spec);
 		if (err < 0)
 			usleep_range(MIN_RETRY_DELAY_US, MAX_RETRY_DELAY_US);
 		else
