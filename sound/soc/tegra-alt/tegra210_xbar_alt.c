@@ -1,7 +1,7 @@
 /*
  * tegra210_xbar_alt.c - Tegra210 XBAR driver
  *
- * Copyright (c) 2014 NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015 NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -919,8 +919,6 @@ static int tegra210_xbar_probe(struct platform_device *pdev)
 	regcache_cache_only(xbar->regmap, true);
 
 	tegra_ape_pd_add_device(&pdev->dev);
-	pm_genpd_dev_need_save(&pdev->dev, true);
-	pm_genpd_dev_need_restore(&pdev->dev, true);
 
 	pm_runtime_enable(&pdev->dev);
 	if (!pm_runtime_enabled(&pdev->dev)) {

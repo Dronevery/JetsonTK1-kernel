@@ -1,7 +1,7 @@
 /*
  * ADMA driver for Nvidia's Tegra210 ADMA controller.
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -1233,8 +1233,6 @@ static int tegra_adma_probe(struct platform_device *pdev)
 	dma_device = &pdev->dev;
 
 	tegra_ape_pd_add_device(&pdev->dev);
-	pm_genpd_dev_need_save(&pdev->dev, true);
-	pm_genpd_dev_need_restore(&pdev->dev, true);
 
 	pm_runtime_enable(&pdev->dev);
 	if (!pm_runtime_enabled(&pdev->dev)) {
