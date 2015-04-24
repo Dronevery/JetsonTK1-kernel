@@ -3,7 +3,7 @@
  *
  * A device driver for ADSP and APE
  *
- * Copyright (C) 2014 NVIDIA Corporation. All rights reserved.
+ * Copyright (C) 2014-2015 NVIDIA Corporation. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -438,7 +438,7 @@ static int __init nvadsp_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, drv_data);
 
-	tegra_ape_pd_add_device(dev);
+	tegra_adsp_pd_add_device(dev);
 	pm_genpd_dev_need_save(dev, true);
 	pm_genpd_dev_need_restore(dev, true);
 

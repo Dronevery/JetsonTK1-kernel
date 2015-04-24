@@ -2,7 +2,7 @@
  * tegra210_adsp_alt.c - Tegra ADSP audio driver
  *
  * Author: Sumit Bhattacharya <sumitb@nvidia.com>
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -1950,27 +1950,29 @@ static int tegra210_adsp_audio_platform_probe(struct platform_device *pdev)
 	pdev->dev.dma_mask = &tegra_dma_mask;
 	pdev->dev.coherent_dma_mask = tegra_dma_mask;
 
-	tegra_ape_pd_add_device(&pdev->dev);
-	pm_genpd_dev_need_save(&pdev->dev, true);
-	pm_genpd_dev_need_restore(&pdev->dev, true);
-
 	pm_runtime_enable(&pdev->dev);
 	if (!pm_runtime_enabled(&pdev->dev))
 		goto err_pm_disable;
 
-	pm_runtime_get_sync(&pdev->dev);
 	/* HACK : Should be handled through dma-engine */
+	tegra_adsp_pd_add_device(&pdev->dev);
+	pm_genpd_dev_need_save(&pdev->dev, true);
+	pm_genpd_dev_need_restore(&pdev->dev, true);
+
+	pm_runtime_get_sync(&pdev->dev);
 	for (i = 0; i < TEGRA210_ADSP_ADMA_CHANNEL_COUNT; i++) {
 		ret = tegra_agic_route_interrupt(
 			INT_ADMA_EOT0 + TEGRA210_ADSP_ADMA_CHANNEL_START + i,
 			TEGRA_AGIC_ADSP);
 		if (ret < 0) {
 			dev_err(&pdev->dev, "Failed to route INT to ADSP");
+			tegra_adsp_pd_remove_device(&pdev->dev);
 			goto err_pm_disable;
 		}
 	}
-	/* HACK end */
 	pm_runtime_put(&pdev->dev);
+	tegra_adsp_pd_remove_device(&pdev->dev);
+	/* HACK end */
 
 	for (i = 0; i < TEGRA210_ADSP_VIRT_REG_MAX; i++)
 		adsp->apps[i].reg = i;
@@ -2009,14 +2011,12 @@ err_unregister_platform:
 	snd_soc_unregister_platform(&pdev->dev);
 err_pm_disable:
 	pm_runtime_disable(&pdev->dev);
-	tegra_ape_pd_remove_device(&pdev->dev);
 	return ret;
 }
 
 static int tegra210_adsp_audio_platform_remove(struct platform_device *pdev)
 {
 	pm_runtime_disable(&pdev->dev);
-	tegra_ape_pd_remove_device(&pdev->dev);
 	snd_soc_unregister_platform(&pdev->dev);
 	return 0;
 }

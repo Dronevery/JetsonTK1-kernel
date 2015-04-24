@@ -1,7 +1,7 @@
 /*
  * drivers/platform/tegra/pm_domains.c
  *
- * Copyright (c) 2012-2014, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2012-2015, NVIDIA CORPORATION. All rights reserved.
  *
  *
  * This software is licensed under the terms of the GNU General Public
@@ -392,6 +392,9 @@ static struct tegra_pm_domain tegra_ape = {
 	.gpd.power_off = tegra_ape_power_off,
 	.gpd.power_on = tegra_ape_power_on,
 };
+static struct tegra_pm_domain tegra_adsp = {
+	.gpd.name = "tegra_adsp",
+};
 #endif
 
 static struct domain_client client_list[] = {
@@ -418,6 +421,7 @@ static struct domain_client client_list[] = {
 	{ .name = "gpu", .domain = &tegra_mc_clk.gpd },
 #ifdef CONFIG_ARCH_TEGRA_21x_SOC
 	{ .name = "tegra_ape", .domain = &tegra_mc_clk.gpd },
+	{ .name = "tegra_adsp", .domain = &tegra_ape.gpd },
 #endif
 	{},
 };
@@ -449,7 +453,10 @@ static int __init tegra_init_pm_domain(void)
 #ifdef CONFIG_ARCH_TEGRA_21x_SOC
 	pm_genpd_init(&tegra_ape.gpd, &simple_qos_governor, false);
 	tegra_pd_add_sd(&tegra_ape.gpd);
-	pm_genpd_set_poweroff_delay(&tegra_ape.gpd, 3000);
+	pm_genpd_set_poweroff_delay(&tegra_ape.gpd, 5000);
+
+	pm_genpd_init(&tegra_adsp.gpd, &simple_qos_governor, false);
+	tegra_pd_add_sd(&tegra_adsp.gpd);
 #endif
 	return 0;
 }
@@ -516,6 +523,19 @@ void tegra_ape_pd_remove_device(struct device *dev)
 	pm_genpd_remove_device(&tegra_ape.gpd, dev);
 }
 EXPORT_SYMBOL(tegra_ape_pd_remove_device);
+
+void tegra_adsp_pd_add_device(struct device *dev)
+{
+	pm_genpd_add_device(&tegra_adsp.gpd, dev);
+	pm_genpd_dev_need_save(dev, true);
+}
+EXPORT_SYMBOL(tegra_adsp_pd_add_device);
+
+void tegra_adsp_pd_remove_device(struct device *dev)
+{
+	pm_genpd_remove_device(&tegra_adsp.gpd, dev);
+}
+EXPORT_SYMBOL(tegra_adsp_pd_remove_device);
 #endif
 
 #else
