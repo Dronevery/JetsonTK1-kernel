@@ -7706,6 +7706,9 @@ dhdsdio_download_nvram(struct dhd_bus *bus)
 	char * memblock = NULL;
 	char *bufp;
 	char *pnv_path;
+#ifdef ENCRYPTED_NVRAM
+	char *nv_ext_ptr;
+#endif
 	bool nvram_file_exists;
 
 	pnv_path = bus->nv_path;
@@ -7715,6 +7718,11 @@ dhdsdio_download_nvram(struct dhd_bus *bus)
 		return (0);
 
 	if (nvram_file_exists) {
+#ifdef ENCRYPTED_NVRAM
+		nv_ext_ptr = strstr(pnv_path, ".txt");
+		strncpy(nv_ext_ptr, ".bin", 4);
+		DHD_ERROR(("%s: encrypted nvram path: %s\n", __func__, pnv_path));
+#endif
 		image = dhd_os_open_image(pnv_path);
 		if (image == NULL)
 			goto err;
@@ -7729,7 +7737,11 @@ dhdsdio_download_nvram(struct dhd_bus *bus)
 
 	/* Download variables */
 	if (nvram_file_exists) {
+#ifdef ENCRYPTED_NVRAM
+		len = dhd_os_get_image_block_encrypted(memblock, MAX_NVRAMBUF_SIZE, image);
+#else
 		len = dhd_os_get_image_block(memblock, MAX_NVRAMBUF_SIZE, image);
+#endif
 	}
 	else {
 		len = strlen(bus->nvram_params);

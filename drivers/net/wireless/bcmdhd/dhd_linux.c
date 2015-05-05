@@ -36,6 +36,9 @@
 
 #include <linux/init.h>
 #include <linux/kernel.h>
+#ifdef ENCRYPTED_NVRAM
+#include <linux/crypto.h>
+#endif
 #include <linux/slab.h>
 #include <linux/skbuff.h>
 #include <linux/netdevice.h>
@@ -6776,6 +6779,38 @@ dhd_os_open_image(char *filename)
 
 	 return fp;
 }
+
+#ifdef ENCRYPTED_NVRAM
+int
+dhd_os_get_image_block_encrypted(char *buf, int len, void *image)
+{
+	struct file *fp = (struct file *)image;
+	int rdlen, i, bsize;
+	struct crypto_cipher *tfm;
+	const u8 key[16] = "nvramkey_aes_16"; /* 16 byte key for AES-128 */
+
+	if (!image)
+		return 0;
+
+	tfm = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
+	if (crypto_cipher_setkey(tfm, key, sizeof(key))) {
+		DHD_ERROR(("%s set key fail\n", __func__));
+		return -1;
+	}
+
+	bsize = crypto_cipher_blocksize(tfm);
+
+	rdlen = kernel_read(fp, fp->f_pos, buf, len);
+	if (rdlen > 0)
+		fp->f_pos += rdlen;
+
+	for (i = 0; i < rdlen; i += bsize)
+		crypto_cipher_decrypt_one(tfm, buf + i, buf + i);
+
+	crypto_free_cipher(tfm);
+	return rdlen;
+}
+#endif
 
 int
 dhd_os_get_image_block(char *buf, int len, void *image)

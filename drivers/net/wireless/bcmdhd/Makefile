@@ -88,6 +88,10 @@ DHDCFLAGS += -DWL_CFG80211_STA_EVENT
 DHDCFLAGS += -DWL_IFACE_COMB_NUM_CHANNELS
 DHDCFLAGS += -DWL_ENABLE_P2P_IF
 
+ifneq ($(CONFIG_BCMDHD_ENCRYPTED_NVRAM),)
+  DHDCFLAGS += -DENCRYPTED_NVRAM
+endif
+
 ##########################
 # driver type
 # m: module type driver

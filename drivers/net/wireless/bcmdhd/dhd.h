@@ -604,6 +604,9 @@ extern int dhd_os_ioctl_resp_wake(dhd_pub_t * pub);
 extern unsigned int dhd_os_get_ioctl_resp_timeout(void);
 extern void dhd_os_set_ioctl_resp_timeout(unsigned int timeout_msec);
 
+#ifdef ENCRYPTED_NVRAM
+extern int dhd_os_get_image_block_encrypted(char *buf, int len, void *image);
+#endif
 extern int dhd_os_get_image_block(char * buf, int len, void * image);
 extern void * dhd_os_open_image(char * filename);
 extern void dhd_os_close_image(void * image);

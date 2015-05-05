@@ -85,3 +85,9 @@ config BCMDHD_CUSTOM_SYSFS_TEGRA
 	default y
 	---help---
 	  Enable custom sysfs for Tegra platform.
+
+config BCMDHD_ENCRYPTED_NVRAM
+	bool "Support encrypted nvram"
+	depends on BCMDHD
+	---help---
+	  Enable support for encrypted nvram.
