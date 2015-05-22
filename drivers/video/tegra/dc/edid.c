@@ -44,6 +44,7 @@ struct tegra_edid_pvt {
 	u16			max_tmds_char_rate_hf_mhz;
 	u16			max_tmds_char_rate_hllc_mhz;
 	u16			colorimetry;
+	u32			quirks;
 	/* Note: dc_edid must remain the last member */
 	struct tegra_dc_edid		dc_edid;
 };
@@ -291,14 +292,29 @@ static int tegra_edid_parse_ext_block(const u8 *raw, int idx,
 		case CEA_DATA_BLOCK_AUDIO:
 		{
 			int sad_n = edid->eld.sad_count * 3;
-			edid->eld.sad_count += len / 3;
-			pr_debug("%s: incrementing eld.sad_count by %d to %d\n",
-				 __func__, len / 3, edid->eld.sad_count);
+
+			for (i = 0; i < (len / 3); ++i) {
+				int j;
+
+				if (edid->quirks & TEGRA_EDID_QUIRK_NO_EAC3 &&
+				    (ptr[i * 3 + 1] & 0xF8) >> 3 == CEA_SAD_FORMAT_EAC3) {
+					pr_warn("%s: device blacklisted for EAC3. Ignoring this CEA audio block!\n",
+						__func__);
+					continue;
+				}
+
+				for(j = 0; (j < 3) && (sad_n < ELD_MAX_SAD_BYTES); ++j) {
+					edid->eld.sad[sad_n++] = ptr[i * 3 + j + 1];
+				}
+			}
+
+			pr_debug("%s: incrementing eld.sad_count from %d to %d\n",
+				 __func__, edid->eld.sad_count, sad_n / 3);
+
+			edid->eld.sad_count = sad_n / 3;
 			edid->eld.conn_type = 0x00;
 			edid->eld.support_hdcp = 0x00;
-			for (i = 0; (i < len) && (sad_n < ELD_MAX_SAD_BYTES);
-			     i++, sad_n++)
-				edid->eld.sad[sad_n] = ptr[i + 1];
+
 			len++;
 			ptr += len; /* adding the header */
 			/* Got an audio data block so enable audio */
@@ -584,6 +600,16 @@ bool tegra_edid_is_420db_present(struct tegra_edid *edid)
 	return edid->data->db420_present;
 }
 
+u32 tegra_edid_get_quirks(struct tegra_edid *edid)
+{
+	if (!edid || !edid->data) {
+		pr_warn("edid invalid\n");
+		return false;
+	}
+
+	return edid->data->quirks;
+}
+
 u16 tegra_edid_get_ex_colorimetry(struct tegra_edid *edid)
 {
 	if (!edid || !edid->data) {
@@ -609,6 +635,7 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 
 	kref_init(&new_data->refcnt);
 
+	new_data->quirks = TEGRA_EDID_QUIRK_NONE;
 	new_data->support_stereo = 0;
 	new_data->color_depth_flag = 0;
 	new_data->max_tmds_char_rate_hf_mhz = 0;
@@ -627,12 +654,14 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 		ret = -EINVAL;
 		goto fail;
 	}
+
 	memcpy(new_data->eld.monitor_name, specs->monitor, sizeof(specs->monitor));
 	new_data->eld.mnl = strlen(new_data->eld.monitor_name) + 1;
 	new_data->eld.product_id[0] = data[0x8];
 	new_data->eld.product_id[1] = data[0x9];
 	new_data->eld.manufacture_id[0] = data[0xA];
 	new_data->eld.manufacture_id[1] = data[0xB];
+	new_data->quirks = tegra_edid_lookup_quirks(specs->manufacturer, specs->model, specs->monitor);
 
 	extension_blocks = data[0x7e];
 
@@ -697,7 +726,6 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 		kref_put(&old_data->refcnt, data_release);
 
 	tegra_edid_dump(edid);
-	edid->quirks = tegra_edid_lookup_quirks(specs->manufacturer, specs->model);
 	return 0;
 fail:
 	vfree(new_data);
@@ -742,7 +770,6 @@ struct tegra_edid *tegra_edid_create(struct tegra_dc *dc,
 	mutex_init(&edid->lock);
 	edid->i2c_ops.i2c_transfer = i2c_func;
 	edid->dc = dc;
-	edid->quirks = TEGRA_EDID_QUIRK_NONE;
 
 	return edid;
 }
