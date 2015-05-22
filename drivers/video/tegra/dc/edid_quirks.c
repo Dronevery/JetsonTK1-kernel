@@ -19,22 +19,19 @@
 static const struct hdmi_blacklist {
 	char manufacturer[4];
 	u32 model;
-	char monitor[14];
 	u32 quirks;
 } edid_blacklist[] = {
 	/* Samsung UN55HU6840 */
-	{ "SAM", 2994, "SAMSUNG",  TEGRA_EDID_QUIRK_BUMPUP_594PCLK },
-	{ "PIO", 0,    "VSX-1020", TEGRA_EDID_QUIRK_NO_EAC3        },
+	{ "SAM", 2994, TEGRA_EDID_QUIRK_BUMPUP_594PCLK },
 };
 
-u32 tegra_edid_lookup_quirks(const char *manufacturer, u32 model, const char *monitor)
+u32 tegra_edid_lookup_quirks(const char *manufacturer, u32 model)
 {
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(edid_blacklist); i++)
 		if (!strcmp(edid_blacklist[i].manufacturer, manufacturer) &&
-			edid_blacklist[i].model == model &&
-			!strcmp(edid_blacklist[i].monitor, monitor))
+			edid_blacklist[i].model == model)
 			return edid_blacklist[i].quirks;
 
 	return TEGRA_EDID_QUIRK_NONE;

@@ -2042,7 +2042,7 @@ static long tegra_dc_hdmi_setup_clk(struct tegra_dc *dc, struct clk *clk)
 				dc->out->parent_clk ? : "pll_d2");
 	dc->mode.pclk = tegra_hdmi_get_pclk(&dc->mode);
 
-	if (tegra_edid_get_quirks(hdmi->edid) & TEGRA_EDID_QUIRK_BUMPUP_594PCLK)
+	if (hdmi->edid->quirks & TEGRA_EDID_QUIRK_BUMPUP_594PCLK)
 		if (dc->mode.pclk == 594000000) {
 			dev_info(&dc->ndev->dev, "hdmi: bumpup 594 MHz pclk WAR. Setting pclk to 594.02 MHz");
 			dc->mode.pclk += 28125;
