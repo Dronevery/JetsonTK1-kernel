@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013-2015, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -648,9 +648,6 @@ safe_settings:
 
 		tegra_usb_pad_reg_update(XUSB_PADCTL_USB2_BIAS_PAD_CTL_1,
 			PD_TRK_MASK, 0);
-
-		/* for tracking complete */
-		udelay(10);
 	} else {
 
 		tegra_usb_pad_reg_update(XUSB_PADCTL_USB2_PAD_MUX_0,
@@ -681,6 +678,9 @@ int utmi_phy_pad_enable(struct tegra_prod_list *prod_list)
 	utmi_phy_pad(prod_list, true);
 
 	spin_unlock_irqrestore(&utmip_pad_lock, flags);
+
+	/* for tracking complete */
+	usleep_range(50, 60);
 
 	clk_disable(utmi_pad_clk);
 	if (!IS_ERR_OR_NULL(usb2_trk))
