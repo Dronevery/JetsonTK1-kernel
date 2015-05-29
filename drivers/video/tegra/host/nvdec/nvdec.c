@@ -225,6 +225,17 @@ static int nvdec_wait_mem_scrubbing(struct platform_device *dev)
 	return -ETIMEDOUT;
 }
 
+int nvhost_nvdec_prepare_poweroff(struct platform_device *dev)
+{
+	struct nvhost_device_data *pdata = platform_get_drvdata(dev);
+
+	if (!pdata)
+		return -EINVAL;
+
+	clk_disable_unprepare(pdata->clk[NVDEC_SCLK_CLK]);
+	return 0;
+}
+
 int nvhost_nvdec_finalize_poweron(struct platform_device *dev)
 {
 	u32 timeout;
@@ -239,6 +250,10 @@ int nvhost_nvdec_finalize_poweron(struct platform_device *dev)
 					nvdec_scp_ctl_stat_debug_mode_m();
 	bool skip_wpr_settings = debug_mode &&
 		(tegra_platform_is_qt() || tegra_platform_is_linsim());
+	struct nvhost_device_data *pdata = platform_get_drvdata(dev);
+
+	if (!pdata)
+		return -EINVAL;
 
 	dev_dbg(&dev->dev, "nvdec_boot: start\n");
 	err = nvhost_nvdec_init_sw(dev);
@@ -352,6 +367,8 @@ int nvhost_nvdec_finalize_poweron(struct platform_device *dev)
 		return err;
 	}
 	dev_info(&dev->dev, "nvdec_boot: success\n");
+
+	clk_prepare_enable(pdata->clk[NVDEC_SCLK_CLK]);
 
 #ifdef CONFIG_TRUSTED_LITTLE_KERNEL
 	te_restore_keyslots();

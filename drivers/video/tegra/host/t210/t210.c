@@ -309,6 +309,7 @@ struct nvhost_device_data t21_nvdec_info = {
 	.engine_can_cg		= true,
 	.poweron_reset		= true,
 	.finalize_poweron	= nvhost_nvdec_finalize_poweron,
+	.prepare_poweroff	= nvhost_nvdec_prepare_poweroff,
 	.moduleid		= NVHOST_MODULE_NVDEC,
 	.ctrl_ops		= &tegra_nvdec_ctrl_ops,
 	.num_channels		= 1,

@@ -24,6 +24,11 @@
 #include <linux/types.h>
 #include <linux/dma-attrs.h>
 #include <linux/nvhost.h>
+enum nvdec_clocks_e {
+	NVDEC_CLK = 0,
+	NVDEC_SCLK_CLK = 1,
+	NVDEC_EMC_CLK = 2
+};
 
 extern const struct file_operations tegra_nvdec_ctrl_ops;
 
