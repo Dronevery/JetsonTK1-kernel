@@ -258,6 +258,7 @@
 
 	chosen {
 		nvidia,tegra-shield-sku;
+		nvidia,fastboot_without_usb;
         };
 
 	camera-pcl {
