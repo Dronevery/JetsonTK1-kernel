@@ -331,6 +331,11 @@ static struct tegra_io_dpd pexclk2_io = {
 	.io_dpd_reg_index	= 0,
 	.io_dpd_bit		= 6,
 };
+static struct tegra_io_dpd gpio_ap = {
+	.name			= "GPIO",
+	.io_dpd_reg_index	= 0,
+	.io_dpd_bit		= 27,
+};
 
 static struct tegra_suspend_platform_data t210ref_suspend_data = {
 	.cpu_timer      = 1700,
@@ -399,6 +404,9 @@ static void __init tegra_t210ref_late_init(void)
 	tegra_io_dpd_enable(&pexclk2_io);
 
 	t210ref_camera_init();
+	/* WAR for GPIO_AP rail dpd setting */
+	if (of_machine_is_compatible("nvidia,foster-e"))
+		tegra_io_dpd_enable(&gpio_ap);
 }
 
 static void __init tegra_t210ref_init_early(void)
