@@ -8468,8 +8468,11 @@ wl_notify_connect_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 			wl_update_prof(cfg, ndev, NULL, (void *)&e->addr, WL_PROF_BSSID);
 
 		} else if (wl_is_linkdown(cfg, e)) {
+#ifdef ESCAN_RESULT_ABORT
+			/* Aborts current scan when AP disconnected */
 			if (cfg->scan_request)
 				wl_notify_escan_complete(cfg, ndev, true, true);
+#endif
 			if (wl_get_drv_status(cfg, CONNECTED, ndev)) {
 				scb_val_t scbval;
 				u8 *curbssid = wl_read_prof(cfg, ndev, WL_PROF_BSSID);
