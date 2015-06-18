@@ -28,6 +28,7 @@
 #include "tegra210-platforms/tegra210-foster-e-led-p1961-b00.dtsi"
 #include "tegra210-platforms/tegra210-foster-e-cpc-p1963.dtsi"
 #include "tegra210-platforms/tegra210-darcy-p2892-emc-a00.dtsi"
+#include "tegra210-platforms/tegra210-darcy-pcie.dtsi"
 
 / {
 	model = "foster_e_hdd";
