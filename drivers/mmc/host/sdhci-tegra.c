@@ -232,7 +232,8 @@
 /* Select SDR50 UHS mode for host if the device runs at SDR50 mode on T210 */
 #define NVQUIRK2_SELECT_SDR50_MODE		BIT(4)
 #define NVQUIRK2_ADD_DELAY_AUTO_CALIBRATION	BIT(5)
-#define NVQUIRK2_SET_PAD_E_INPUT_3_v_3		BIT(6)
+/*Enables E_Input before setting the voltage */
+#define NVQUIRK2_SET_PAD_E_INPUT_VOL		BIT(6)
 
 /* Common subset of quirks for Tegra3 and later sdmmc controllers */
 #define TEGRA_SDHCI_NVQUIRKS	(NVQUIRK_ENABLE_PADPIPE_CLKEN | \
@@ -1930,6 +1931,7 @@ static void tegra_sdhci_configure_e_input(struct sdhci_host *sdhci, bool enable)
 	else
 		val &= ~SDMMC_SDMEMCOMPPADCTRL_PAD_E_INPUT_OR_E_PWRD_MASK;
 	sdhci_writel(sdhci, val, SDMMC_SDMEMCOMPPADCTRL);
+	udelay(1);
 
 }
 
@@ -2116,8 +2118,6 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 		min_uV = SDHOST_LOW_VOLT_MIN;
 		max_uV = SDHOST_LOW_VOLT_MAX;
 	} else if (signal_voltage == MMC_SIGNAL_VOLTAGE_330) {
-		if (soc_data->nvquirks & NVQUIRK2_SET_PAD_E_INPUT_3_v_3)
-			tegra_sdhci_configure_e_input(sdhci, true);
 		if (ctrl & SDHCI_CTRL_VDD_180)
 			ctrl &= ~SDHCI_CTRL_VDD_180;
 	}
@@ -2129,6 +2129,10 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 	/* Set/clear the 1.8V signalling */
 	sdhci_writew(sdhci, ctrl, SDHCI_HOST_CONTROL2);
 
+	if ((soc_data->nvquirks & NVQUIRK2_SET_PAD_E_INPUT_VOL) &&
+		(plat->pwrdet_support))
+		tegra_sdhci_configure_e_input(sdhci, true);
+
 	/* Switch the I/O rail voltage */
 	rc = tegra_sdhci_configure_regulators(tegra_host, CONFIG_REG_SET_VOLT,
 		min_uV, max_uV);
@@ -2136,8 +2140,6 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 		dev_err(mmc_dev(sdhci->mmc),
 			"setting 1.8V failed %d. Revert to 3.3V\n", rc);
 		signal_voltage = MMC_SIGNAL_VOLTAGE_330;
-		if (soc_data->nvquirks & NVQUIRK2_SET_PAD_E_INPUT_3_v_3)
-			tegra_sdhci_configure_e_input(sdhci, true);
 		rc = tegra_sdhci_configure_regulators(tegra_host,
 			CONFIG_REG_SET_VOLT, tegra_host->vddio_min_uv,
 			tegra_host->vddio_max_uv);
@@ -3970,13 +3972,6 @@ static int tegra_sdhci_resume(struct sdhci_host *sdhci)
 
 	/* Enable the power rails if any */
 	if (tegra_host->card_present) {
-		err = tegra_sdhci_configure_regulators(tegra_host,
-			CONFIG_REG_EN, 0, 0);
-		if (err) {
-			dev_err(mmc_dev(sdhci->mmc),
-				"Regulators enable in resume failed %d\n", err);
-			return err;
-		}
 		if (tegra_host->vdd_io_reg) {
 			if (plat && (plat->mmc_data.ocr_mask & SDHOST_1V8_OCR_MASK))
 				signal_voltage = MMC_SIGNAL_VOLTAGE_180;
@@ -3984,6 +3979,13 @@ static int tegra_sdhci_resume(struct sdhci_host *sdhci)
 				signal_voltage = MMC_SIGNAL_VOLTAGE_330;
 			tegra_sdhci_signal_voltage_switch(sdhci,
 				signal_voltage);
+		}
+		err = tegra_sdhci_configure_regulators(tegra_host,
+			CONFIG_REG_EN, 0, 0);
+		if (err) {
+			dev_err(mmc_dev(sdhci->mmc),
+				"Regulators enable in resume failed %d\n", err);
+			return err;
 		}
 	}
 
@@ -4742,7 +4744,7 @@ static struct sdhci_tegra_soc_data soc_data_tegra21 = {
 		     NVQUIRK2_BROKEN_SD2_0_SUPPORT |
 		     NVQUIRK2_SELECT_SDR50_MODE |
 		     NVQUIRK2_ADD_DELAY_AUTO_CALIBRATION |
-		     NVQUIRK2_SET_PAD_E_INPUT_3_v_3 |
+		     NVQUIRK2_SET_PAD_E_INPUT_VOL |
 		     NVQUIRK2_DYNAMIC_TRIM_SUPPLY_SWITCH,
 };
 
@@ -5338,14 +5340,6 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	}
 
 	if (tegra_host->vdd_slot_reg || tegra_host->vdd_io_reg) {
-		rc = tegra_sdhci_configure_regulators(tegra_host,
-			CONFIG_REG_EN, 0, 0);
-		if (rc) {
-			dev_err(mmc_dev(host->mmc),
-				"Enable regulators failed in probe %d\n", rc);
-			goto err_clk_put;
-		}
-
 		if (plat && (plat->mmc_data.ocr_mask & SDHOST_1V8_OCR_MASK))
 			signal_voltage = MMC_SIGNAL_VOLTAGE_180;
 		else
@@ -5358,6 +5352,13 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 				tegra_host->vddio_max_uv, rc);
 			regulator_put(tegra_host->vdd_io_reg);
 			tegra_host->vdd_io_reg = NULL;
+		}
+		rc = tegra_sdhci_configure_regulators(tegra_host,
+			CONFIG_REG_EN, 0, 0);
+		if (rc) {
+			dev_err(mmc_dev(host->mmc),
+				"Enable regulators failed in probe %d\n", rc);
+			goto err_clk_put;
 		}
 	}
 
