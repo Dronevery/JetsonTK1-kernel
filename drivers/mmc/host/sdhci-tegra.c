@@ -1324,13 +1324,7 @@ static irqreturn_t carddetect_irq(int irq, void *data)
 	tegra_host->card_present =
 			(gpio_get_value_cansleep(plat->cd_gpio) == 0);
 
-	if (tegra_host->card_present) {
-		err = tegra_sdhci_configure_regulators(tegra_host,
-			CONFIG_REG_EN, 0, 0);
-		if (err)
-			dev_err(mmc_dev(sdhost->mmc),
-				"Failed to enable card regulators %d\n", err);
-	} else {
+	if (!tegra_host->card_present) {
 		err = tegra_sdhci_configure_regulators(tegra_host,
 			CONFIG_REG_DIS, 0 , 0);
 		if (err)
@@ -2143,6 +2137,14 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 		rc = tegra_sdhci_configure_regulators(tegra_host,
 			CONFIG_REG_SET_VOLT, tegra_host->vddio_min_uv,
 			tegra_host->vddio_max_uv);
+	}
+	if (!tegra_host->is_rail_enabled) {
+		rc = tegra_sdhci_configure_regulators(tegra_host,
+			CONFIG_REG_EN, 0, 0);
+		if (rc) {
+			dev_err(mmc_dev(sdhci->mmc),
+				"Enable regulators failed %d\n", rc);
+		}
 	}
 	if (gpio_is_valid(plat->power_gpio)) {
 		if (signal_voltage == MMC_SIGNAL_VOLTAGE_330) {
