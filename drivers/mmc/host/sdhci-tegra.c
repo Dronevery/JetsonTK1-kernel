@@ -2138,7 +2138,7 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 			CONFIG_REG_SET_VOLT, tegra_host->vddio_min_uv,
 			tegra_host->vddio_max_uv);
 	}
-	if (!tegra_host->is_rail_enabled) {
+	if ((!tegra_host->is_rail_enabled) && (tegra_host->card_present)) {
 		rc = tegra_sdhci_configure_regulators(tegra_host,
 			CONFIG_REG_EN, 0, 0);
 		if (rc) {
