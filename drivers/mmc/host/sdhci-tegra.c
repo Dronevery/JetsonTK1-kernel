@@ -2123,7 +2123,7 @@ static int tegra_sdhci_signal_voltage_switch(struct sdhci_host *sdhci,
 	/* Set/clear the 1.8V signalling */
 	sdhci_writew(sdhci, ctrl, SDHCI_HOST_CONTROL2);
 
-	if ((soc_data->nvquirks & NVQUIRK2_SET_PAD_E_INPUT_VOL) &&
+	if ((soc_data->nvquirks2 & NVQUIRK2_SET_PAD_E_INPUT_VOL) &&
 		(plat->pwrdet_support))
 		tegra_sdhci_configure_e_input(sdhci, true);
 
