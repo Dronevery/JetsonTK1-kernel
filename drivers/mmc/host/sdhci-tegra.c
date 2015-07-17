@@ -1346,19 +1346,18 @@ static irqreturn_t carddetect_irq(int irq, void *data)
 static void vendor_trim_clear_sel_vreg(struct sdhci_host *host, bool enable)
 {
 	unsigned int misc_ctrl;
-	unsigned int wait_usecs;
 
 	misc_ctrl = sdhci_readl(host, SDMMC_VNDR_IO_TRIM_CNTRL_0);
 	if (enable) {
 		misc_ctrl &= ~(SDMMC_VNDR_IO_TRIM_CNTRL_0_SEL_VREG);
-		wait_usecs = 3;
+		sdhci_writel(host, misc_ctrl, SDMMC_VNDR_IO_TRIM_CNTRL_0);
+		udelay(3);
+		tegra_sdhci_reset(host, SDHCI_RESET_CMD | SDHCI_RESET_DATA);
 	} else {
 		misc_ctrl |= (SDMMC_VNDR_IO_TRIM_CNTRL_0_SEL_VREG);
-		wait_usecs = 1;
+		sdhci_writel(host, misc_ctrl, SDMMC_VNDR_IO_TRIM_CNTRL_0);
+		udelay(1);
 	}
-	sdhci_writel(host, misc_ctrl, SDMMC_VNDR_IO_TRIM_CNTRL_0);
-	udelay(wait_usecs);
-	tegra_sdhci_reset(host, SDHCI_RESET_CMD | SDHCI_RESET_DATA);
 }
 
 static void tegra_sdhci_reset_exit(struct sdhci_host *host, u8 mask)
