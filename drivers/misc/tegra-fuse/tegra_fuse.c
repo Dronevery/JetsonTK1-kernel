@@ -97,6 +97,7 @@ static const char *tegra_revision_name[TEGRA_REVISION_MAX] = {
 	[TEGRA_REVISION_A01]     = "A01",
 	[TEGRA_REVISION_A01q]    = "A01Q",
 	[TEGRA_REVISION_A02]     = "A02",
+	[TEGRA_REVISION_A02p]    = "A02P",
 	[TEGRA_REVISION_A03]     = "A03",
 	[TEGRA_REVISION_A03p]    = "A03 prime",
 	[TEGRA_REVISION_A04]     = "A04",
@@ -481,6 +482,8 @@ static struct chip_revision tegra_chip_revisions[] = {
 	CHIP_REVISION(TEGRA12, 1, 1, 0,   A01),
 	CHIP_REVISION(TEGRA21, 1, 1, 0,   A01),
 	CHIP_REVISION(TEGRA21, 1, 1, 'q', A01q),
+	CHIP_REVISION(TEGRA21, 1, 2, 0,   A02),
+	CHIP_REVISION(TEGRA21, 1, 2, 'p', A02p),
 };
 
 static enum tegra_revision tegra_decode_revision(const struct tegra_id *id)
@@ -1463,7 +1466,7 @@ u32 tegra_get_bct_strapping(void)
 
 void tegra_init_fuse(void)
 {
-	u32 sku_id;
+	u32 sku_id, regsoc;
 
 	tegra_fuse_cfg_reg_visible();
 #ifdef CONFIG_ARCH_TEGRA_21x_SOC
@@ -1476,10 +1479,13 @@ void tegra_init_fuse(void)
 	tegra_revision = tegra_chip_get_revision();
 	tegra_fuse_tsosc_init();
 	tegra_init_speedo_data();
-	pr_info("Tegra Revision: %s SKU: 0x%x CPU Process: %d Core Process: %d\n",
+	regsoc = tegra_fuse_readl(FUSE_SPEEDO_1_CALIB_0);
+
+	pr_info("Tegra Revision: %s SKU: 0x%x CPU Process: %d Core Process: %d"
+		" Bootrom patch v0x%x\n",
 		tegra_revision_name[tegra_revision],
 		sku_id, tegra_cpu_process_id(),
-		tegra_core_process_id());
+		tegra_core_process_id(), regsoc);
 }
 
 static struct tegra_fuse_chip_data tegra114_fuse_chip_data = {
