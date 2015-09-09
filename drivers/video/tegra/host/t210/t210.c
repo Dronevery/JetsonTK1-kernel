@@ -67,7 +67,7 @@ struct nvhost_device_data t21_host1x_info = {
 	.clocks			= {{"host1x", 81000000},
 				   {"actmon", UINT_MAX}, {} },
 	NVHOST_MODULE_NO_POWERGATE_IDS,
-	.can_powergate		= true,
+	.can_powergate		= false,
 	.powergate_delay	= 50,
 	.private_data		= &host1x04_info,
 	.finalize_poweron = nvhost_host1x_finalize_poweron,
@@ -299,7 +299,7 @@ struct nvhost_device_data t21_nvdec_info = {
 #endif
 	.clockgate_delay	= 10,
 	.powergate_delay	= 500,
-	.can_powergate		= true,
+	.can_powergate		= false,
 	/* Don't change clk indexing order */
 	.clocks			= {{"nvdec", UINT_MAX, 0, TEGRA_MC_CLIENT_NVDEC},
 				   {"sclk", 80000000},

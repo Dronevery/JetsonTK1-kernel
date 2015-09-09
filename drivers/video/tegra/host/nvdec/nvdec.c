@@ -746,6 +746,8 @@ static int nvdec_probe(struct platform_device *dev)
 	/* get the module clocks to sane state */
 	nvhost_module_init(dev);
 
+	nvhost_module_enable_clk(&dev->dev);
+
 #ifdef CONFIG_PM_GENERIC_DOMAINS
 	pdata->pd.name = "nvdec";
 
