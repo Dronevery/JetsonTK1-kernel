@@ -578,7 +578,7 @@ int tsec_hdcp_rptr_stream_ready(struct hdcp_context_t *hdcp_context)
 		HDCP_MTHD_RPLY_BUF_SIZE);
 	stream_manage_param.session_id = hdcp_context->session_id;
 	stream_manage_param.manage_flag = HDCP_STREAM_MANAGE_FLAG_READY;
-	stream_manage_param.streamid_type = 0x0000;
+	stream_manage_param.streamid_type = 0x0001;
 	stream_manage_param.content_id[0][0] = 0x0000;
 	stream_manage_param.str_type[0][0] = 0x0;
 	memcpy(stream_manage_param.mprime,
