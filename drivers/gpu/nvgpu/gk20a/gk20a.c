@@ -1113,8 +1113,6 @@ static int gk20a_pm_disable_clk(struct device *dev)
 
 static void gk20a_pm_shutdown(struct platform_device *pdev)
 {
-	struct gk20a_platform *platform = platform_get_drvdata(pdev);
-	int ret = 0;
 #ifdef CONFIG_PM_RUNTIME
 	unsigned long timeout = jiffies +
 		msecs_to_jiffies(GK20A_WAIT_FOR_IDLE_MS);
@@ -1136,8 +1134,6 @@ static void gk20a_pm_shutdown(struct platform_device *pdev)
 			break;
 	}
 #endif
-	if (platform->railgate)
-		ret = platform->railgate(pdev);
 }
 
 #ifdef CONFIG_PM
