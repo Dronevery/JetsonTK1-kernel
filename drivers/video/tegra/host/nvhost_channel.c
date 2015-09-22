@@ -32,6 +32,8 @@
 
 #define NVHOST_CHANNEL_LOW_PRIO_MAX_WAIT 50
 
+static struct mutex g_channel_lock;	/* global mutex for channels */
+
 /* Memory allocation for all supported channels */
 int nvhost_alloc_channels(struct nvhost_master *host)
 {
@@ -50,6 +52,7 @@ int nvhost_alloc_channels(struct nvhost_master *host)
 		return -ENOMEM;
 
 	mutex_init(&host->chlist_mutex);
+	mutex_init(&g_channel_lock);
 
 	for (i = 0; i < max_channels; i++) {
 		ch = kzalloc(sizeof(*ch), GFP_KERNEL);
@@ -326,8 +329,18 @@ void nvhost_getchannel(struct nvhost_channel *ch)
 
 void nvhost_putchannel(struct nvhost_channel *ch, int cnt)
 {
-	struct nvhost_device_data *pdata = platform_get_drvdata(ch->dev);
-	struct nvhost_master *host = nvhost_get_host(pdata->pdev);
+	struct nvhost_device_data *pdata;
+	struct nvhost_master *host;
+
+	mutex_lock(&g_channel_lock);
+
+	if (ch->dev == NULL) {
+		pr_info("%s: ch->dev is null\n", __func__);
+		mutex_unlock(&g_channel_lock);
+		return;
+	}
+	pdata = platform_get_drvdata(ch->dev);
+	host = nvhost_get_host(pdata->pdev);
 
 	mutex_lock(&host->chlist_mutex);
 	ch->refcount -= cnt;
@@ -338,6 +351,7 @@ void nvhost_putchannel(struct nvhost_channel *ch, int cnt)
 	else if (ch->refcount < 0)
 		WARN_ON(1);
 	mutex_unlock(&host->chlist_mutex);
+	mutex_unlock(&g_channel_lock);
 }
 
 int nvhost_channel_suspend(struct nvhost_master *host)
