@@ -1374,6 +1374,7 @@ static int dbg_hotplug_show(struct seq_file *s, void *unused)
 	if (WARN_ON(!dc || !dc->out))
 		return -EINVAL;
 
+	rmb();
 	seq_put_decimal_ll(s, '\0', dc->out->hotplug_state);
 	seq_putc(s, '\n');
 	return 0;
@@ -1391,6 +1392,7 @@ static ssize_t dbg_hotplug_write(struct file *file, const char __user *addr,
 	struct tegra_dc *dc = m ? m->private : NULL;
 	int ret;
 	long new_state;
+	int hotplug_state;
 
 	if (WARN_ON(!dc || !dc->out))
 		return -EINVAL;
@@ -1400,14 +1402,16 @@ static ssize_t dbg_hotplug_write(struct file *file, const char __user *addr,
 		return ret;
 
 	mutex_lock(&dc->lock);
-	if (dc->out->hotplug_state == 0 && new_state != 0
+	rmb();
+	hotplug_state = dc->out->hotplug_state;
+	if (hotplug_state == 0 && new_state != 0
 			&& tegra_dc_hotplug_supported(dc)) {
 		/* was 0, now -1 or 1.
 		 * we are overriding the hpd GPIO, so ignore the interrupt. */
 		int gpio_irq = gpio_to_irq(dc->out->hotplug_gpio);
 
 		disable_irq(gpio_irq);
-	} else if (dc->out->hotplug_state != 0 && new_state == 0
+	} else if (hotplug_state != 0 && new_state == 0
 			&& tegra_dc_hotplug_supported(dc)) {
 		/* was -1 or 1, and now 0
 		 * restore the interrupt for hpd GPIO. */
@@ -1417,6 +1421,7 @@ static ssize_t dbg_hotplug_write(struct file *file, const char __user *addr,
 	}
 
 	dc->out->hotplug_state = new_state;
+	wmb();
 
 	/* retrigger the hotplug */
 	if (dc->out_ops->detect)
@@ -1647,14 +1652,18 @@ bool tegra_dc_hpd(struct tegra_dc *dc)
 	int sense;
 	int level;
 	int hpd;
+	int hotplug_state;
 
 	if (WARN_ON(!dc || !dc->out))
 		return false;
 
-	if (dc->out->hotplug_state != TEGRA_HPD_STATE_NORMAL) {
-		if (dc->out->hotplug_state == TEGRA_HPD_STATE_FORCE_ASSERT)
+	rmb();
+	hotplug_state = dc->out->hotplug_state;
+
+	if (hotplug_state != TEGRA_HPD_STATE_NORMAL) {
+		if (hotplug_state == TEGRA_HPD_STATE_FORCE_ASSERT)
 			return true;
-		if (dc->out->hotplug_state == TEGRA_HPD_STATE_FORCE_DEASSERT)
+		if (hotplug_state == TEGRA_HPD_STATE_FORCE_DEASSERT)
 			return false;
 	}
 
